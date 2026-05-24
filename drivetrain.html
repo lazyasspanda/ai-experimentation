@@ -1,0 +1,180 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>MAISON DRIVETRAIN — Chassis Chronicles '26</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"><script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script><script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script><style>*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}:root{--bg-dark:0 0% 4%;--surf-dark:0 0% 8%;--text-dark:0 0% 96%;--stroke-dark:0 0% 12%;--bg-light:0 0% 95%;--surf-light:0 0% 100%;--text-light:0 0% 7%;--stroke-light:0 0% 88%;--muted:0 0% 50%;--font-body:'Inter',sans-serif;--font-display:'Instrument Serif',serif;--accent-gradient:linear-gradient(90deg,#A4B3C6 0%,#2C4A6F 50%,#0D131A 100%);--ease-soft:cubic-bezier(0.16,1,0.3,1);--pad:clamp(20px,5vw,80px)}html{scroll-behavior:auto}body{font-family:var(--font-body);background:#0a0a0a;color:#f5f5f5;overflow-x:hidden;line-height:1.5}img,video{display:block;max-width:100%;height:auto}a{color:inherit;text-decoration:none}button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}::selection{background:#2C4A6F;color:#fff}.preloader{position:fixed;inset:0;z-index:9999;background:#000;display:flex;flex-direction:column;justify-content:flex-end;padding:var(--pad)}.pl-counter{font-family:var(--font-display);font-style:italic;font-size:clamp(48px,10vw,120px);color:#fff;font-variant-numeric:tabular-nums}.pl-words{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);overflow:hidden;height:48px}.pl-words span{display:block;font-family:var(--font-display);font-size:36px;font-style:italic;color:#A4B3C6;text-align:center;will-change:transform}.pl-track{position:absolute;bottom:0;left:0;right:0;height:2px;background:#1a1a1a}.pl-fill{height:100%;width:0%;background:var(--accent-gradient);box-shadow:0 0 12px rgba(164,179,198,0.4);transition:width 0.1s linear}.hero-section{position:relative;width:100%;height:100vh;overflow:hidden}.hero-video{position:absolute;top:50%;left:50%;min-width:100%;min-height:100%;transform:translate(-50%,-50%);object-fit:cover}.hero-tint{position:absolute;inset:0;background:rgba(0,0,0,0.45)}.hero-fade{position:absolute;bottom:0;left:0;right:0;height:256px;background:linear-gradient(to top,#0a0a0a,transparent)}.pill-nav{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:50;display:inline-flex;align-items:center;border-radius:9999px;backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.1);background:rgba(0,0,0,0.4);padding:8px 12px;gap:8px;transition:box-shadow 0.5s var(--ease-soft)}.pill-nav.scrolled{box-shadow:0 25px 50px -12px rgba(0,0,0,0.8)}.pill-nav .logo-ring{width:36px;height:36px;border-radius:50%;background:var(--accent-gradient);display:flex;align-items:center;justify-content:center;transition:transform 0.5s var(--ease-soft)}.pill-nav .logo-ring:hover{transform:scale(1.08)}.pill-nav .logo-ring span{font-family:var(--font-display);font-style:italic;font-size:11px;color:#fff}.nav-links{display:flex;gap:4px}.nav-links a{font-size:10px;text-transform:uppercase;letter-spacing:0.2em;padding:8px 16px;border-radius:9999px;color:rgba(255,255,255,0.6);transition:all 0.5s var(--ease-soft)}.nav-links a:hover{background:rgba(255,255,255,0.05);color:#fff}.alloc-btn{position:relative;font-size:10px;text-transform:uppercase;letter-spacing:0.15em;padding:10px 20px;border-radius:9999px;background:#111;color:#fff;overflow:hidden;border:1px solid transparent;transition:all 0.5s var(--ease-soft)}.alloc-btn:hover{border-color:#A4B3C6}.hero-content{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:0 var(--pad);z-index:10}.hero-eyebrow{font-size:11px;color:rgba(255,255,255,0.5);letter-spacing:0.4em;text-transform:uppercase;margin-bottom:24px}.hero-title{font-family:var(--font-display);font-size:clamp(48px,9vw,140px);line-height:0.85;letter-spacing:-0.03em;color:#fff;margin-bottom:32px}.hero-title span{display:block;will-change:transform}.hero-stream{font-size:14px;color:rgba(255,255,255,0.5);margin-bottom:48px}.hero-stream .cycle-word{display:inline-block;color:#A4B3C6;font-style:italic;min-width:120px}.hero-indicator{position:absolute;bottom:60px;left:50%;transform:translateX(-50%);width:1px;height:48px;background:#333;overflow:hidden}.hero-indicator::after{content:'';position:absolute;top:-100%;left:0;width:100%;height:100%;background:#A4B3C6;animation:indicatorLoop 1.8s linear infinite}@keyframes indicatorLoop{0%{top:-100%}100%{top:200%}}.light-phase{background:#f5f5f5;color:#111}.atelier-section{padding:120px var(--pad)}.atelier-tabs{display:flex;gap:4px;border-bottom:1px solid #e0e0e0;padding-bottom:16px;margin-bottom:60px;position:relative}.atelier-tabs button{font-size:11px;text-transform:uppercase;letter-spacing:0.15em;padding:10px 20px;border-radius:9999px;color:#888;transition:all 0.4s var(--ease-soft);position:relative}.atelier-tabs button.active{color:#111;background:#e8e8e8}.atelier-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}@media(max-width:768px){.atelier-grid{grid-template-columns:1fr;gap:32px}}.atelier-spec h3{font-family:var(--font-display);font-style:italic;font-size:clamp(32px,4vw,56px);color:#111;margin-bottom:16px}.atelier-spec .mono-data{font-family:'Inter';font-size:10px;text-transform:uppercase;letter-spacing:0.2em;color:#999}.atelier-visual{position:relative;aspect-ratio:4/3;background:#eee;border-radius:4px;overflow:hidden}.atelier-visual img{width:100%;height:100%;object-fit:cover;transition:transform 0.8s var(--ease-soft)}.atelier-visual:hover img{transform:scale(1.04)}.jelly-section{padding:140px 0;overflow:hidden}.jelly-track-wrap{position:relative;height:100vh}.jelly-track{display:flex;gap:24px;padding:0 var(--pad);height:100%;align-items:center;will-change:transform}.capsule{width:360px;height:520px;background:#ebebeb;border-radius:180px;overflow:hidden;position:relative;flex-shrink:0;perspective:1200px}.capsule .inner-pill{width:100%;height:100%;display:flex;align-items:center;justify-content:center;will-change:transform;transition:transform 0.5s var(--ease-soft)}.capsule img{width:80%;height:80%;object-fit:contain;filter:drop-shadow(0 30px 60px rgba(0,0,0,0.15))}.capsule-label{position:absolute;bottom:40px;left:0;right:0;text-align:center;font-size:10px;text-transform:uppercase;letter-spacing:0.2em;color:#666}.dark-phase{background:#0a0a0a;color:#fff}.bento-section{padding:120px var(--pad)}.bento-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:24px;max-width:1400px;margin:0 auto}.bento-card{position:relative;border-radius:4px;overflow:hidden;background:#141414;min-height:400px;cursor:pointer}.bento-card .halftone{position:absolute;inset:0;background-image:radial-gradient(circle,rgba(255,255,255,0.03) 1px,transparent 1px);background-size:6px 6px;pointer-events:none}.bento-card img{width:100%;height:100%;object-fit:cover;transition:transform 0.8s var(--ease-soft)}.bento-card:hover img{transform:scale(1.05)}.bento-card .hover-badge{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;backdrop-filter:blur(8px);background:rgba(0,0,0,0.3);transition:opacity 0.5s var(--ease-soft);font-size:11px;text-transform:uppercase;letter-spacing:0.2em}.bento-card:hover .hover-badge{opacity:1}.b-8{grid-column:span 8}.b-4{grid-column:span 4}@media(max-width:768px){.b-8,.b-4{grid-column:span 12}}.parallax-section{position:relative;height:300vh;overflow:hidden}.parallax-pin{position:relative;height:100vh;display:flex;align-items:center;justify-content:center}.parallax-title{font-family:var(--font-display);font-size:clamp(60px,12vw,200px);text-transform:uppercase;letter-spacing:-0.02em;color:rgba(255,255,255,0.08);text-align:center;line-height:0.9}.parallax-cols{position:absolute;inset:0;display:grid;grid-template-columns:1fr 1fr;gap:32px;padding:0 64px;z-index:20;pointer-events:none}.parallax-col{display:flex;flex-direction:column;gap:24px;will-change:transform}.parallax-col img{width:100%;border-radius:4px;pointer-events:auto}.telemetry-section{padding:120px var(--pad);border-top:1px solid #e0e0e0}.telemetry-grid{display:grid;grid-template-columns:repeat(3,1fr);max-width:1200px;margin:0 auto}@media(max-width:768px){.telemetry-grid{grid-template-columns:1fr}}.tele-node{padding:40px;text-align:center;border-right:1px solid #e0e0e0}.tele-node:last-child{border-right:none}@media(max-width:768px){.tele-node{border-right:none;border-bottom:1px solid #e0e0e0}.tele-node:last-child{border-bottom:none}}.tele-value{font-family:var(--font-display);font-style:italic;font-size:clamp(48px,7vw,96px);color:#111}.tele-label{font-size:9px;text-transform:uppercase;letter-spacing:0.25em;color:#999;margin-top:12px}.tele-bar{height:2px;background:#eee;margin-top:20px;border-radius:1px;overflow:hidden}.tele-bar-fill{height:100%;width:0;background:var(--accent-gradient);transition:width 1.5s var(--ease-soft)}.footer-section{position:relative;background:#000;color:#fff;padding-top:100px;overflow:hidden}.footer-bg-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.2;transform:scaleY(-1)}.marquee-wrap{overflow:hidden;padding:40px 0;position:relative;z-index:2}.marquee-text{white-space:nowrap;font-family:var(--font-display);font-size:clamp(60px,10vw,140px);color:rgba(255,255,255,0.06);will-change:transform}.form-container{max-width:560px;margin:0 auto;padding:80px var(--pad);position:relative;z-index:10}.form-step{display:none}.form-step.active{display:block}.form-label{font-size:10px;text-transform:uppercase;letter-spacing:0.3em;color:#666;margin-bottom:24px}.form-input{width:100%;background:transparent;border:none;border-bottom:1px solid #333;color:#fff;font-family:var(--font-display);font-style:italic;font-size:clamp(24px,3vw,40px);padding:16px 0;outline:none;transition:border-color 0.4s}.form-input:focus{border-color:#fff}.chip-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:16px}.chip{padding:12px 24px;border:1px solid #333;border-radius:9999px;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:#888;cursor:pointer;transition:all 0.4s var(--ease-soft)}.chip:hover{border-color:#fff;color:#fff}.chip.selected{background:var(--accent-gradient);color:#fff;border-color:transparent}.form-nav{display:flex;justify-content:space-between;align-items:center;margin-top:48px;padding-top:24px;border-top:1px solid #222}.form-nav button{font-size:10px;text-transform:uppercase;letter-spacing:0.2em;padding:14px 28px;border-radius:9999px;border:1px solid #fff;color:#fff;transition:all 0.4s var(--ease-soft)}.form-nav button:hover{background:#fff;color:#000}.form-success{display:none;text-align:center;padding:80px 0}.form-success h3{font-family:var(--font-display);font-style:italic;font-size:clamp(28px,4vw,48px);margin-bottom:16px}.form-success p{font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#666}.base-footer{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;padding:80px var(--pad);border-top:1px solid #222;position:relative;z-index:10;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:#666}@media(max-width:768px){.base-footer{grid-template-columns:1fr;gap:24px}.nav-links{display:none}.capsule{width:260px;height:380px}}
+</style>
+</head>
+<body>
+</body>
+</html>
+
+
+<!-- Section 1: Preloader -->
+<div class="preloader" id="preloader">
+<div class="pl-words" id="plWords"><span>ENGINEER</span></div>
+<div class="pl-counter" id="plCounter">000</div>
+<div class="pl-track"><div class="pl-fill" id="plFill"></div></div>
+</div>
+
+<!-- Pill Navigation -->
+<nav class="pill-nav" id="pillNav">
+<div class="logo-ring"><span>MD</span></div>
+<div class="nav-links">
+<a href="#atelier">Atelier</a>
+<a href="#propulsion">Propulsion</a>
+<a href="#inventory">Inventory</a>
+<a href="#horizon">Horizon</a>
+</div>
+<button class="alloc-btn" onclick="document.getElementById('allocSection').scrollIntoView({behavior:'smooth'})">Request Allocation</button>
+</nav>
+
+<!-- Section 2: Hero -->
+<section class="hero-section" id="heroSection">
+<video class="hero-video" id="heroVideo" autoplay muted loop playsinline poster="https://images.unsplash.com/photo-1544636331-e26879cd4d9b?auto=format&fit=crop&w=1920&q=80"></video>
+<div class="hero-tint"></div>
+<div class="hero-fade"></div>
+<div class="hero-content">
+<span class="hero-eyebrow">CHASSIS CHRONICLES — '26</span>
+<h1 class="hero-title" id="heroTitle"><span>The apex form</span><span>of propulsion.</span></h1>
+<p class="hero-stream">The kinetic stream of <span class="cycle-word" id="cycleWord">electric</span> engineering.</p>
+</div>
+<div class="hero-indicator"></div>
+</section>
+
+<!-- Section 3: Atelier Configurator (Light Phase) -->
+<section class="light-phase atelier-section" id="atelier">
+<div class="atelier-tabs">
+<button class="active" data-tab="aero">Aerodynamics</button>
+<button data-tab="power">Powertrain</button>
+<button data-tab="cockpit">Cockpit</button>
+<button data-tab="tele">Telemetry</button>
+</div>
+<div class="atelier-grid">
+<div class="atelier-spec">
+<h3>Coefficient of Silence</h3>
+<p class="mono-data">CD 0.19 // ACTIVE AERO MATRIX // 3-PHASE DUCTING</p>
+</div>
+<div class="atelier-visual">
+<img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=800&q=80" alt="Aerodynamics">
+</div>
+</div>
+</section>
+
+<!-- Section 4: Jelly Bean Propulsion Scroller (Light Phase) -->
+<section class="light-phase jelly-section" id="propulsion">
+<div class="jelly-track-wrap" id="jellyWrap">
+<div class="jelly-track" id="jellyTrack">
+<div class="capsule"><div class="inner-pill"><img src="https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=600&q=80" alt="Vanguard"></div><div class="capsule-label">Vanguard EV</div></div>
+<div class="capsule"><div class="inner-pill"><img src="https://images.unsplash.com/photo-1619767886558-efdc259cde1a?auto=format&fit=crop&w=600&q=80" alt="Apex"></div><div class="capsule-label">Apex Monoposto</div></div>
+<div class="capsule"><div class="inner-pill"><img src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=600&q=80" alt="Echelon"></div><div class="capsule-label">Echelon GT</div></div>
+<div class="capsule"><div class="inner-pill"><img src="https://images.unsplash.com/photo-1542362567-b07e54358753?auto=format&fit=crop&w=600&q=80" alt="Strata"></div><div class="capsule-label">Strata Hypercar</div></div>
+</div>
+</div>
+</section>
+
+<!-- Section 5: Bento Inventory (Dark Phase) -->
+<section class="dark-phase bento-section" id="inventory">
+<div class="bento-grid">
+<div class="bento-card b-8"><img src="https://images.unsplash.com/photo-1544636331-e26879cd4d9b?auto=format&fit=crop&w=1200&q=80" alt="Vanguard"><div class="halftone"></div><div class="hover-badge">Explore Spec — Vanguard</div></div>
+<div class="bento-card b-4"><img src="https://images.unsplash.com/photo-1619767886558-efdc259cde1a?auto=format&fit=crop&w=600&q=80" alt="Apex"><div class="halftone"></div><div class="hover-badge">Explore Spec — Apex</div></div>
+<div class="bento-card b-4"><img src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=600&q=80" alt="Echelon"><div class="halftone"></div><div class="hover-badge">Explore Spec — Echelon</div></div>
+<div class="bento-card b-8"><img src="https://images.unsplash.com/photo-1542362567-b07e54358753?auto=format&fit=crop&w=1200&q=80" alt="Strata"><div class="halftone"></div><div class="hover-badge">Explore Spec — Strata</div></div>
+</div>
+</section>
+
+<!-- Section 6: Parallax Horizon (Dark Phase) -->
+<section class="dark-phase parallax-section" id="horizon">
+<div class="parallax-pin" id="parallaxPin">
+<h2 class="parallax-title">AERO<br>DYNAMICS</h2>
+<div class="parallax-cols">
+<div class="parallax-col" id="pColL"><img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=600&q=80" alt=""><img src="https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=600&q=80" alt=""></div>
+<div class="parallax-col" id="pColR"><img src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=600&q=80" alt=""><img src="https://images.unsplash.com/photo-1542362567-b07e54358753?auto=format&fit=crop&w=600&q=80" alt=""></div>
+</div>
+</div>
+</section>
+
+<!-- Section 7: Telemetry (Light Phase) -->
+<section class="light-phase telemetry-section" id="telemetry">
+<div class="telemetry-grid">
+<div class="tele-node"><div class="tele-value" data-target="1.62">0</div><div class="tele-label">0–100 KM/H Velocity Vector</div><div class="tele-bar"><div class="tele-bar-fill"></div></div></div>
+<div class="tele-node"><div class="tele-value" data-target="1.14">0</div><div class="tele-label">Lateral Kinetic Friction</div><div class="tele-bar"><div class="tele-bar-fill"></div></div></div>
+<div class="tele-node"><div class="tele-value" data-target="800">0</div><div class="tele-label">Matrix Power Architecture</div><div class="tele-bar"><div class="tele-bar-fill"></div></div></div>
+</div>
+</section>
+
+<!-- Section 8: Footer + Allocation Form (Dark Phase) -->
+<section class="footer-section" id="allocSection">
+<div class="marquee-wrap"><div class="marquee-text" id="marquee">DESIGNED FOR PROPULSION • VELOCITY SYSTEMATIZED • DESIGNED FOR PROPULSION • VELOCITY SYSTEMATIZED • </div></div>
+<div class="form-container">
+<div class="form-step active" data-step="1">
+<div class="form-label">01 // Enter Legal Entity Identity</div>
+<input class="form-input" type="text" id="fName" placeholder="Full designation">
+<div class="form-nav"><span style="color:#666;font-size:10px;letter-spacing:0.2em">01 / 03</span><button onclick="goFormStep(2)">Continue →</button></div>
+</div>
+<div class="form-step" data-step="2">
+<div class="form-label">02 // Select Propulsion Vector Core</div>
+<div class="chip-row"><button class="chip" onclick="selectChip(this)">Vanguard EV</button><button class="chip" onclick="selectChip(this)">Apex Monoposto</button><button class="chip" onclick="selectChip(this)">Echelon GT</button><button class="chip" onclick="selectChip(this)">Strata Hypercar</button></div>
+<div class="form-nav"><button onclick="goFormStep(1)">← Back</button><button onclick="goFormStep(3)">Continue →</button></div>
+</div>
+<div class="form-step" data-step="3">
+<div class="form-label">03 // Secure Digital Communication Node</div>
+<input class="form-input" type="email" placeholder="Encrypted address">
+<div class="form-nav"><button onclick="goFormStep(2)">← Back</button><button onclick="submitAlloc()">Lock Allocation →</button></div>
+</div>
+<div class="form-success" id="formSuccess"><h3>Allocation Coordinates Locked.</h3><p>Chassis review pending in Pune Archive.</p></div>
+</div>
+<div class="base-footer">
+<div>MAISON DRIVETRAIN SYSTEM</div>
+<div><a href="#">Atelier</a> · <a href="#">Propulsion</a> · <a href="#">Archive</a></div>
+<div>MH-12 // PUNE ARCHIVES // 2026</div>
+</div>
+</section>
+
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+/* === PRELOADER === */
+const plCounter=document.getElementById('plCounter'),plFill=document.getElementById('plFill'),plWords=document.getElementById('plWords');
+const words=['ENGINEER','SCULPT','ACCELERATE'];let wi=0,count=0;
+const wordInterval=setInterval(()=>{wi=(wi+1)%words.length;plWords.innerHTML=`<span>${words[wi]}</span>`;gsap.fromTo(plWords.querySelector('span'),{y:30,opacity:0},{y:0,opacity:1,duration:0.4,ease:'power2.out'})},900);
+const plStart=performance.now();
+function plLoop(t){const p=Math.min((t-plStart)/2700,1);count=Math.floor(p*100);plCounter.textContent=String(count).padStart(3,'0');plFill.style.width=p*100+'%';if(p<1){requestAnimationFrame(plLoop)}else{clearInterval(wordInterval);gsap.to('#preloader',{opacity:0,duration:0.6,onComplete:()=>{document.getElementById('preloader').style.display='none';heroReveal()}})}}
+requestAnimationFrame(plLoop);
+
+/* === HLS VIDEO === */
+const video=document.getElementById('heroVideo');
+if(Hls.isSupported()){const hls=new Hls();hls.loadSource('https://stream.mux.com/Aa02T7oM1wH5Mk5EEVDYhbZ1ChcdhRsS2m1NYyx4Ua1g.m3u8');hls.attachMedia(video);hls.on(Hls.Events.MANIFEST_PARSED,()=>video.play())}else if(video.canPlayType('application/vnd.apple.mpegurl')){video.src='https://stream.mux.com/Aa02T7oM1wH5Mk5EEVDYhbZ1ChcdhRsS2m1NYyx4Ua1g.m3u8';video.play()}
+
+/* === HERO REVEAL === */
+function heroReveal(){gsap.from('#heroTitle span',{y:80,opacity:0,filter:'blur(15px)',duration:1.2,stagger:0.15,ease:'power4.out'})}
+
+/* === CYCLE WORD === */
+const cycleWords=['electric','thermal','kinetic','aerodynamic'];let ci=0;
+setInterval(()=>{ci=(ci+1)%cycleWords.length;const el=document.getElementById('cycleWord');gsap.to(el,{y:-20,opacity:0,duration:0.3,onComplete:()=>{el.textContent=cycleWords[ci];gsap.fromTo(el,{y:20,opacity:0},{y:0,opacity:1,duration:0.4,ease:'power2.out'})}})},2000);
+
+/* === NAV SCROLL SHADOW === */
+window.addEventListener('scroll',()=>{document.getElementById('pillNav').classList.toggle('scrolled',window.scrollY>100)});
+
+/* === JELLY BEAN SCROLLER === */
+const jellyTrack=document.getElementById('jellyTrack'),jellyWrap=document.getElementById('jellyWrap');
+if(jellyTrack){gsap.to(jellyTrack,{x:()=>-(jellyTrack.scrollWidth-window.innerWidth),ease:'none',scrollTrigger:{trigger:jellyWrap,start:'top top',end:()=>'+='+jellyTrack.scrollWidth,pin:true,scrub:1,invalidateOnRefresh:true}})}
+
+/* === CAPSULE 3D TILT === */
+document.querySelectorAll('.capsule').forEach(cap=>{cap.addEventListener('mousemove',e=>{const b=cap.getBoundingClientRect(),x=(e.clientX-b.left)/b.width-0.5,y=(e.clientY-b.top)/b.height-0.5;gsap.to(cap.querySelector('.inner-pill'),{rotateY:x*15,rotateX:-y*15,duration:0.5,ease:'power2.out'})});cap.addEventListener('mouseleave',()=>{gsap.to(cap.querySelector('.inner-pill'),{rotateY:0,rotateX:0,duration:0.6,ease:'power2.out'})})});
+
+/* === PARALLAX === */
+ScrollTrigger.create({trigger:'#horizon',start:'top top',end:'bottom bottom',pin:'#parallaxPin',pinSpacing:false});
+gsap.to('#pColL',{yPercent:-35,ease:'none',scrollTrigger:{trigger:'#horizon',start:'top bottom',end:'bottom top',scrub:true}});
+gsap.to('#pColR',{yPercent:35,ease:'none',scrollTrigger:{trigger:'#horizon',start:'top bottom',end:'bottom top',scrub:true}});
+
+/* === TELEMETRY COUNTER === */
+document.querySelectorAll('.tele-node').forEach(node=>{const val=node.querySelector('.tele-value'),target=parseFloat(val.dataset.target),bar=node.querySelector('.tele-bar-fill');ScrollTrigger.create({trigger:node,start:'top 80%',onEnter:()=>{const isInt=target>10;const obj={v:0};gsap.to(obj,{v:target,duration:1.8,ease:'power2.out',onUpdate:()=>{val.textContent=isInt?Math.floor(obj.v):obj.v.toFixed(2)}});bar.style.width='100%'}})});
+
+/* === MARQUEE === */
+gsap.to('#marquee',{xPercent:-50,duration:35,ease:'none',repeat:-1});
+
+/* === FORM STEPS === */
+function goFormStep(n){document.querySelectorAll('.form-step').forEach(s=>s.classList.remove('active'));const step=document.querySelector(`.form-step[data-step="${n}"]`);if(step){step.classList.add('active');gsap.from(step,{opacity:0,y:20,duration:0.5,ease:'power2.out'})}}
+function selectChip(el){document.querySelectorAll('.chip').forEach(c=>c.classList.remove('selected'));el.classList.add('selected')}
+function submitAlloc(){document.querySelectorAll('.form-step').forEach(s=>s.style.display='none');const success=document.getElementById('formSuccess');success.style.display='block';gsap.from(success,{opacity:0,y:30,duration:0.8,ease:'power2.out'})}
+
+/* === ATELIER TABS === */
+document.querySelectorAll('.atelier-tabs button').forEach(btn=>{btn.addEventListener('click',()=>{document.querySelectorAll('.atelier-tabs button').forEach(b=>b.classList.remove('active'));btn.classList.add('active')})});
+</script>
