@@ -1,0 +1,1994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAISON DRIVETRAIN — Premium Automotive</title>
+<meta name="description" content="India's finest selection of pre-owned performance and luxury vehicles.">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --void:       #06070A;
+  --obsidian:   #0D0F14;
+  --carbon:     #141720;
+  --graphite:   #1E2129;
+  --seam:       rgba(255,255,255,0.07);
+  --chalk:      #F2F0EB;
+  --linen:      #E8E5DE;
+  --wire:       rgba(0,0,0,0.10);
+  --snow:       #F0EDE6;
+  --fog:        #8A8880;
+  --ghost:      #3A3C42;
+  --ink:        #0F1015;
+  --slate:      #44464E;
+  --chrome:     #C8C4BC;
+  --chrome-dim: rgba(200,196,188,0.15);
+  --amber:      #B08040;
+  --serif:  'Cormorant Garamond', Georgia, serif;
+  --sans:   'Syne', 'Helvetica Neue', sans-serif;
+  --mono:   'DM Mono', monospace;
+  --ease:       cubic-bezier(0.76, 0, 0.24, 1);
+  --ease-out:   cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring:cubic-bezier(0.34, 1.56, 0.64, 1);
+  --px: clamp(20px, 5vw, 80px);
+  --max: 1440px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: auto; }
+body {
+  font-family: var(--sans);
+  background: var(--void);
+  color: var(--snow);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+img { display: block; max-width: 100%; height: auto; }
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+::selection { background: var(--amber); color: #000; }
+
+
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--chrome);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.eyebrow::before {
+  content: '';
+  display: block;
+  width: 32px;
+  height: 1px;
+  background: var(--chrome);
+}
+.section-h {
+  font-family: var(--serif);
+  font-weight: 300;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+}
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 28px;
+  border: 1px solid var(--chrome);
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--snow);
+  position: relative;
+  overflow: hidden;
+  transition: color 0.4s var(--ease);
+}
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--chrome);
+  transform: translateX(-101%);
+  transition: transform 0.5s var(--ease);
+}
+.btn-primary:hover { color: var(--void); }
+.btn-primary:hover::before { transform: translateX(0); }
+.btn-primary span { position: relative; z-index: 1; }
+.btn-dark {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+.btn-dark::before { background: var(--ink); }
+.btn-dark:hover { color: var(--chalk); }
+
+
+/* === PRELOADER === */
+#preloader {
+  position: fixed; inset: 0; z-index: 9999;
+  background: var(--void);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+.pl-tach {
+  position: absolute; bottom: var(--px); left: var(--px);
+  display: flex; flex-direction: column; gap: 8px; align-items: flex-start;
+}
+.pl-label {
+  font-family: var(--mono); font-size: 0.625rem;
+  letter-spacing: 0.25em; text-transform: uppercase; color: var(--ghost);
+}
+.pl-brand { text-align: center; line-height: 1; }
+.pl-brand-top {
+  font-family: var(--mono); font-size: clamp(12px, 2vw, 16px);
+  letter-spacing: 0.5em; text-transform: uppercase; color: var(--fog);
+  margin-bottom: 8px;
+}
+.pl-brand-bottom {
+  font-family: var(--serif); font-size: clamp(48px, 10vw, 120px);
+  font-weight: 300; color: var(--snow); letter-spacing: -0.03em;
+}
+.pl-counter {
+  position: absolute; bottom: var(--px); right: var(--px);
+  font-family: var(--mono); font-size: clamp(48px, 8vw, 80px);
+  color: var(--snow); font-variant-numeric: tabular-nums; line-height: 1;
+}
+.pl-panel {
+  position: absolute; left: 0; right: 0; height: 50%;
+  background: var(--void); z-index: 2;
+  transition: transform 0.8s cubic-bezier(0.76, 0, 0.24, 1);
+}
+.pl-panel--top { top: 0; transform-origin: top; }
+.pl-panel--bottom { bottom: 0; transform-origin: bottom; }
+#preloader.splitting .pl-panel--top { transform: translateY(-100%); }
+#preloader.splitting .pl-panel--bottom { transform: translateY(100%); }
+
+
+/* === NAVIGATION === */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  transition: background 0.5s var(--ease), border-color 0.5s var(--ease), padding 0.4s var(--ease);
+  padding: 20px var(--px);
+  border-bottom: 1px solid transparent;
+}
+.nav.scrolled {
+  background: rgba(6, 7, 10, 0.85);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border-bottom-color: var(--seam);
+  padding: 14px var(--px);
+}
+.nav__inner {
+  display: flex; align-items: center; justify-content: space-between;
+  max-width: var(--max); margin: 0 auto;
+}
+.nav__logo { display: flex; align-items: center; gap: 10px; }
+.nav__logo-mark {
+  width: 32px; height: 32px;
+  background: var(--chrome);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--serif); font-style: italic; font-size: 13px;
+  color: var(--void); flex-shrink: 0;
+}
+.nav__logo-text {
+  font-family: var(--sans); font-size: 10px; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--snow); line-height: 1.3;
+}
+.nav__links { display: flex; gap: 0; list-style: none; }
+.nav__link {
+  display: block; padding: 8px 20px;
+  font-family: var(--mono); font-size: 0.6875rem;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--fog); position: relative;
+  transition: color 0.3s var(--ease);
+}
+.nav__link::after {
+  content: '';
+  position: absolute; bottom: 4px; left: 50%; right: 50%;
+  height: 1px; background: var(--chrome);
+  transition: left 0.35s var(--ease), right 0.35s var(--ease);
+}
+.nav__link:hover { color: var(--snow); }
+.nav__link:hover::after { left: 20px; right: 20px; }
+.nav__right { display: flex; align-items: center; gap: 16px; }
+.nav__cta {
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--mono); font-size: 0.6875rem;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--void); background: var(--chrome);
+  padding: 10px 20px;
+  transition: background 0.3s var(--ease), color 0.3s var(--ease);
+}
+.nav__cta:hover { background: var(--snow); }
+
+
+.nav__hamburger {
+  display: none; flex-direction: column; gap: 5px;
+  width: 28px; padding: 4px 0;
+}
+.nav__hamburger span {
+  display: block; height: 1px; background: var(--snow);
+  transition: transform 0.4s var(--ease), opacity 0.3s;
+}
+.nav__hamburger.is-open span:first-child { transform: translateY(6px) rotate(45deg); }
+.nav__hamburger.is-open span:last-child { transform: translateY(-6px) rotate(-45deg); }
+.nav__overlay {
+  position: fixed; inset: 0; z-index: 99;
+  background: var(--void);
+  clip-path: circle(0% at calc(100% - 40px) 28px);
+  transition: clip-path 0.6s var(--ease);
+  display: flex; align-items: center;
+}
+.nav__overlay.is-open {
+  clip-path: circle(150% at calc(100% - 40px) 28px);
+}
+.nav__overlay-inner {
+  padding: var(--px);
+  display: flex; flex-direction: column; justify-content: space-between;
+  height: 100%; width: 100%; padding-top: 100px;
+}
+.nav__overlay-links { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.nav__overlay-links li { overflow: hidden; }
+.nav__overlay-links a {
+  display: block;
+  font-family: var(--serif); font-style: italic;
+  font-size: clamp(3rem, 8vw, 6rem); font-weight: 300;
+  color: var(--snow); line-height: 1.1;
+  transform: translateY(100%);
+  transition: transform 0.6s var(--ease), color 0.3s;
+}
+.nav__overlay.is-open .nav__overlay-links li:nth-child(1) a { transform: translateY(0); transition-delay: 0.1s; }
+.nav__overlay.is-open .nav__overlay-links li:nth-child(2) a { transform: translateY(0); transition-delay: 0.15s; }
+.nav__overlay.is-open .nav__overlay-links li:nth-child(3) a { transform: translateY(0); transition-delay: 0.2s; }
+.nav__overlay.is-open .nav__overlay-links li:nth-child(4) a { transform: translateY(0); transition-delay: 0.25s; }
+.nav__overlay.is-open .nav__overlay-links li:nth-child(5) a { transform: translateY(0); transition-delay: 0.3s; }
+.nav__overlay-links a:hover { color: var(--chrome); }
+.nav__overlay-footer { padding-bottom: var(--px); }
+@media (max-width: 900px) {
+  .nav__links { display: none; }
+  .nav__cta { display: none; }
+  .nav__hamburger { display: flex; }
+}
+
+
+/* === HERO === */
+.hero {
+  position: relative;
+  height: 100svh; min-height: 700px;
+  display: flex; align-items: center;
+  overflow: hidden;
+  background: var(--void);
+}
+.hero__img-wrap {
+  position: absolute;
+  top: -10%; right: 0;
+  width: 65%; height: 120%;
+  will-change: transform;
+}
+.hero__img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  filter: saturate(0.85) brightness(0.9);
+}
+.hero__img-fade {
+  position: absolute; inset: 0;
+  background: linear-gradient(90deg, var(--void) 0%, rgba(6,7,10,0.6) 35%, transparent 65%);
+}
+.hero__content {
+  position: relative; z-index: 2;
+  padding: 0 var(--px);
+  max-width: 680px;
+  padding-top: 80px;
+}
+.hero__h1 {
+  font-size: clamp(4rem, 9vw, 10rem);
+  color: var(--snow); margin-bottom: 40px;
+}
+.hero__h1-line { display: block; overflow: hidden; }
+.hero__h1-line--indent { padding-left: 2em; }
+.hero__h1-italic { font-style: italic; color: var(--chrome); }
+.hero__divider {
+  width: 0; height: 1px; background: var(--chrome);
+  margin-bottom: 32px;
+  transition: width 1s var(--ease);
+}
+body.ready .hero__divider { width: 100%; }
+.hero__bottom {
+  display: flex; gap: 48px; align-items: flex-end;
+  flex-wrap: wrap;
+}
+.hero__body {
+  font-family: var(--sans); font-size: 0.9375rem; font-weight: 400;
+  line-height: 1.7; color: var(--fog);
+  max-width: 340px;
+}
+.hero__actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.btn-ghost {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 14px 28px;
+  font-family: var(--mono); font-size: 0.6875rem;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--fog); border: 1px solid var(--ghost);
+  transition: border-color 0.3s, color 0.3s;
+}
+.btn-ghost:hover { border-color: var(--chrome); color: var(--snow); }
+
+
+.hero__badge {
+  position: absolute; bottom: 80px; right: 40px; z-index: 3;
+  width: 100px; height: 100px;
+  display: flex; align-items: center; justify-content: center;
+}
+.hero__badge-ring {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  animation: badgeSpin 15s linear infinite;
+}
+@keyframes badgeSpin { to { transform: rotate(360deg); } }
+.hero__badge-arrow {
+  width: 36px; height: 36px; border: 1px solid var(--seam); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+}
+.hero__scroll-line {
+  position: absolute; bottom: 20px; left: 50%;
+  width: 1px; height: 60px; background: var(--ghost); overflow: hidden;
+}
+.hero__scroll-dot {
+  position: absolute; top: -6px; left: -2px;
+  width: 5px; height: 5px; border-radius: 50%; background: var(--chrome);
+  animation: scrollDrop 2s var(--ease) infinite;
+}
+@keyframes scrollDrop {
+  0%   { top: -6px; opacity: 0; }
+  20%  { opacity: 1; }
+  80%  { opacity: 1; }
+  100% { top: 66px; opacity: 0; }
+}
+.hero__marquee-strip {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 16px 0;
+  border-top: 1px solid var(--seam);
+  background: rgba(6,7,10,0.6);
+  backdrop-filter: blur(8px);
+  overflow: hidden;
+}
+.hero__marquee {
+  display: flex; gap: 40px; align-items: center;
+  width: max-content;
+  animation: marqueeRun 30s linear infinite;
+}
+@keyframes marqueeRun {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.hero__marquee span {
+  font-family: var(--serif); font-size: 1rem; font-weight: 300;
+  color: var(--fog); white-space: nowrap;
+  transition: color 0.3s;
+}
+.hero__marquee span:hover { color: var(--chrome); }
+.hero__marquee .dot { color: var(--ghost); font-size: 0.75rem; }
+@media (max-width: 768px) {
+  .hero__img-wrap { width: 100%; opacity: 0.35; }
+  .hero__img-fade { background: linear-gradient(to top, var(--void) 0%, rgba(6,7,10,0.8) 60%, transparent 100%); }
+  .hero__content { max-width: 100%; }
+  .hero__badge { bottom: 100px; right: 20px; width: 80px; height: 80px; }
+  .hero__h1-line--indent { padding-left: 0; }
+}
+
+
+/* === INVENTORY === */
+.inventory { background: var(--chalk); padding: 120px var(--px); }
+.inventory__inner { max-width: var(--max); margin: 0 auto; }
+.inventory__header {
+  display: flex; justify-content: space-between; align-items: flex-end;
+  margin-bottom: 48px; flex-wrap: wrap; gap: 24px;
+}
+.inventory__header-right {
+  display: flex; align-items: flex-end; gap: 40px; flex-wrap: wrap;
+}
+.inventory__filters {
+  display: flex; gap: 0; position: relative;
+  border-bottom: 1px solid var(--wire);
+  margin-bottom: 48px;
+}
+.filter-tab {
+  padding: 12px 24px;
+  font-family: var(--mono); font-size: 0.6875rem;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--slate); background: transparent;
+  border-bottom: 2px solid transparent;
+  transition: color 0.3s; position: relative; z-index: 1;
+  cursor: pointer;
+}
+.filter-tab.is-active { color: var(--ink); }
+.filter-indicator {
+  position: absolute; bottom: -1px; left: 0;
+  height: 2px; background: var(--ink);
+  transition: left 0.4s var(--ease), width 0.4s var(--ease);
+}
+.inventory__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+}
+.car-card {
+  background: var(--linen);
+  overflow: hidden;
+  border: 1px solid var(--wire);
+  position: relative;
+  transition: border-color 0.3s, box-shadow 0.4s var(--ease), transform 0.4s var(--ease-spring);
+  cursor: pointer;
+}
+.car-card:hover {
+  border-color: var(--ink);
+  box-shadow: 0 2px 0 0 var(--ink), 0 20px 40px rgba(0,0,0,0.12);
+  transform: translateY(-4px);
+}
+.car-card__img-wrap { position: relative; height: 220px; overflow: hidden; }
+.car-card__img {
+  width: 100%; height: 100%; object-fit: cover;
+  transition: transform 0.7s var(--ease);
+  filter: saturate(0.9);
+}
+.car-card:hover .car-card__img { transform: scale(1.05); }
+.car-card__img-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(242,240,235,0.8) 0%, transparent 40%);
+}
+.car-card__badge {
+  position: absolute; top: 16px; left: 16px;
+  font-family: var(--mono); font-size: 0.6rem;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  background: var(--ink); color: var(--chalk);
+  padding: 4px 10px;
+}
+
+
+.car-card__body { padding: 20px 24px 24px; }
+.car-card__make {
+  font-family: var(--mono); font-size: 0.625rem;
+  letter-spacing: 0.25em; text-transform: uppercase;
+  color: var(--amber); margin-bottom: 4px;
+}
+.car-card__name {
+  font-family: var(--serif); font-size: 1.75rem; font-weight: 400;
+  color: var(--ink); line-height: 1.1; margin-bottom: 8px;
+}
+.car-card__specs {
+  font-family: var(--mono); font-size: 0.625rem;
+  letter-spacing: 0.08em; color: var(--slate);
+  display: flex; gap: 6px; align-items: center; margin-bottom: 20px;
+}
+.car-card__specs .sep { color: var(--wire); }
+.car-card__footer {
+  display: flex; justify-content: space-between; align-items: flex-end;
+  border-top: 1px solid var(--wire); padding-top: 16px;
+}
+.price-from { display: block; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.12em; color: var(--slate); margin-bottom: 2px; }
+.price-val { font-family: var(--serif); font-size: 1.5rem; color: var(--ink); }
+.car-card__cta {
+  display: flex; align-items: center; gap: 6px;
+  font-family: var(--mono); font-size: 0.625rem;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--ink); padding: 8px 0;
+  transition: gap 0.3s var(--ease-spring), color 0.3s;
+}
+.car-card:hover .car-card__cta { gap: 10px; color: var(--amber); }
+.car-card.is-hiding {
+  opacity: 0; transform: scale(0.95) translateY(8px);
+  pointer-events: none;
+  transition: opacity 0.25s, transform 0.25s;
+}
+.car-card.is-shown {
+  opacity: 1; transform: scale(1) translateY(0);
+  transition: opacity 0.4s var(--ease-out), transform 0.4s var(--ease-out);
+}
+@media (max-width: 768px) {
+  .inventory__header { flex-direction: column; align-items: flex-start; }
+  .inventory__filters { overflow-x: auto; scrollbar-width: none; }
+  .inventory__grid { grid-template-columns: 1fr; }
+}
+
+
+/* === TRADE-IN === */
+.trade {
+  display: grid; grid-template-columns: 1fr 1fr;
+  min-height: 100vh;
+  background: var(--obsidian);
+}
+.trade__visual { position: relative; overflow: hidden; }
+.trade__img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%; object-fit: cover;
+  opacity: 0; transition: opacity 0.8s var(--ease);
+  filter: brightness(0.7) saturate(0.8);
+}
+.trade__img--active { opacity: 1; }
+.trade__visual-text {
+  position: absolute; bottom: var(--px); left: var(--px); z-index: 2;
+  display: flex; flex-direction: column; gap: 16px;
+}
+.trade__visual-quote {
+  font-family: var(--serif); font-size: clamp(2rem, 4vw, 3.5rem);
+  font-weight: 300; color: var(--snow); line-height: 1.1;
+}
+.trade__visual-quote em { font-style: italic; color: var(--chrome); }
+.trade__form-panel {
+  padding: 80px 60px;
+  display: flex; flex-direction: column; gap: 48px;
+  justify-content: center;
+}
+.trade__progress-track {
+  height: 1px; background: var(--seam); position: relative; margin-bottom: 12px;
+}
+.trade__progress-fill {
+  position: absolute; top: 0; left: 0; height: 100%;
+  background: var(--chrome); transition: width 0.5s var(--ease);
+}
+.trade__progress-labels { display: flex; gap: 0; }
+.trade__step-label {
+  flex: 1; font-family: var(--mono); font-size: 0.625rem;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--ghost); transition: color 0.3s;
+}
+.trade__step-label.is-active { color: var(--chrome); }
+.trade__step { display: none; flex-direction: column; gap: 32px; }
+.trade__step.is-active { display: flex; }
+.trade__step-title { font-size: clamp(2rem, 4vw, 3rem); color: var(--snow); }
+.trade__step-title em { font-style: italic; color: var(--chrome); }
+.form-field-group { display: flex; flex-direction: column; gap: 0; }
+.form-field {
+  border-bottom: 1px solid var(--seam);
+  padding: 16px 0;
+  transition: border-color 0.3s;
+}
+.form-field:focus-within { border-bottom-color: var(--chrome); }
+.form-field__label {
+  font-family: var(--mono); font-size: 0.6rem;
+  letter-spacing: 0.2em; text-transform: uppercase; color: var(--ghost);
+  display: block; margin-bottom: 6px;
+}
+.form-field__input {
+  width: 100%; background: transparent; border: none;
+  font-family: var(--serif); font-style: italic; font-size: 1.25rem;
+  color: var(--snow); outline: none;
+}
+.form-field__input::placeholder { color: var(--ghost); }
+
+
+.condition-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.condition-opt input { display: none; }
+.condition-opt__face {
+  border: 1px solid var(--seam); padding: 16px 20px;
+  cursor: pointer; transition: border-color 0.3s, background 0.3s;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.condition-opt input:checked + .condition-opt__face {
+  border-color: var(--chrome); background: var(--chrome-dim);
+}
+.condition-opt__name {
+  font-family: var(--sans); font-size: 0.875rem; font-weight: 600; color: var(--snow);
+}
+.condition-opt__desc {
+  font-family: var(--mono); font-size: 0.625rem; color: var(--fog); letter-spacing: 0.06em;
+}
+.trade__step-nav { display: flex; gap: 12px; align-items: center; }
+.trade__success {
+  display: none; flex-direction: column; gap: 24px; align-items: flex-start;
+}
+.trade__success.is-visible { display: flex; }
+.trade__success-icon {
+  width: 56px; height: 56px; border: 1px solid var(--chrome); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--serif); font-size: 1.5rem; color: var(--chrome);
+}
+@media (max-width: 900px) {
+  .trade { grid-template-columns: 1fr; }
+  .trade__visual { min-height: 50vw; }
+  .trade__form-panel { padding: 40px var(--px); }
+}
+
+
+/* === FINANCE === */
+.finance { background: var(--chalk); padding: 120px var(--px); }
+.finance__inner {
+  max-width: var(--max); margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1.2fr; gap: 80px; align-items: center;
+}
+.finance__left { display: flex; flex-direction: column; gap: 24px; }
+.finance__trust {
+  display: flex; gap: 24px; margin-top: 24px;
+}
+.finance__trust-badge {
+  font-family: var(--mono); font-size: 0.625rem;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--slate); padding: 8px 12px;
+  border: 1px solid var(--wire);
+}
+.finance__card {
+  background: var(--linen);
+  border: 1px solid var(--wire);
+  border-top: 2px solid var(--amber);
+  padding: 48px;
+  display: flex; flex-direction: column; gap: 32px;
+}
+.finance__slider-group { display: flex; flex-direction: column; gap: 24px; }
+.finance__slider-wrap {
+  display: flex; flex-direction: column; gap: 8px;
+}
+.finance__slider-label {
+  display: flex; justify-content: space-between;
+  font-family: var(--mono); font-size: 0.625rem;
+  letter-spacing: 0.15em; text-transform: uppercase; color: var(--slate);
+}
+.finance__slider-label span:last-child { color: var(--ink); font-weight: 500; }
+.finance__range {
+  -webkit-appearance: none; appearance: none;
+  width: 100%; height: 2px; background: var(--wire);
+  outline: none; cursor: pointer;
+}
+.finance__range::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--ink); border: 3px solid var(--chalk);
+  box-shadow: 0 0 0 1px var(--ink);
+}
+.finance__range::-moz-range-thumb {
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--ink); border: 3px solid var(--chalk);
+  box-shadow: 0 0 0 1px var(--ink);
+}
+.finance__tenure { display: flex; flex-direction: column; gap: 8px; }
+.finance__tenure-label {
+  font-family: var(--mono); font-size: 0.625rem;
+  letter-spacing: 0.15em; text-transform: uppercase; color: var(--slate);
+}
+.finance__tenure-opts { display: flex; gap: 0; }
+.tenure-opt input { display: none; }
+.tenure-opt__face {
+  padding: 10px 18px;
+  font-family: var(--mono); font-size: 0.75rem;
+  color: var(--slate); border: 1px solid var(--wire);
+  margin-left: -1px; cursor: pointer;
+  transition: background 0.3s, color 0.3s, border-color 0.3s;
+}
+.tenure-opt input:checked + .tenure-opt__face {
+  background: var(--ink); color: var(--chalk);
+  border-color: var(--ink); position: relative; z-index: 1;
+}
+
+
+.finance__result {
+  border-top: 1px solid var(--wire); padding-top: 32px;
+  display: flex; flex-direction: column; gap: 16px;
+}
+.finance__emi-label {
+  font-family: var(--mono); font-size: 0.625rem;
+  letter-spacing: 0.2em; text-transform: uppercase; color: var(--slate);
+}
+.finance__emi-val {
+  font-family: var(--serif); font-size: clamp(3rem, 6vw, 4.5rem);
+  font-weight: 300; color: var(--ink); line-height: 1;
+}
+.finance__sub-stats {
+  display: flex; gap: 40px;
+}
+.finance__sub-stat { display: flex; flex-direction: column; gap: 4px; }
+.finance__sub-stat-label {
+  font-family: var(--mono); font-size: 0.6rem;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--slate);
+}
+.finance__sub-stat-val {
+  font-family: var(--serif); font-size: 1.5rem; color: var(--ink);
+}
+.finance__cta-link {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--mono); font-size: 0.6875rem;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--amber); margin-top: 8px;
+  transition: gap 0.3s var(--ease-spring);
+}
+.finance__cta-link:hover { gap: 14px; }
+@media (max-width: 768px) {
+  .finance__inner { grid-template-columns: 1fr; gap: 48px; }
+  .finance__card { padding: 32px 24px; }
+}
+
+/* === ABOUT === */
+.about {
+  background: var(--void); padding: 160px var(--px);
+  position: relative; overflow: hidden;
+}
+.about__inner {
+  max-width: var(--max); margin: 0 auto;
+  display: grid; grid-template-columns: 200px 1fr 200px;
+  gap: 60px; align-items: start;
+  min-height: 80vh;
+}
+.about__img-col {
+  position: relative; height: 500px; overflow: hidden; border-radius: 2px;
+}
+.about__img-col img {
+  width: 100%; height: 140%; object-fit: cover;
+  position: absolute; top: 0; left: 0;
+  filter: saturate(0.8) brightness(0.85);
+}
+.about__text-col {
+  display: flex; flex-direction: column; gap: 0;
+  align-items: center; text-align: center;
+  padding-top: 60px;
+  position: relative;
+  min-height: 400px;
+}
+.about__chapter {
+  position: absolute; top: 60px; left: 0; right: 0;
+  opacity: 0; transform: translateY(20px);
+  transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
+  display: flex; flex-direction: column; gap: 20px; align-items: center;
+}
+.about__chapter.is-active { opacity: 1; transform: translateY(0); }
+.about__chapter-h {
+  font-family: var(--serif); font-size: clamp(2rem, 4vw, 3.5rem);
+  font-weight: 300; color: var(--snow); line-height: 1.05;
+}
+.about__chapter-h em { font-style: italic; color: var(--chrome); }
+.about__chapter-body {
+  font-family: var(--mono); font-size: 0.75rem;
+  line-height: 1.8; color: var(--fog); max-width: 400px;
+  letter-spacing: 0.04em;
+}
+
+
+.about__stats {
+  margin-top: 80px; padding: 60px var(--px);
+  border-top: 1px solid var(--seam);
+  border-bottom: 1px solid var(--seam);
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px;
+  max-width: var(--max); margin-left: auto; margin-right: auto;
+}
+.about__stat { display: flex; flex-direction: column; gap: 8px; text-align: center; }
+.about__stat-val {
+  font-family: var(--serif); font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 300; color: var(--snow); line-height: 1;
+}
+.about__stat-label {
+  font-family: var(--mono); font-size: 0.625rem;
+  letter-spacing: 0.2em; text-transform: uppercase; color: var(--fog);
+}
+@media (max-width: 768px) {
+  .about__inner { grid-template-columns: 1fr; }
+  .about__img-col { height: 300px; }
+  .about__stats { grid-template-columns: 1fr; gap: 32px; }
+}
+
+/* === TOOLS === */
+.tools { background: var(--obsidian); padding: 120px var(--px); }
+.tools__inner { max-width: var(--max); margin: 0 auto; }
+.tools__header { margin-bottom: 60px; }
+.tools__header-sub {
+  font-family: var(--serif); font-style: italic;
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
+  color: var(--chrome); font-weight: 300; margin-top: 12px;
+}
+.tools__grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  grid-template-rows: auto auto;
+  gap: 20px;
+}
+.tool-tile {
+  padding: 40px; display: flex; flex-direction: column;
+  justify-content: space-between; gap: 24px;
+  min-height: 280px; position: relative;
+  transition: border-color 0.4s var(--ease), background 0.4s var(--ease), transform 0.3s var(--ease-spring);
+}
+.tool-tile:hover { transform: translateY(-2px); }
+.tool-tile--dark {
+  background: var(--carbon); border: 1px solid var(--seam);
+}
+.tool-tile--dark:hover { border-color: var(--amber); }
+.tool-tile--light {
+  background: var(--chalk); border: 1px solid var(--wire);
+  color: var(--ink);
+}
+.tool-tile__icon { width: 40px; height: 40px; color: var(--chrome); }
+.tool-tile--light .tool-tile__icon { color: var(--ink); transition: transform 0.4s var(--ease-spring); }
+.tool-tile--light:hover .tool-tile__icon { transform: rotate(5deg) scale(1.1); }
+.tool-tile__h {
+  font-family: var(--serif); font-size: 1.75rem; font-weight: 300;
+  line-height: 1.1;
+}
+.tool-tile--light .tool-tile__h { color: var(--ink); }
+.tool-tile__body {
+  font-family: var(--mono); font-size: 0.6875rem;
+  line-height: 1.7; color: var(--fog); letter-spacing: 0.04em;
+}
+.tool-tile--light .tool-tile__body { color: var(--slate); }
+.tool-tile__cta {
+  font-family: var(--mono); font-size: 0.625rem;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--chrome); display: flex; align-items: center; gap: 8px;
+  transition: gap 0.3s var(--ease-spring), color 0.3s;
+}
+.tool-tile:hover .tool-tile__cta { gap: 14px; color: var(--amber); }
+.tool-tile--light .tool-tile__cta { color: var(--ink); }
+.tool-tile--light:hover .tool-tile__cta { color: var(--amber); }
+.tool-tile__emi-preview {
+  font-family: var(--serif); font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 300; color: var(--fog); transition: color 0.3s;
+}
+.tool-tile:hover .tool-tile__emi-preview { color: var(--snow); }
+.tool-tile__emi-sub {
+  font-family: var(--mono); font-size: 0.625rem; color: var(--ghost);
+  letter-spacing: 0.1em;
+}
+@media (max-width: 768px) {
+  .tools__grid { grid-template-columns: 1fr; }
+}
+
+
+/* === FAQ === */
+.faq { background: var(--chalk); padding: 120px var(--px); }
+.faq__inner {
+  max-width: var(--max); margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1.5fr; gap: 80px;
+}
+.faq__sticky {
+  position: sticky; top: 100px; align-self: start;
+  display: flex; flex-direction: column; gap: 32px;
+}
+.faq__sticky-img {
+  width: 100%; height: 300px; object-fit: cover;
+  opacity: 0; transition: opacity 0.4s var(--ease);
+  filter: saturate(0.85);
+}
+.faq__sticky-img.is-visible { opacity: 1; }
+.faq__list { display: flex; flex-direction: column; gap: 0; }
+.faq-item {
+  border-bottom: 1px solid var(--wire);
+  transition: border-left 0.3s;
+}
+.faq-item[open] { border-left: 2px solid var(--amber); padding-left: 20px; }
+.faq-item summary {
+  list-style: none; cursor: pointer;
+  padding: 24px 0;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px;
+  font-family: var(--sans); font-size: 1rem; font-weight: 500;
+  color: var(--ink); line-height: 1.4;
+}
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary::after {
+  content: '+';
+  font-family: var(--mono); font-size: 1.25rem;
+  color: var(--slate); flex-shrink: 0;
+  transition: transform 0.3s var(--ease);
+}
+.faq-item[open] summary::after { content: '-'; transform: rotate(180deg); }
+.faq-item__answer {
+  padding: 0 0 24px;
+  font-family: var(--mono); font-size: 0.8125rem;
+  line-height: 1.8; color: var(--slate);
+  letter-spacing: 0.02em;
+}
+@media (max-width: 768px) {
+  .faq__inner { grid-template-columns: 1fr; gap: 40px; }
+  .faq__sticky { position: static; }
+  .faq__sticky-img { height: 200px; }
+}
+
+
+/* === FOOTER === */
+.footer { background: var(--void); padding: 0; position: relative; overflow: hidden; }
+.footer__marquee-bg {
+  position: absolute; top: 50%; left: 0; right: 0;
+  transform: translateY(-50%);
+  overflow: hidden; pointer-events: none;
+}
+.footer__marquee-bg-text {
+  display: flex; gap: 80px; width: max-content;
+  animation: marqueeRun 40s linear infinite;
+}
+.footer__marquee-bg-text span {
+  font-family: var(--serif); font-size: clamp(80px, 12vw, 140px);
+  font-weight: 300; white-space: nowrap;
+  color: var(--snow); opacity: 0.04;
+}
+.footer__inner {
+  position: relative; z-index: 2;
+  max-width: var(--max); margin: 0 auto;
+  padding: 80px var(--px) 40px;
+}
+.footer__grid {
+  display: grid; grid-template-columns: 1.2fr repeat(3, 0.8fr) 1.2fr;
+  gap: 40px; margin-bottom: 60px;
+}
+.footer__brand { display: flex; flex-direction: column; gap: 16px; }
+.footer__brand-logo {
+  font-family: var(--serif); font-style: italic;
+  font-size: 1.75rem; color: var(--snow);
+}
+.footer__brand-tag {
+  font-family: var(--mono); font-size: 0.6875rem;
+  color: var(--fog); line-height: 1.7; letter-spacing: 0.04em;
+}
+.footer__col-title {
+  font-family: var(--mono); font-size: 0.6rem;
+  letter-spacing: 0.25em; text-transform: uppercase;
+  color: var(--ghost); margin-bottom: 16px;
+}
+.footer__col-links { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.footer__col-links a {
+  font-family: var(--sans); font-size: 0.875rem;
+  color: var(--fog); transition: color 0.3s;
+}
+.footer__col-links a:hover { color: var(--snow); }
+.footer__newsletter { display: flex; flex-direction: column; gap: 16px; }
+.footer__newsletter-input {
+  display: flex; border-bottom: 1px solid var(--seam);
+}
+.footer__newsletter-input input {
+  flex: 1; background: transparent; border: none;
+  font-family: var(--mono); font-size: 0.75rem;
+  color: var(--snow); padding: 12px 0; outline: none;
+  letter-spacing: 0.06em;
+}
+.footer__newsletter-input input::placeholder { color: var(--ghost); }
+.footer__newsletter-input button {
+  font-family: var(--mono); font-size: 0.625rem;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--chrome); padding: 12px 16px;
+  transition: color 0.3s;
+}
+.footer__newsletter-input button:hover { color: var(--snow); }
+.footer__bottom {
+  border-top: 1px solid var(--seam);
+  padding-top: 24px;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 16px;
+}
+.footer__copy {
+  font-family: var(--mono); font-size: 0.625rem;
+  color: var(--ghost); letter-spacing: 0.1em;
+}
+.footer__legal { display: flex; gap: 24px; }
+.footer__legal a {
+  font-family: var(--mono); font-size: 0.5625rem;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--ghost); transition: color 0.3s;
+}
+.footer__legal a:hover { color: var(--fog); }
+.footer__endline {
+  text-align: center; padding: 32px 0 24px;
+  font-family: var(--mono); font-size: 0.625rem;
+  letter-spacing: 0.3em; color: var(--ghost);
+}
+@media (max-width: 768px) {
+  .footer__grid { grid-template-columns: 1fr; gap: 32px; }
+}
+
+
+/* === RESPONSIVE === */
+@media (max-width: 1024px) {
+  .hero__img-wrap { width: 55%; }
+  .trade { grid-template-columns: 1fr; min-height: auto; }
+  .trade__visual { min-height: 60vw; }
+  .about__inner { grid-template-columns: 1fr; }
+  .tools__grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 480px) {
+  .hero__h1 { font-size: 14vw; }
+  .hero__bottom { flex-direction: column; align-items: flex-start; }
+  .hero__badge { display: none; }
+  .trade__form-panel { padding: 32px var(--px); }
+}
+</style>
+</head>
+<body>
+
+
+<!-- PRELOADER -->
+<div id="preloader">
+  <div class="pl-tach">
+    <svg viewBox="0 0 200 120" width="200">
+      <path class="tach-track" d="M 20 110 A 90 90 0 0 1 180 110" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round"/>
+      <path class="tach-fill" id="tachFill" d="M 20 110 A 90 90 0 0 1 180 110" fill="none" stroke="#C8C4BC" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="283" stroke-dashoffset="283"/>
+      <line class="tach-needle" id="tachNeedle" x1="100" y1="110" x2="100" y2="30" stroke="#C8C4BC" stroke-width="1" stroke-linecap="round" transform="rotate(-90 100 110)"/>
+      <circle cx="100" cy="110" r="4" fill="#C8C4BC"/>
+      <circle cx="100" cy="110" r="2" fill="#06070A"/>
+    </svg>
+    <div class="pl-label">Loading</div>
+  </div>
+  <div class="pl-brand">
+    <div class="pl-brand-top">MAISON</div>
+    <div class="pl-brand-bottom" style="font-style:italic">Drivetrain</div>
+  </div>
+  <div class="pl-counter" id="plCounter">000</div>
+  <div class="pl-panel pl-panel--top"></div>
+  <div class="pl-panel pl-panel--bottom"></div>
+</div>
+
+
+<!-- NAVIGATION -->
+<nav id="nav" class="nav">
+  <div class="nav__inner">
+    <a href="#" class="nav__logo">
+      <span class="nav__logo-mark">MD</span>
+      <span class="nav__logo-text">Maison<br>Drivetrain</span>
+    </a>
+    <ul class="nav__links" role="list">
+      <li><a href="#inventory" class="nav__link">Fleet</a></li>
+      <li><a href="#trade" class="nav__link">Trade-In</a></li>
+      <li><a href="#finance" class="nav__link">Finance</a></li>
+      <li><a href="#about" class="nav__link">About</a></li>
+      <li><a href="#faq" class="nav__link">FAQ</a></li>
+    </ul>
+    <div class="nav__right">
+      <a href="#inventory" class="nav__cta">
+        <span>Browse Fleet</span>
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 11L11 1M11 1H4M11 1V8" stroke="currentColor" stroke-width="1.2"/></svg>
+      </a>
+      <button class="nav__hamburger" id="navToggle" aria-label="Menu">
+        <span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile overlay -->
+<div class="nav__overlay" id="navOverlay">
+  <div class="nav__overlay-inner">
+    <ul class="nav__overlay-links">
+      <li><a href="#inventory">Fleet</a></li>
+      <li><a href="#trade">Trade-In</a></li>
+      <li><a href="#finance">Finance</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+    <div class="nav__overlay-footer">
+      <span class="eyebrow">Mumbai &middot; Pune &middot; Bangalore</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- HERO -->
+<section class="hero" id="heroSection">
+  <div class="hero__img-wrap" id="heroImgWrap">
+    <img class="hero__img" id="heroImg" src="https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=2400&q=90" alt="Maison Drivetrain — performance on the open road">
+    <div class="hero__img-fade"></div>
+  </div>
+  <div class="hero__content">
+    <div class="hero__eyebrow eyebrow" style="margin-bottom: 32px">Established 2014 &middot; Premium Automotive</div>
+    <h1 class="hero__h1 section-h">
+      <span class="hero__h1-line" data-reveal>Drive</span>
+      <span class="hero__h1-line hero__h1-line--indent" data-reveal>What You</span>
+      <span class="hero__h1-line hero__h1-italic" data-reveal>Deserve.</span>
+    </h1>
+    <div class="hero__divider" id="heroRule"></div>
+    <div class="hero__bottom">
+      <p class="hero__body" data-reveal>Multi-brand. Single standard. India's finest selection of pre-owned performance and luxury vehicles &mdash; personally verified, fully documented.</p>
+      <div class="hero__actions" data-reveal>
+        <a href="#inventory" class="btn-primary"><span>Browse Fleet</span></a>
+        <a href="#trade" class="btn-ghost"><span>Value My Car</span></a>
+      </div>
+    </div>
+  </div>
+  <div class="hero__badge" id="heroBadge">
+    <svg class="hero__badge-ring" viewBox="0 0 120 120">
+      <path id="badgeTextPath" d="M 60,60 m -45,0 a 45,45 0 1,1 90,0 a 45,45 0 1,1 -90,0" fill="none"/>
+      <text font-family="DM Mono" font-size="8.5" fill="#C8C4BC" letter-spacing="3.5">
+        <textPath href="#badgeTextPath">SCROLL TO EXPLORE &middot; SCROLL TO EXPLORE &middot;</textPath>
+      </text>
+    </svg>
+    <div class="hero__badge-arrow">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <line x1="8" y1="1" x2="8" y2="15" stroke="#C8C4BC" stroke-width="1.2"/>
+        <polyline points="3,10 8,15 13,10" fill="none" stroke="#C8C4BC" stroke-width="1.2"/>
+      </svg>
+    </div>
+  </div>
+  <div class="hero__scroll-line"><div class="hero__scroll-dot"></div></div>
+  <div class="hero__marquee-strip">
+    <div class="hero__marquee" id="heroMarquee">
+      <span>BMW</span><span class="dot">&middot;</span>
+      <span>Porsche</span><span class="dot">&middot;</span>
+      <span>Mercedes-AMG</span><span class="dot">&middot;</span>
+      <span>Audi</span><span class="dot">&middot;</span>
+      <span>Lamborghini</span><span class="dot">&middot;</span>
+      <span>Ferrari</span><span class="dot">&middot;</span>
+      <span>Bentley</span><span class="dot">&middot;</span>
+      <span>McLaren</span><span class="dot">&middot;</span>
+      <span>BMW</span><span class="dot">&middot;</span>
+      <span>Porsche</span><span class="dot">&middot;</span>
+      <span>Mercedes-AMG</span><span class="dot">&middot;</span>
+      <span>Audi</span><span class="dot">&middot;</span>
+      <span>Lamborghini</span><span class="dot">&middot;</span>
+      <span>Ferrari</span><span class="dot">&middot;</span>
+      <span>Bentley</span><span class="dot">&middot;</span>
+      <span>McLaren</span><span class="dot">&middot;</span>
+    </div>
+  </div>
+</section>
+
+
+<!-- INVENTORY -->
+<section id="inventory" class="inventory">
+  <div class="inventory__inner">
+    <div class="inventory__header">
+      <div class="eyebrow" style="color: var(--slate)">Current Inventory</div>
+      <div class="inventory__header-right">
+        <h2 class="section-h" style="color: var(--ink); font-size: clamp(2rem, 5vw, 4rem)">The Showroom<br><em>Floor.</em></h2>
+        <a href="#" class="btn-primary btn-dark"><span>View All 40+ Cars</span></a>
+      </div>
+    </div>
+    <div class="inventory__filters" role="tablist">
+      <button class="filter-tab is-active" data-filter="all" role="tab">All</button>
+      <button class="filter-tab" data-filter="sports" role="tab">Sports</button>
+      <button class="filter-tab" data-filter="suv" role="tab">SUV</button>
+      <button class="filter-tab" data-filter="sedan" role="tab">Sedan</button>
+      <button class="filter-tab" data-filter="electric" role="tab">Electric</button>
+      <button class="filter-tab" data-filter="luxury" role="tab">Luxury</button>
+      <div class="filter-indicator" id="filterIndicator"></div>
+    </div>
+    <div class="inventory__grid" id="inventoryGrid">
+
+
+      <article class="car-card" data-category="sports">
+        <div class="car-card__img-wrap">
+          <img class="car-card__img" src="https://images.unsplash.com/photo-1617531653332-bd46c16f7d61?w=800&q=85&auto=format" alt="BMW M3 Competition" loading="lazy">
+          <div class="car-card__img-overlay"></div>
+          <div class="car-card__badge">Available</div>
+        </div>
+        <div class="car-card__body">
+          <div class="car-card__make">BMW</div>
+          <h3 class="car-card__name">M3 Competition</h3>
+          <div class="car-card__specs"><span>510 bhp</span><span class="sep">&middot;</span><span>0-100: 3.9s</span><span class="sep">&middot;</span><span>2022</span></div>
+          <div class="car-card__footer">
+            <div class="car-card__price"><span class="price-from">Starting from</span><span class="price-val">&#8377;1.25 Cr</span></div>
+            <a href="#" class="car-card__cta"><span>Enquire</span><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 11L11 1M11 1H4M11 1V8" stroke="currentColor" stroke-width="1.2"/></svg></a>
+          </div>
+        </div>
+      </article>
+
+      <article class="car-card" data-category="sports">
+        <div class="car-card__img-wrap">
+          <img class="car-card__img" src="https://images.unsplash.com/photo-1614200187524-dc4b892acf16?w=800&q=85&auto=format" alt="Porsche 911 GT3" loading="lazy">
+          <div class="car-card__img-overlay"></div>
+          <div class="car-card__badge">Available</div>
+        </div>
+        <div class="car-card__body">
+          <div class="car-card__make">Porsche</div>
+          <h3 class="car-card__name">911 GT3</h3>
+          <div class="car-card__specs"><span>502 bhp</span><span class="sep">&middot;</span><span>0-100: 3.4s</span><span class="sep">&middot;</span><span>2023</span></div>
+          <div class="car-card__footer">
+            <div class="car-card__price"><span class="price-from">Starting from</span><span class="price-val">&#8377;2.80 Cr</span></div>
+            <a href="#" class="car-card__cta"><span>Enquire</span><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 11L11 1M11 1H4M11 1V8" stroke="currentColor" stroke-width="1.2"/></svg></a>
+          </div>
+        </div>
+      </article>
+
+
+      <article class="car-card" data-category="suv">
+        <div class="car-card__img-wrap">
+          <img class="car-card__img" src="https://images.unsplash.com/photo-1562911791-c7a97b729ec5?w=800&q=85&auto=format" alt="Range Rover Autobiography" loading="lazy">
+          <div class="car-card__img-overlay"></div>
+          <div class="car-card__badge">Available</div>
+        </div>
+        <div class="car-card__body">
+          <div class="car-card__make">Range Rover</div>
+          <h3 class="car-card__name">Autobiography</h3>
+          <div class="car-card__specs"><span>395 bhp</span><span class="sep">&middot;</span><span>0-100: 5.4s</span><span class="sep">&middot;</span><span>2023</span></div>
+          <div class="car-card__footer">
+            <div class="car-card__price"><span class="price-from">Starting from</span><span class="price-val">&#8377;2.10 Cr</span></div>
+            <a href="#" class="car-card__cta"><span>Enquire</span><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 11L11 1M11 1H4M11 1V8" stroke="currentColor" stroke-width="1.2"/></svg></a>
+          </div>
+        </div>
+      </article>
+
+      <article class="car-card" data-category="sports">
+        <div class="car-card__img-wrap">
+          <img class="car-card__img" src="https://images.unsplash.com/photo-1553440569-bcc63803a83d?w=800&q=85&auto=format" alt="Mercedes-AMG GT 53" loading="lazy">
+          <div class="car-card__img-overlay"></div>
+          <div class="car-card__badge">Available</div>
+        </div>
+        <div class="car-card__body">
+          <div class="car-card__make">Mercedes-AMG</div>
+          <h3 class="car-card__name">GT 53</h3>
+          <div class="car-card__specs"><span>435 bhp</span><span class="sep">&middot;</span><span>0-100: 4.5s</span><span class="sep">&middot;</span><span>2022</span></div>
+          <div class="car-card__footer">
+            <div class="car-card__price"><span class="price-from">Starting from</span><span class="price-val">&#8377;1.65 Cr</span></div>
+            <a href="#" class="car-card__cta"><span>Enquire</span><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 11L11 1M11 1H4M11 1V8" stroke="currentColor" stroke-width="1.2"/></svg></a>
+          </div>
+        </div>
+      </article>
+
+
+      <article class="car-card" data-category="electric">
+        <div class="car-card__img-wrap">
+          <img class="car-card__img" src="https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800&q=85&auto=format" alt="Audi Q8 e-tron" loading="lazy">
+          <div class="car-card__img-overlay"></div>
+          <div class="car-card__badge">Available</div>
+        </div>
+        <div class="car-card__body">
+          <div class="car-card__make">Audi</div>
+          <h3 class="car-card__name">Q8 e-tron</h3>
+          <div class="car-card__specs"><span>408 bhp</span><span class="sep">&middot;</span><span>0-100: 5.6s</span><span class="sep">&middot;</span><span>2024</span></div>
+          <div class="car-card__footer">
+            <div class="car-card__price"><span class="price-from">Starting from</span><span class="price-val">&#8377;1.45 Cr</span></div>
+            <a href="#" class="car-card__cta"><span>Enquire</span><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 11L11 1M11 1H4M11 1V8" stroke="currentColor" stroke-width="1.2"/></svg></a>
+          </div>
+        </div>
+      </article>
+
+      <article class="car-card" data-category="luxury">
+        <div class="car-card__img-wrap">
+          <img class="car-card__img" src="https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=800&q=85&auto=format" alt="Bentley Bentayga" loading="lazy">
+          <div class="car-card__img-overlay"></div>
+          <div class="car-card__badge">Available</div>
+        </div>
+        <div class="car-card__body">
+          <div class="car-card__make">Bentley</div>
+          <h3 class="car-card__name">Bentayga</h3>
+          <div class="car-card__specs"><span>542 bhp</span><span class="sep">&middot;</span><span>0-100: 4.5s</span><span class="sep">&middot;</span><span>2023</span></div>
+          <div class="car-card__footer">
+            <div class="car-card__price"><span class="price-from">Starting from</span><span class="price-val">&#8377;4.80 Cr</span></div>
+            <a href="#" class="car-card__cta"><span>Enquire</span><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 11L11 1M11 1H4M11 1V8" stroke="currentColor" stroke-width="1.2"/></svg></a>
+          </div>
+        </div>
+      </article>
+
+
+      <article class="car-card" data-category="sedan">
+        <div class="car-card__img-wrap">
+          <img class="car-card__img" src="https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?w=800&q=85&auto=format" alt="BMW 7 Series" loading="lazy">
+          <div class="car-card__img-overlay"></div>
+          <div class="car-card__badge">Available</div>
+        </div>
+        <div class="car-card__body">
+          <div class="car-card__make">BMW</div>
+          <h3 class="car-card__name">7 Series</h3>
+          <div class="car-card__specs"><span>375 bhp</span><span class="sep">&middot;</span><span>0-100: 5.2s</span><span class="sep">&middot;</span><span>2023</span></div>
+          <div class="car-card__footer">
+            <div class="car-card__price"><span class="price-from">Starting from</span><span class="price-val">&#8377;1.15 Cr</span></div>
+            <a href="#" class="car-card__cta"><span>Enquire</span><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 11L11 1M11 1H4M11 1V8" stroke="currentColor" stroke-width="1.2"/></svg></a>
+          </div>
+        </div>
+      </article>
+
+      <article class="car-card" data-category="sports">
+        <div class="car-card__img-wrap">
+          <img class="car-card__img" src="https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=800&q=85&auto=format" alt="Ferrari Roma" loading="lazy">
+          <div class="car-card__img-overlay"></div>
+          <div class="car-card__badge">Available</div>
+        </div>
+        <div class="car-card__body">
+          <div class="car-card__make">Ferrari</div>
+          <h3 class="car-card__name">Roma</h3>
+          <div class="car-card__specs"><span>612 bhp</span><span class="sep">&middot;</span><span>0-100: 3.4s</span><span class="sep">&middot;</span><span>2022</span></div>
+          <div class="car-card__footer">
+            <div class="car-card__price"><span class="price-from">Starting from</span><span class="price-val">&#8377;4.20 Cr</span></div>
+            <a href="#" class="car-card__cta"><span>Enquire</span><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 11L11 1M11 1H4M11 1V8" stroke="currentColor" stroke-width="1.2"/></svg></a>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- TRADE-IN -->
+<section id="trade" class="trade">
+  <div class="trade__visual" id="tradeVisual">
+    <img class="trade__img trade__img--active" id="tradeImg1" src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=1200&q=90" alt="">
+    <img class="trade__img" id="tradeImg2" src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=90" alt="">
+    <img class="trade__img" id="tradeImg3" src="https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=1200&q=90" alt="">
+    <div class="trade__visual-text">
+      <span class="eyebrow">Trade-In Programme</span>
+      <p class="trade__visual-quote">Your car earned its value.<br><em>We'll honour it.</em></p>
+    </div>
+  </div>
+  <div class="trade__form-panel">
+    <div class="trade__progress">
+      <div class="trade__progress-track">
+        <div class="trade__progress-fill" id="tradeProgressFill" style="width: 33.3%"></div>
+      </div>
+      <div class="trade__progress-labels">
+        <span class="trade__step-label is-active" data-step="1">01 Vehicle</span>
+        <span class="trade__step-label" data-step="2">02 Condition</span>
+        <span class="trade__step-label" data-step="3">03 Contact</span>
+      </div>
+    </div>
+    <!-- Step 1 -->
+    <div class="trade__step is-active" id="tradeStep1">
+      <h3 class="trade__step-title section-h">Tell us<br><em>about your car.</em></h3>
+      <div class="form-field-group">
+        <div class="form-field"><label class="form-field__label" for="t-make">Make</label><input class="form-field__input" type="text" id="t-make" placeholder="e.g. BMW"></div>
+        <div class="form-field"><label class="form-field__label" for="t-model">Model</label><input class="form-field__input" type="text" id="t-model" placeholder="e.g. M3"></div>
+        <div class="form-field"><label class="form-field__label" for="t-year">Year</label><input class="form-field__input" type="number" id="t-year" placeholder="e.g. 2021" min="2005" max="2025"></div>
+        <div class="form-field"><label class="form-field__label" for="t-km">Kilometres</label><input class="form-field__input" type="number" id="t-km" placeholder="e.g. 28000"></div>
+      </div>
+      <button class="btn-primary" onclick="tradeNextStep(2)"><span>Next &mdash; Condition &rarr;</span></button>
+    </div>
+
+
+    <!-- Step 2 -->
+    <div class="trade__step" id="tradeStep2">
+      <h3 class="trade__step-title section-h">Rate its<br><em>condition.</em></h3>
+      <div class="condition-grid">
+        <label class="condition-opt"><input type="radio" name="condition" value="excellent"><div class="condition-opt__face"><span class="condition-opt__name">Excellent</span><span class="condition-opt__desc">No visible wear. Like showroom.</span></div></label>
+        <label class="condition-opt"><input type="radio" name="condition" value="good"><div class="condition-opt__face"><span class="condition-opt__name">Good</span><span class="condition-opt__desc">Minor surface marks, no accidents.</span></div></label>
+        <label class="condition-opt"><input type="radio" name="condition" value="fair"><div class="condition-opt__face"><span class="condition-opt__name">Fair</span><span class="condition-opt__desc">Visible wear, may need minor work.</span></div></label>
+        <label class="condition-opt"><input type="radio" name="condition" value="needs-work"><div class="condition-opt__face"><span class="condition-opt__name">Needs Work</span><span class="condition-opt__desc">Mechanical or cosmetic repairs needed.</span></div></label>
+      </div>
+      <div class="trade__step-nav">
+        <button class="btn-ghost" onclick="tradeNextStep(1)"><span>&larr; Back</span></button>
+        <button class="btn-primary" onclick="tradeNextStep(3)"><span>Next &mdash; Contact &rarr;</span></button>
+      </div>
+    </div>
+    <!-- Step 3 -->
+    <div class="trade__step" id="tradeStep3">
+      <h3 class="trade__step-title section-h">Almost<br><em>done.</em></h3>
+      <div class="form-field-group">
+        <div class="form-field"><label class="form-field__label" for="t-name">Full Name</label><input class="form-field__input" type="text" id="t-name" placeholder="Your name"></div>
+        <div class="form-field"><label class="form-field__label" for="t-email">Email</label><input class="form-field__input" type="email" id="t-email" placeholder="you@email.com"></div>
+        <div class="form-field"><label class="form-field__label" for="t-phone">Phone</label><input class="form-field__input" type="tel" id="t-phone" placeholder="+91 00000 00000"></div>
+      </div>
+      <div class="trade__step-nav">
+        <button class="btn-ghost" onclick="tradeNextStep(2)"><span>&larr; Back</span></button>
+        <button class="btn-primary" onclick="tradeSubmit()"><span>Get My Estimate</span></button>
+      </div>
+    </div>
+    <!-- Success -->
+    <div class="trade__success" id="tradeSuccess">
+      <div class="trade__success-icon">&#10003;</div>
+      <h3 class="trade__step-title section-h">We're<br><em>reviewing it.</em></h3>
+      <p style="font-family: var(--mono); font-size: 0.75rem; color: var(--fog); letter-spacing: 0.1em">Our valuation team will respond within 2 business hours.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- FINANCE -->
+<section id="finance" class="finance">
+  <div class="finance__inner">
+    <div class="finance__left">
+      <div class="eyebrow" style="color: var(--slate)">Finance Centre</div>
+      <h2 class="section-h" style="color: var(--ink); font-size: clamp(2.5rem, 5vw, 4rem)">Run the<br><em>Numbers.</em></h2>
+      <p style="font-family: var(--mono); font-size: 0.8125rem; line-height: 1.8; color: var(--slate); letter-spacing: 0.02em">
+        Transparent financing from India's top NBFCs and banks. No hidden charges. Pre-approvals within 48 hours. Rates from 8.5% per annum.
+      </p>
+      <div class="finance__trust">
+        <div class="finance__trust-badge">14 NBFC Partners</div>
+        <div class="finance__trust-badge">48hr Approval</div>
+      </div>
+    </div>
+    <div class="finance__card">
+      <div class="finance__slider-group">
+        <div class="finance__slider-wrap">
+          <div class="finance__slider-label"><span>Car Price</span><span id="finPriceVal">&#8377;1.50 Cr</span></div>
+          <input type="range" class="finance__range" id="finPrice" min="5000000" max="50000000" value="15000000" step="500000">
+        </div>
+        <div class="finance__slider-wrap">
+          <div class="finance__slider-label"><span>Down Payment</span><span id="finDPVal">&#8377;30.0 Lac</span></div>
+          <input type="range" class="finance__range" id="finDP" min="500000" max="20000000" value="3000000" step="100000">
+        </div>
+        <div class="finance__tenure">
+          <div class="finance__tenure-label">Loan Tenure (Months)</div>
+          <div class="finance__tenure-opts">
+            <label class="tenure-opt"><input type="radio" name="tenure" value="12"><span class="tenure-opt__face">12</span></label>
+            <label class="tenure-opt"><input type="radio" name="tenure" value="24"><span class="tenure-opt__face">24</span></label>
+            <label class="tenure-opt"><input type="radio" name="tenure" value="36"><span class="tenure-opt__face">36</span></label>
+            <label class="tenure-opt"><input type="radio" name="tenure" value="48" checked><span class="tenure-opt__face">48</span></label>
+            <label class="tenure-opt"><input type="radio" name="tenure" value="60"><span class="tenure-opt__face">60</span></label>
+          </div>
+        </div>
+      </div>
+      <div class="finance__result">
+        <div class="finance__emi-label">Estimated Monthly EMI</div>
+        <div class="finance__emi-val" id="emiDisplay" data-current="0">&#8377;0</div>
+        <div class="finance__sub-stats">
+          <div class="finance__sub-stat">
+            <span class="finance__sub-stat-label">Interest Paid</span>
+            <span class="finance__sub-stat-val" id="interestDisplay" data-current="0">&#8377;0</span>
+          </div>
+          <div class="finance__sub-stat">
+            <span class="finance__sub-stat-label">Total Cost</span>
+            <span class="finance__sub-stat-val" id="totalDisplay" data-current="0">&#8377;0</span>
+          </div>
+        </div>
+        <a href="mailto:finance@maisondrivetrain.com" class="finance__cta-link">
+          Speak to a Finance Advisor
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 11L11 1M11 1H4M11 1V8" stroke="currentColor" stroke-width="1.2"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ABOUT -->
+<section id="about" class="about">
+  <div class="about__inner">
+    <div class="about__img-col">
+      <img id="aboutImgLeft" src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&q=90" alt="" loading="lazy">
+    </div>
+    <div class="about__text-col">
+      <div class="about__chapter is-active" data-chapter="0">
+        <span class="eyebrow">Our Story</span>
+        <h3 class="about__chapter-h">Born from<br><em>frustration.</em></h3>
+        <p class="about__chapter-body">We started because every pre-owned dealership we visited compromised on transparency, quality, or both. We decided to build the one we wished existed.</p>
+      </div>
+      <div class="about__chapter" data-chapter="1">
+        <span class="eyebrow">Philosophy</span>
+        <h3 class="about__chapter-h">We drive<br><em>every car first.</em></h3>
+        <p class="about__chapter-body">No vehicle enters our showroom until a member of our team has personally driven and inspected it. If we wouldn't own it, we won't sell it.</p>
+      </div>
+      <div class="about__chapter" data-chapter="2">
+        <span class="eyebrow">Promise</span>
+        <h3 class="about__chapter-h">You buy once.<br><em>We stay forever.</em></h3>
+        <p class="about__chapter-body">After-sale support isn't a department — it's our identity. Service reminders, resale assistance, and priority access to new inventory. Always.</p>
+      </div>
+    </div>
+    <div class="about__img-col">
+      <img id="aboutImgRight" src="https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=800&q=90" alt="" loading="lazy">
+    </div>
+  </div>
+  <div class="about__stats">
+    <div class="about__stat">
+      <div class="about__stat-val stat-value" data-target="600" data-prefix="&#8377;" data-suffix=" Cr+">0</div>
+      <div class="about__stat-label">Inventory Moved</div>
+    </div>
+    <div class="about__stat">
+      <div class="about__stat-val stat-value" data-target="14" data-suffix=" Years">0</div>
+      <div class="about__stat-label">In Business</div>
+    </div>
+    <div class="about__stat">
+      <div class="about__stat-val stat-value" data-target="2400" data-suffix="+">0</div>
+      <div class="about__stat-label">Happy Owners</div>
+    </div>
+  </div>
+</section>
+
+
+<!-- TOOLS -->
+<section id="tools" class="tools">
+  <div class="tools__inner">
+    <div class="tools__header">
+      <div class="eyebrow">Shopping Tools</div>
+      <h2 class="section-h" style="font-size: clamp(2rem, 5vw, 4rem); color: var(--snow); margin-top: 16px">Every tool you need<br>before you decide.</h2>
+      <p class="tools__header-sub"><em>Research without pressure.</em></p>
+    </div>
+    <div class="tools__grid">
+      <!-- Tile 1: Compare -->
+      <div class="tool-tile tool-tile--dark">
+        <div class="tool-tile__icon">
+          <svg viewBox="0 0 40 40" fill="none" width="40" height="40">
+            <rect x="4" y="8" width="18" height="24" rx="2" stroke="currentColor" stroke-width="1.2"/>
+            <rect x="18" y="8" width="18" height="24" rx="2" stroke="currentColor" stroke-width="1.2"/>
+          </svg>
+        </div>
+        <div>
+          <h3 class="tool-tile__h">Compare<br>Side-by-Side.</h3>
+          <p class="tool-tile__body" style="margin-top:12px">Pick any two cars in our inventory and see a full spec comparison — power, torque, features, and pricing.</p>
+        </div>
+        <a href="#" class="tool-tile__cta">Launch Comparator <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 11L11 1M11 1H4M11 1V8" stroke="currentColor" stroke-width="1.2"/></svg></a>
+      </div>
+      <!-- Tile 2: EMI Estimator -->
+      <div class="tool-tile tool-tile--dark">
+        <div class="tool-tile__icon">
+          <svg viewBox="0 0 40 40" fill="none" width="40" height="40">
+            <polyline points="4,30 12,20 20,25 28,12 36,18" stroke="currentColor" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div>
+          <div class="tool-tile__emi-preview">From &#8377;42,000/mo</div>
+          <div class="tool-tile__emi-sub">Based on 5yr &middot; 8.5%</div>
+        </div>
+        <a href="#finance" class="tool-tile__cta">Open Calculator <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 11L11 1M11 1H4M11 1V8" stroke="currentColor" stroke-width="1.2"/></svg></a>
+      </div>
+      <!-- Tile 3: Test Drive -->
+      <div class="tool-tile tool-tile--dark">
+        <div class="tool-tile__icon">
+          <svg viewBox="0 0 40 40" fill="none" width="40" height="40">
+            <circle cx="20" cy="24" r="6" stroke="currentColor" stroke-width="1.2"/>
+            <path d="M20 18V8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+            <path d="M16 10h8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div>
+          <h3 class="tool-tile__h">Drive Before<br>You Decide.</h3>
+          <p class="tool-tile__body" style="margin-top:12px">All test drives are private. No showroom pressure. We bring the car to you within Mumbai, Pune, and Bangalore.</p>
+        </div>
+        <a href="#" class="tool-tile__cta">Book a Drive <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 11L11 1M11 1H4M11 1V8" stroke="currentColor" stroke-width="1.2"/></svg></a>
+      </div>
+      <!-- Tile 4: Vehicle History -->
+      <div class="tool-tile tool-tile--light">
+        <div class="tool-tile__icon">
+          <svg viewBox="0 0 40 40" fill="none" width="40" height="40">
+            <rect x="8" y="4" width="24" height="32" rx="2" stroke="currentColor" stroke-width="1.2"/>
+            <line x1="14" y1="14" x2="26" y2="14" stroke="currentColor" stroke-width="1"/>
+            <line x1="14" y1="20" x2="26" y2="20" stroke="currentColor" stroke-width="1"/>
+            <line x1="14" y1="26" x2="22" y2="26" stroke="currentColor" stroke-width="1"/>
+          </svg>
+        </div>
+        <div>
+          <h3 class="tool-tile__h">Full Service<br>History. No surprises.</h3>
+          <p class="tool-tile__body" style="margin-top:12px">Every vehicle in our inventory comes with a complete documented service record. Verified ownership chain. Zero unknowns.</p>
+        </div>
+        <a href="#" class="tool-tile__cta">Learn More <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 11L11 1M11 1H4M11 1V8" stroke="currentColor" stroke-width="1.2"/></svg></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- FAQ -->
+<section id="faq" class="faq">
+  <div class="faq__inner">
+    <div class="faq__sticky">
+      <div class="eyebrow" style="color: var(--slate)">Common Questions</div>
+      <h2 class="section-h" style="color: var(--ink); font-size: clamp(2rem, 4vw, 3.5rem)">Clear<br><em>Answers.</em></h2>
+      <img class="faq__sticky-img" id="faqContextImg" src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=600&q=85" alt="">
+    </div>
+    <div class="faq__list">
+      <details class="faq-item" data-img="https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=600&q=85">
+        <summary>Do you offer home test drives?</summary>
+        <div class="faq-item__answer">Yes — across Mumbai, Pune, and Bangalore within 60km. Simply book online and we bring the car to your doorstep at a time that works for you.</div>
+      </details>
+      <details class="faq-item" data-img="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=600&q=85">
+        <summary>How do you verify vehicle history?</summary>
+        <div class="faq-item__answer">Every vehicle carries a documented service record. We share full history pre-purchase including ownership chain, accident reports, and service intervals.</div>
+      </details>
+      <details class="faq-item" data-img="https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=600&q=85">
+        <summary>What financing options are available?</summary>
+        <div class="faq-item__answer">We partner with 14 NBFCs and banks. Approvals typically within 48 hours. Competitive rates starting at 8.5% per annum with flexible tenure options.</div>
+      </details>
+      <details class="faq-item" data-img="https://images.unsplash.com/photo-1562911791-c7a97b729ec5?w=600&q=85">
+        <summary>Can I reserve a vehicle before visiting?</summary>
+        <div class="faq-item__answer">Yes. A fully refundable &#8377;50,000 token holds any car for up to 7 days. This gives you time to arrange financing or a personal inspection.</div>
+      </details>
+      <details class="faq-item" data-img="https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=600&q=85">
+        <summary>Do you accept trade-ins?</summary>
+        <div class="faq-item__answer">We do. Fill our Trade-In Estimator above for a same-day preliminary valuation. Final offer confirmed within 2 business hours of inspection.</div>
+      </details>
+      <details class="faq-item" data-img="https://images.unsplash.com/photo-1553440569-bcc63803a83d?w=600&q=85">
+        <summary>Is delivery available?</summary>
+        <div class="faq-item__answer">We deliver within Maharashtra for free. Pan-India delivery available on request with full transit insurance and doorstep handover.</div>
+      </details>
+      <details class="faq-item" data-img="https://images.unsplash.com/photo-1617531653332-bd46c16f7d61?w=600&q=85">
+        <summary>What warranty comes with my car?</summary>
+        <div class="faq-item__answer">12-month comprehensive mechanical warranty on every vehicle, from day one. Extended warranty options available up to 36 months.</div>
+      </details>
+      <details class="faq-item" data-img="https://images.unsplash.com/photo-1614200187524-dc4b892acf16?w=600&q=85">
+        <summary>Can you source a specific car for me?</summary>
+        <div class="faq-item__answer">Yes. Our sourcing team operates across India, UAE, and the UK. Contact us with your exact specification and we'll find it within 2-4 weeks.</div>
+      </details>
+    </div>
+  </div>
+</section>
+
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer__marquee-bg">
+    <div class="footer__marquee-bg-text">
+      <span>MAISON DRIVETRAIN</span>
+      <span>MAISON DRIVETRAIN</span>
+      <span>MAISON DRIVETRAIN</span>
+      <span>MAISON DRIVETRAIN</span>
+    </div>
+  </div>
+  <div class="footer__inner">
+    <div class="footer__grid">
+      <div class="footer__brand">
+        <div class="footer__brand-logo">Maison Drivetrain</div>
+        <p class="footer__brand-tag">India's finest selection of pre-owned performance and luxury vehicles. Multi-brand. Single standard.</p>
+      </div>
+      <div>
+        <div class="footer__col-title">Explore</div>
+        <ul class="footer__col-links">
+          <li><a href="#inventory">Current Fleet</a></li>
+          <li><a href="#trade">Trade-In</a></li>
+          <li><a href="#finance">Finance</a></li>
+          <li><a href="#faq">FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer__col-title">Company</div>
+        <ul class="footer__col-links">
+          <li><a href="#about">About Us</a></li>
+          <li><a href="#">Careers</a></li>
+          <li><a href="#">Press</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer__col-title">Locations</div>
+        <ul class="footer__col-links">
+          <li><a href="#">Mumbai</a></li>
+          <li><a href="#">Pune</a></li>
+          <li><a href="#">Bangalore</a></li>
+        </ul>
+      </div>
+      <div class="footer__newsletter">
+        <div class="footer__col-title">Stay Updated</div>
+        <p style="font-family: var(--mono); font-size: 0.6875rem; color: var(--fog); line-height: 1.6; letter-spacing: 0.04em">New arrivals and exclusive inventory drops. No spam.</p>
+        <div class="footer__newsletter-input">
+          <input type="email" placeholder="Your email">
+          <button>Subscribe &rarr;</button>
+        </div>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span class="footer__copy">&copy; 2025 Maison Drivetrain. All rights reserved.</span>
+      <div class="footer__legal">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Cookies</a>
+      </div>
+    </div>
+    <div class="footer__endline">Mumbai &middot; Pune &middot; Bangalore &middot; 2025</div>
+  </div>
+</footer>
+
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+/* === PRELOADER === */
+(function() {
+  const counter = document.getElementById('plCounter');
+  const tachFill = document.getElementById('tachFill');
+  const needle = document.getElementById('tachNeedle');
+  const totalDash = 283;
+  let current = 0;
+  const duration = 1600;
+  const start = performance.now();
+
+  function easeInOut(t) {
+    return t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t+2,2)/2;
+  }
+
+  function tick(now) {
+    const elapsed = Math.min(now - start, duration);
+    const progress = easeInOut(elapsed / duration);
+    current = Math.round(progress * 100);
+    counter.textContent = String(current).padStart(3, '0');
+    tachFill.style.strokeDashoffset = totalDash - progress * totalDash;
+    const angle = -90 + progress * 180;
+    needle.setAttribute('transform', 'rotate(' + angle + ' 100 110)');
+    if (elapsed < duration) { requestAnimationFrame(tick); }
+    else {
+      setTimeout(function() {
+        needle.style.transition = 'transform 0.4s cubic-bezier(0.34,1.56,0.64,1)';
+        needle.setAttribute('transform', 'rotate(70 100 110)');
+        setTimeout(function() {
+          document.getElementById('preloader').classList.add('splitting');
+          setTimeout(function() {
+            document.getElementById('preloader').style.display = 'none';
+            document.body.classList.add('ready');
+          }, 900);
+        }, 400);
+      }, 150);
+    }
+  }
+  requestAnimationFrame(tick);
+})();
+</script>
+
+
+<script>
+/* === LENIS SMOOTH SCROLL === */
+const lenis = new Lenis({
+  duration: 1.2,
+  easing: function(t) { return Math.min(1, 1.001 - Math.pow(2, -10 * t)); },
+  smooth: true,
+  smoothTouch: false,
+});
+function rafLenis(time) {
+  lenis.raf(time);
+  requestAnimationFrame(rafLenis);
+}
+requestAnimationFrame(rafLenis);
+lenis.on('scroll', ScrollTrigger.update);
+gsap.ticker.add(function(time) { lenis.raf(time * 1000); });
+gsap.ticker.lagSmoothing(0);
+
+/* === NAV === */
+window.addEventListener('scroll', function() {
+  document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 60);
+}, { passive: true });
+
+document.getElementById('navToggle').addEventListener('click', function() {
+  this.classList.toggle('is-open');
+  document.getElementById('navOverlay').classList.toggle('is-open');
+  document.body.style.overflow = document.getElementById('navOverlay').classList.contains('is-open') ? 'hidden' : '';
+});
+document.querySelectorAll('.nav__overlay-links a').forEach(function(a) {
+  a.addEventListener('click', function() {
+    document.getElementById('navToggle').classList.remove('is-open');
+    document.getElementById('navOverlay').classList.remove('is-open');
+    document.body.style.overflow = '';
+  });
+});
+
+/* === HERO PARALLAX + ENTRANCE === */
+gsap.registerPlugin(ScrollTrigger);
+
+gsap.to('#heroImg', {
+  yPercent: 20,
+  ease: 'none',
+  scrollTrigger: {
+    trigger: '#heroSection',
+    start: 'top top',
+    end: 'bottom top',
+    scrub: true,
+  }
+});
+
+gsap.utils.toArray('.hero__h1-line').forEach(function(line, i) {
+  gsap.fromTo(line,
+    { y: '110%', opacity: 0 },
+    { y: '0%', opacity: 1, duration: 1, ease: 'power3.out', delay: 0.6 + i * 0.12 }
+  );
+});
+gsap.fromTo('.hero__body',
+  { y: 24, opacity: 0 },
+  { y: 0, opacity: 1, duration: 0.8, ease: 'power2.out', delay: 1.3 }
+);
+gsap.fromTo('.hero__actions',
+  { y: 20, opacity: 0 },
+  { y: 0, opacity: 1, duration: 0.7, ease: 'power2.out', delay: 1.5 }
+);
+gsap.fromTo('.hero__eyebrow',
+  { opacity: 0, x: -16 },
+  { opacity: 1, x: 0, duration: 0.8, ease: 'power2.out', delay: 0.4 }
+);
+</script>
+
+
+<script>
+/* === INVENTORY FILTER === */
+function initFilter() {
+  var tabs = document.querySelectorAll('.filter-tab');
+  var cards = document.querySelectorAll('.car-card');
+  var indicator = document.getElementById('filterIndicator');
+
+  function moveIndicator(tab) {
+    indicator.style.left = tab.offsetLeft + 'px';
+    indicator.style.width = tab.offsetWidth + 'px';
+  }
+
+  var activeTab = document.querySelector('.filter-tab.is-active');
+  if (activeTab) moveIndicator(activeTab);
+
+  tabs.forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      tabs.forEach(function(t) { t.classList.remove('is-active'); });
+      tab.classList.add('is-active');
+      moveIndicator(tab);
+      var filter = tab.dataset.filter;
+      cards.forEach(function(card, i) {
+        var show = filter === 'all' || card.dataset.category === filter;
+        card.classList.remove('is-shown');
+        card.classList.toggle('is-hiding', !show);
+        if (show) {
+          card.style.display = '';
+          setTimeout(function() { card.classList.add('is-shown'); }, 10 + i * 40);
+        } else {
+          setTimeout(function() { card.style.display = 'none'; }, 300);
+        }
+      });
+    });
+  });
+}
+initFilter();
+
+/* === TRADE-IN STEPS === */
+var currentTradeStep = 1;
+function tradeNextStep(step) {
+  var steps = document.querySelectorAll('.trade__step');
+  steps.forEach(function(s) { s.classList.remove('is-active'); });
+
+  var imgs = document.querySelectorAll('.trade__img');
+  imgs.forEach(function(img) { img.classList.remove('trade__img--active'); });
+
+  var targetStep = document.getElementById('tradeStep' + step);
+  var targetImg = document.getElementById('tradeImg' + step);
+
+  if (targetStep) {
+    targetStep.classList.add('is-active');
+    gsap.fromTo(targetStep, { x: 32, opacity: 0 }, { x: 0, opacity: 1, duration: 0.5, ease: 'power2.out' });
+  }
+  if (targetImg) targetImg.classList.add('trade__img--active');
+
+  var progressPct = { 1: 33.3, 2: 66.6, 3: 100 };
+  document.getElementById('tradeProgressFill').style.width = progressPct[step] + '%';
+
+  document.querySelectorAll('.trade__step-label').forEach(function(label) {
+    label.classList.toggle('is-active', parseInt(label.dataset.step) === step);
+  });
+  currentTradeStep = step;
+}
+
+function tradeSubmit() {
+  document.querySelectorAll('.trade__step').forEach(function(s) { s.classList.remove('is-active'); });
+  document.getElementById('tradeProgressFill').style.width = '100%';
+  var success = document.getElementById('tradeSuccess');
+  success.classList.add('is-visible');
+  gsap.fromTo(success, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: 'power2.out' });
+}
+</script>
+
+
+<script>
+/* === FINANCE CALCULATOR === */
+function initFinance() {
+  var priceSlider = document.getElementById('finPrice');
+  var dpSlider = document.getElementById('finDP');
+  var tenureInputs = document.querySelectorAll('input[name="tenure"]');
+  var emiDisplay = document.getElementById('emiDisplay');
+  var interestDisplay = document.getElementById('interestDisplay');
+  var totalDisplay = document.getElementById('totalDisplay');
+
+  function calcEMI() {
+    var P = parseFloat(priceSlider.value) - parseFloat(dpSlider.value);
+    if (P <= 0) P = 100000;
+    var annualRate = 8.5;
+    var r = annualRate / 12 / 100;
+    var checkedTenure = document.querySelector('input[name="tenure"]:checked');
+    var n = checkedTenure ? parseInt(checkedTenure.value) : 48;
+
+    var emi = P * r * Math.pow(1+r,n) / (Math.pow(1+r,n) - 1);
+    var totalPaid = emi * n;
+    var totalInterest = totalPaid - P;
+
+    animateNumber(emiDisplay, Math.round(emi));
+    animateNumber(interestDisplay, Math.round(totalInterest));
+    animateNumber(totalDisplay, Math.round(totalPaid));
+
+    document.getElementById('finDPVal').textContent = '\u20B9' + (parseFloat(dpSlider.value)/100000).toFixed(1) + ' Lac';
+    document.getElementById('finPriceVal').textContent = '\u20B9' + (parseFloat(priceSlider.value)/10000000).toFixed(2) + ' Cr';
+  }
+
+  function animateNumber(el, target) {
+    var current = parseFloat(el.dataset.current || 0);
+    var diff = target - current;
+    var steps = 20;
+    var step = 0;
+    el.dataset.current = target;
+    var interval = setInterval(function() {
+      step++;
+      var progress = step / steps;
+      var eased = 1 - Math.pow(1 - progress, 3);
+      el.textContent = '\u20B9' + Math.round(current + diff * eased).toLocaleString('en-IN');
+      if (step >= steps) clearInterval(interval);
+    }, 20);
+  }
+
+  if (priceSlider) {
+    priceSlider.addEventListener('input', calcEMI);
+    dpSlider.addEventListener('input', calcEMI);
+    tenureInputs.forEach(function(input) { input.addEventListener('change', calcEMI); });
+    calcEMI();
+  }
+}
+initFinance();
+
+/* === FAQ CONTEXTUAL IMAGE === */
+function initFAQ() {
+  var details = document.querySelectorAll('.faq-item');
+  var contextImg = document.getElementById('faqContextImg');
+
+  details.forEach(function(detail) {
+    detail.addEventListener('toggle', function() {
+      if (detail.open && contextImg) {
+        var imgSrc = detail.dataset.img;
+        if (imgSrc) {
+          gsap.to(contextImg, { opacity: 0, duration: 0.25, onComplete: function() {
+            contextImg.src = imgSrc;
+            contextImg.classList.add('is-visible');
+            gsap.to(contextImg, { opacity: 1, duration: 0.4, ease: 'power2.out' });
+          }});
+        }
+      }
+    });
+  });
+}
+initFAQ();
+</script>
+
+
+<script>
+/* === ABOUT — Counter-parallax + Chapter transitions === */
+gsap.to('#aboutImgLeft', {
+  yPercent: -25,
+  ease: 'none',
+  scrollTrigger: { trigger: '#about', start: 'top bottom', end: 'bottom top', scrub: true }
+});
+gsap.to('#aboutImgRight', {
+  yPercent: 25,
+  ease: 'none',
+  scrollTrigger: { trigger: '#about', start: 'top bottom', end: 'bottom top', scrub: true }
+});
+
+var chapters = document.querySelectorAll('.about__chapter');
+function activateChapter(index) {
+  chapters.forEach(function(ch, i) {
+    ch.classList.toggle('is-active', i === index);
+  });
+}
+chapters.forEach(function(ch, i) {
+  ScrollTrigger.create({
+    trigger: '#about',
+    start: (i * 33) + '% center',
+    end: ((i+1) * 33) + '% center',
+    onEnter: function() { activateChapter(i); },
+    onEnterBack: function() { activateChapter(i); },
+  });
+});
+
+/* === STATS COUNTERS === */
+ScrollTrigger.batch('.stat-value', {
+  start: 'top 80%',
+  onEnter: function(batch) {
+    batch.forEach(function(el) {
+      var target = parseFloat(el.dataset.target);
+      var suffix = el.dataset.suffix || '';
+      var prefix = el.dataset.prefix || '';
+      gsap.fromTo({ v: 0 }, { v: target }, {
+        duration: 2,
+        ease: 'power2.out',
+        onUpdate: function() {
+          var val = this.targets()[0].v;
+          el.textContent = prefix + Math.floor(val).toLocaleString('en-IN') + suffix;
+        }
+      });
+    });
+  },
+  once: true,
+});
+
+/* === TOOLS STAGGER REVEAL === */
+ScrollTrigger.batch('.tool-tile', {
+  start: 'top 85%',
+  onEnter: function(batch) {
+    gsap.fromTo(batch,
+      { y: 40, opacity: 0 },
+      { y: 0, opacity: 1, stagger: 0.12, duration: 0.9, ease: 'power3.out' }
+    );
+  },
+  once: true,
+});
+
+/* === GLOBAL SCROLL REVEALS === */
+ScrollTrigger.batch('[data-reveal]', {
+  start: 'top 88%',
+  onEnter: function(batch) {
+    gsap.fromTo(batch,
+      { y: 32, opacity: 0 },
+      { y: 0, opacity: 1, stagger: 0.08, duration: 0.9, ease: 'power3.out' }
+    );
+  },
+  once: true,
+});
+ScrollTrigger.batch('.section-h', {
+  start: 'top 85%',
+  onEnter: function(batch) {
+    gsap.fromTo(batch,
+      { y: 48, opacity: 0 },
+      { y: 0, opacity: 1, stagger: 0.1, duration: 1.1, ease: 'power3.out' }
+    );
+  },
+  once: true,
+});
+</script>
+</body>
+</html>
