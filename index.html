@@ -238,16 +238,22 @@ p{ margin:0; }
 .hero-grid{
   position: relative;
   display:grid;
-  grid-template-columns: 30% 70%;
+  grid-template-columns: 40% 60%;     /* clean 40/60 split */
   align-items: stretch;
   min-height: 78vh;
+  gap: 0;
 }
+
+/* LEFT COLUMN — owns eyebrow, H1, meta paragraph, CTA, scroll badge.
+   Flex column with three discrete blocks ⇒ nothing overlaps anything else. */
 .hero-copy{
   position: relative;
   z-index: 3;
-  padding-left: var(--pad-x);
-  padding-right: 4vw;
-  display:flex; flex-direction: column; justify-content: flex-end;
+  padding: 0 4vw 0 var(--pad-x);
+  display: flex;
+  flex-direction: column;
+  /* top → eyebrow, middle → H1, bottom → meta+CTA; badge is absolutely pinned */
+  background: var(--pearl);          /* solid surface so the badge sits on a clean ground */
 }
 .hero-copy .eyebrow-row{
   display:flex; align-items:center; gap: 14px;
@@ -260,32 +266,53 @@ p{ margin:0; }
   color: var(--ink-soft);
 }
 
+/* Headline grows into the available middle space, pushing bottom block down */
 .hero-headline{
   font-family: var(--serif);
-  font-size: clamp(72px, 13.5vw, 240px);
-  line-height: 0.86;
-  letter-spacing: -0.045em;
+  font-size: clamp(56px, 10.5vw, 184px);
+  line-height: 0.88;
+  letter-spacing: -0.04em;
   font-weight: 500;
   position: relative;
   z-index: 4;
-  white-space: nowrap;
+  white-space: nowrap;                /* lets lines bleed slightly into right column */
+  margin: auto 0 8vh;                 /* auto top → pinned to bottom of middle area */
 }
 .hero-headline em{
   font-style: italic;
   font-weight: 400;
   display: inline-block;
 }
+.hero-headline .line1{ display:block; }
 .hero-headline .line2{
   display:block;
-  margin-left: 22vw;     /* push deep into image area for overlap */
+  margin-left: 4vw;                   /* gentle editorial step */
   position: relative;
   z-index: 5;
 }
 .hero-headline .line3{
   display:block;
-  margin-left: 6vw;
+  margin-left: 1vw;
 }
 
+/* Bottom row of left column: paragraph copy beside the CTA */
+.hero-bottom{
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 32px;
+  padding-bottom: 12vh;               /* leave room for the absolutely-pinned scroll badge */
+  border-top: 1px solid var(--hair);
+  padding-top: 28px;
+}
+.hero-meta{
+  max-width: 280px;
+}
+.hero-meta p{ font-size: 13px; line-height: 1.65; color: var(--ink-soft); }
+.hero-cta{ flex-shrink: 0; }          /* keep CTA from squashing */
+
+/* RIGHT COLUMN — image with a soft pearl gradient on its left edge so the bleeding
+   H1 stays legible without the type having to live on top of full-bleed photography. */
 .hero-image{
   position: relative;
   z-index: 1;
@@ -295,28 +322,33 @@ p{ margin:0; }
   height: 78vh;
   align-self: end;
 }
+.hero-image::before{
+  content:"";
+  position:absolute; inset: 0;
+  background: linear-gradient(90deg,
+              var(--pearl) 0%,
+              rgba(249,249,246,0.85) 8%,
+              rgba(249,249,246,0.0) 26%);
+  z-index: 2;
+  pointer-events: none;
+}
 .hero-image img{
   width:100%; height:100%; object-fit: cover;
   transform-origin: center;
   filter: saturate(0.92) contrast(1.02);
 }
 
-.hero-meta{
-  position:absolute; left: var(--pad-x); bottom: 6vh;
-  z-index: 4;
-  display:flex; gap: 64px;
-  max-width: 460px;
-}
-.hero-meta p{ font-size: 13px; line-height: 1.65; color: var(--ink-soft); max-width: 320px; }
-
-/* Rotating "Scroll to Explore" badge */
+/* Rotating "Scroll to Explore" badge — pinned bottom-right of the LEFT column,
+   sitting on the solid pearl ground for guaranteed legibility. */
 .scroll-badge{
   position: absolute;
-  right: calc(var(--pad-x) + 24px);
-  bottom: 6vh;
-  width: 124px; height: 124px;
+  right: 4vw;
+  bottom: 4vh;
+  width: 116px; height: 116px;
   z-index: 6;
   display:flex; align-items:center; justify-content:center;
+  background: var(--pearl);           /* solid disc behind the type */
+  border-radius: 50%;
 }
 .scroll-badge svg{ position:absolute; inset:0; width:100%; height:100%; animation: spin 18s linear infinite; }
 .scroll-badge .arrow{
@@ -333,12 +365,14 @@ p{ margin:0; }
 
 @media (max-width: 980px){
   .hero-grid{ grid-template-columns: 1fr; }
+  .hero-copy{ background: transparent; padding: 0 var(--pad-x); }
   .hero-image{ margin: 32px var(--pad-x) 0; height: 60vh; order: 2; }
-  .hero-headline{ font-size: 18vw; white-space: normal; }
+  .hero-image::before{ display:none; }
+  .hero-headline{ font-size: 16vw; white-space: normal; margin: 32px 0; }
   .hero-headline .line2{ margin-left: 0; }
   .hero-headline .line3{ margin-left: 0; }
-  .hero-meta{ position: static; padding: 0 var(--pad-x); margin-top: 28px; }
-  .scroll-badge{ display:none; }
+  .hero-bottom{ flex-direction: column; align-items: flex-start; gap: 24px; padding-bottom: 4vh; }
+  .scroll-badge{ position: static; margin-top: 24px; }
 }
 
 /* =========================================================
@@ -357,19 +391,21 @@ p{ margin:0; }
 
 .ethos-text{
   font-family: var(--serif);
-  font-size: clamp(28px, 4.4vw, 68px);
+  font-size: clamp(28px, 4vw, 60px);
   line-height: 1.18;
   letter-spacing: -0.02em;
-  max-width: 1100px;
-  margin: 0 auto;
+  max-width: 50%;                 /* keep type strictly in the left half */
+  margin: 0;                      /* no longer centered — left-anchored */
   font-weight: 400;
+  position: relative;
+  z-index: 2;
 }
 .ethos-text .word{ display: inline-block; opacity: 0.18; transition: opacity .2s linear; }
 .ethos-text em{ font-style: italic; }
 
 .ethos-sig{
-  margin: 14vh auto 0;
-  max-width: 1100px;
+  margin: 14vh 0 0;
+  max-width: 50%;
   display:flex; justify-content: space-between; align-items: flex-end;
   border-top: 1px solid var(--hair);
   padding-top: 28px;
@@ -379,19 +415,18 @@ p{ margin:0; }
   font-family: var(--serif); font-style: italic; font-size: 36px;
 }
 
-/* Floating detail images (parallax) */
+/* Floating detail images live strictly in the right half of the section so they
+   exist in a separate spatial quadrant from the typography. */
 .floater{
   position: absolute;
-  width: 180px; height: 240px;
   overflow:hidden;
   box-shadow: 0 30px 60px -30px rgba(26,26,26,0.25);
-  z-index: 4;
+  z-index: 1;
   will-change: transform;
 }
 .floater img{ width:100%; height:100%; object-fit: cover; }
-.f1{ top: 12vh; right: 8vw; width: 200px; height: 260px; }
-.f2{ bottom: 10vh; left: 6vw; width: 220px; height: 160px; }
-.f3{ top: 50%; right: 16vw; width: 140px; height: 180px; }
+.f1{ top: 12vh; right: 10%; width: 220px; height: 280px; }
+.f2{ bottom: 10%; right: 10%; width: 240px; height: 180px; }   /* per brief */
 
 @media (max-width: 768px){
   .floater{ display:none; }
@@ -678,8 +713,9 @@ p{ margin:0; }
    ========================================================= */
 .experts{
   position: relative;
-  padding: 24vh 0 22vh;
+  padding: 18vh 0 8vh;            /* tightened bottom padding — pace into testimonials */
   overflow: hidden;
+  isolation: isolate;             /* contain the blend-mode to this section */
 }
 .experts-bg{
   position: absolute; top: 8vh; left: 0;
@@ -690,11 +726,14 @@ p{ margin:0; }
   font-size: clamp(120px, 22vw, 360px);
   line-height: 0.9;
   letter-spacing: -0.04em;
-  color: transparent;
-  -webkit-text-stroke: 1px var(--hair-strong);
+  /* PREMIUM EFFECT — solid white type with mix-blend-mode: difference.
+     Over the pearl ground it reads as ~black; over the portraits it inverts to a
+     ghostly translucent halo. The result is highly readable AND editorial. */
+  color: #ffffff;
+  mix-blend-mode: difference;
   pointer-events: none;
   will-change: transform;
-  z-index: 0;
+  z-index: 10;                    /* sits ABOVE the portraits */
 }
 .experts-head{
   position: relative;
@@ -1106,45 +1145,54 @@ p{ margin:0; }
 <header class="hero" id="hero">
   <div class="hero-grid">
 
+    <!-- LEFT COLUMN — strict vertical stack, nothing overlaps anything else.
+         Eyebrow → H1 (auto-pushed) → meta + CTA row.
+         Scroll badge is absolutely pinned to bottom-right of THIS column. -->
     <div class="hero-copy">
       <div class="eyebrow-row">
         <span class="num">01 — The Practice</span>
         <span class="hair" style="flex:1; max-width:140px;"></span>
       </div>
+
       <h1 class="hero-headline">
         <span class="line1">The art</span>
         <span class="line2"><em>of living</em></span>
         <span class="line3">slowly.</span>
       </h1>
+
+      <div class="hero-bottom">
+        <div class="hero-meta">
+          <p class="eyebrow" style="margin-bottom: 14px;">A Longevity Practice</p>
+          <p>Diagnostic medicine, restorative architecture, and the discipline of unhurried care — practiced in Geneva and Kyoto.</p>
+        </div>
+        <button class="cta-book hero-cta" data-open-modal>
+          <span class="dot"></span>
+          Book Consultation
+        </button>
+      </div>
+
+      <a href="#ethos" class="scroll-badge" aria-label="Scroll to explore">
+        <svg viewBox="0 0 200 200">
+          <defs>
+            <path id="circ" d="M 100, 100 m -78, 0 a 78,78 0 1,1 156,0 a 78,78 0 1,1 -156,0" fill="none"/>
+          </defs>
+          <text fill="#1A1A1A" font-family="Inter, sans-serif" font-size="11" letter-spacing="6">
+            <textPath href="#circ">SCROLL · TO · EXPLORE · MAISON · LUMEN ·  </textPath>
+          </text>
+        </svg>
+        <span class="arrow">
+          <svg class="arr" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="1.4">
+            <path d="M12 4v16M6 14l6 6 6-6"/>
+          </svg>
+        </span>
+      </a>
     </div>
 
+    <!-- RIGHT COLUMN — image with pearl gradient on its left edge for legibility -->
     <div class="hero-image" id="heroImg">
-      <img src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1800&q=80" alt="An interior of a tranquil longevity sanctuary" />
+      <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2000" alt="A serene architectural interior in warm directional light" />
     </div>
   </div>
-
-  <div class="hero-meta">
-    <div>
-      <p class="eyebrow" style="margin-bottom: 14px;">A Longevity Practice</p>
-      <p>Diagnostic medicine, restorative architecture, and the discipline of unhurried care — practiced across two private residences in Geneva and Kyoto.</p>
-    </div>
-  </div>
-
-  <a href="#ethos" class="scroll-badge" aria-label="Scroll to explore">
-    <svg viewBox="0 0 200 200">
-      <defs>
-        <path id="circ" d="M 100, 100 m -78, 0 a 78,78 0 1,1 156,0 a 78,78 0 1,1 -156,0" fill="none"/>
-      </defs>
-      <text fill="#1A1A1A" font-family="Inter, sans-serif" font-size="11" letter-spacing="6">
-        <textPath href="#circ">SCROLL · TO · EXPLORE · MAISON · LUMEN ·  </textPath>
-      </text>
-    </svg>
-    <span class="arrow">
-      <svg class="arr" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="1.4">
-        <path d="M12 4v16M6 14l6 6 6-6"/>
-      </svg>
-    </span>
-  </a>
 </header>
 
 <!-- ============================================================
@@ -1156,9 +1204,9 @@ p{ margin:0; }
     <span class="eyebrow">02 — Ethos</span>
   </div>
 
-  <div class="floater f1"><img src="https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=600&q=80" alt="" /></div>
-  <div class="floater f2"><img src="https://images.unsplash.com/photo-1519682337058-a94d519337bc?auto=format&fit=crop&w=800&q=80" alt="" /></div>
-  <div class="floater f3"><img src="https://images.unsplash.com/photo-1502082553048-f009c37129b9?auto=format&fit=crop&w=600&q=80" alt="" /></div>
+  <!-- Floating detail images live in the right half — separate spatial quadrant from the type. -->
+  <div class="floater f1"><img src="https://images.unsplash.com/photo-1616627547584-bf28cee262db?q=80&w=1000" alt="" /></div>
+  <div class="floater f2"><img src="https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=600&q=80" alt="" /></div>
 
   <p class="ethos-text" id="ethosText">
     We do not prescribe trends. We prescribe <em>time</em>. Each protocol is a conversation between architecture, biology, and ritual — drawn slowly, in small notations, across years rather than appointments. The body remembers what the calendar forgets.
@@ -1314,8 +1362,8 @@ p{ margin:0; }
 
     <article class="expert e1">
       <div class="e-frame">
-        <div class="e-overflow"><img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=900&q=80" alt="Portrait" /></div>
-        <div class="e-clip"><img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=900&q=80" alt="Portrait" /></div>
+        <div class="e-overflow"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=800" alt="Portrait" /></div>
+        <div class="e-clip"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=800" alt="Portrait" /></div>
       </div>
       <div class="e-meta">
         <span class="e-name">Dr. <em>Aleksandra</em> Hadley</span>
@@ -1325,8 +1373,8 @@ p{ margin:0; }
 
     <article class="expert e2">
       <div class="e-frame">
-        <div class="e-overflow"><img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=900&q=80" alt="Portrait" /></div>
-        <div class="e-clip"><img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=900&q=80" alt="Portrait" /></div>
+        <div class="e-overflow"><img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=800" alt="Portrait" /></div>
+        <div class="e-clip"><img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=800" alt="Portrait" /></div>
       </div>
       <div class="e-meta">
         <span class="e-name"><em>Hideki</em> Mori</span>
@@ -1336,8 +1384,8 @@ p{ margin:0; }
 
     <article class="expert e3">
       <div class="e-frame">
-        <div class="e-overflow"><img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=900&q=80" alt="Portrait" /></div>
-        <div class="e-clip"><img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=900&q=80" alt="Portrait" /></div>
+        <div class="e-overflow"><img src="https://images.unsplash.com/photo-1531123897727-8f129e1688ce?q=80&w=800" alt="Portrait" /></div>
+        <div class="e-clip"><img src="https://images.unsplash.com/photo-1531123897727-8f129e1688ce?q=80&w=800" alt="Portrait" /></div>
       </div>
       <div class="e-meta">
         <span class="e-name">Dr. <em>Iris</em> Lange</span>
