@@ -1,0 +1,1933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MAISON LUMEN — The Practice of Longevity</title>
+<meta name="description" content="An editorial study in longevity, restoration and quiet luxury. Maison Lumen — the practice." />
+
+<!-- Bootstrap 3 (grid only — visuals fully overridden) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" />
+
+<!-- Editorial typography -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<!-- Motion stack -->
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/SplitText.min.js"></script>
+
+<style>
+/* =========================================================
+   0. DESIGN TOKENS
+   ========================================================= */
+:root{
+  --pearl:        #F9F9F6;
+  --stone:        #E5E4DF;
+  --stone-deep:   #D6D4CC;
+  --ink:          #1A1A1A;
+  --ink-soft:     #2A2A28;
+  --hair:         rgba(26,26,26,0.14);
+  --hair-strong:  rgba(26,26,26,0.32);
+
+  --serif:  'Playfair Display', 'Times New Roman', serif;
+  --sans:   'Inter', 'Helvetica Neue', Arial, sans-serif;
+
+  --ease:        cubic-bezier(.7,0,.2,1);
+  --ease-soft:   cubic-bezier(.25,1,.3,1);
+
+  --pad-x: clamp(24px, 5vw, 96px);
+}
+
+/* =========================================================
+   1. RESET & BASE — overrides Bootstrap's dated typography
+   ========================================================= */
+*,*::before,*::after{ box-sizing: border-box; }
+html,body{
+  margin:0; padding:0;
+  background: var(--pearl);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: 15px;
+  letter-spacing: 0.01em;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+html{ scroll-behavior:auto; }
+body{ overflow-x: hidden; cursor: none; }
+
+img{ display:block; max-width:100%; height:auto; user-select:none; -webkit-user-drag:none; }
+a{ color:inherit; text-decoration:none; }
+button{ font-family:inherit; cursor:pointer; border:none; background:none; color:inherit; padding:0; }
+::selection{ background: var(--ink); color: var(--pearl); }
+
+/* Override BS3 container so we can break the grid */
+.container, .container-fluid{ padding-left: var(--pad-x); padding-right: var(--pad-x); }
+
+/* Universal serif heading reset (kill BS3 h1..h6 sizing) */
+h1,h2,h3,h4,h5,h6{
+  font-family: var(--serif);
+  font-weight: 400;
+  margin: 0;
+  letter-spacing: -0.02em;
+  line-height: 0.92;
+  color: var(--ink);
+}
+p{ margin:0; }
+
+/* Micro-UI label */
+.eyebrow{
+  font-family: var(--sans);
+  font-size: 11px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--ink-soft);
+}
+
+/* Hairlines */
+.hair{ height:1px; background: var(--hair); width:100%; }
+.vhair{ width:1px; background: var(--hair); height:100%; }
+
+/* =========================================================
+   2. CUSTOM CURSOR
+   ========================================================= */
+.cursor, .cursor-dot{
+  position: fixed; top:0; left:0;
+  pointer-events:none;
+  z-index: 9999;
+  mix-blend-mode: difference;
+}
+.cursor{
+  width: 36px; height: 36px;
+  border: 1px solid rgba(249,249,246,0.7);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width .35s var(--ease), height .35s var(--ease), background .3s var(--ease);
+}
+.cursor-dot{
+  width:4px; height:4px; background: var(--pearl);
+  border-radius:50%;
+  transform: translate(-50%,-50%);
+}
+.cursor.is-hover{ width:64px; height:64px; background: rgba(249,249,246,0.08); }
+@media (hover:none){ .cursor,.cursor-dot{ display:none; } body{ cursor:auto; } }
+
+/* =========================================================
+   3. PRE-LOADER
+   ========================================================= */
+#preloader{
+  position: fixed; inset:0;
+  background: var(--pearl);
+  z-index: 1000;
+  display:flex; align-items:flex-end; justify-content: space-between;
+  padding: var(--pad-x);
+  overflow:hidden;
+}
+#preloader .pl-mark{
+  font-family: var(--serif);
+  font-size: clamp(64px, 14vw, 220px);
+  font-style: italic;
+  font-weight: 500;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+}
+#preloader .pl-counter{
+  font-family: var(--sans);
+  font-size: 12px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  display:flex; gap:14px; align-items:flex-end;
+}
+#preloader .pl-counter span{ font-variant-numeric: tabular-nums; }
+#preloader .pl-curtain{
+  position:absolute; left:0; right:0; bottom:0;
+  height:0%;
+  background: var(--ink);
+  z-index: 1;
+}
+
+/* =========================================================
+   4. NAVBAR
+   ========================================================= */
+.nav{
+  position: fixed; top:0; left:0; right:0;
+  z-index: 200;
+  padding: 22px var(--pad-x);
+  display:flex; align-items:center; justify-content: space-between;
+  transition: backdrop-filter .4s var(--ease), background .4s var(--ease), padding .4s var(--ease);
+}
+.nav.scrolled{
+  background: rgba(249,249,246,0.72);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  backdrop-filter: blur(18px) saturate(140%);
+  padding: 14px var(--pad-x);
+  border-bottom: 1px solid var(--hair);
+}
+.nav .brand{
+  font-family: var(--serif);
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.nav .brand small{
+  display:block;
+  font-family: var(--sans);
+  font-size: 9px;
+  letter-spacing: 0.4em;
+  font-weight: 500;
+  text-transform: uppercase;
+  margin-top: 2px;
+  color: var(--ink-soft);
+}
+.nav-links{
+  display:flex; gap: 36px;
+  font-size: 12px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+.nav-links a{ position:relative; padding: 6px 0; }
+.nav-links a::after{
+  content:""; position:absolute; left:0; bottom:0;
+  width:0; height:1px; background: var(--ink);
+  transition: width .5s var(--ease);
+}
+.nav-links a:hover::after{ width:100%; }
+
+.cta-book{
+  display:inline-flex; align-items:center; gap:14px;
+  padding: 12px 22px 12px 26px;
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  font-size: 11px; letter-spacing: 0.28em; text-transform: uppercase;
+  font-weight: 500;
+  background: transparent;
+  position: relative;
+  overflow: hidden;
+  transition: color .5s var(--ease);
+}
+.cta-book .dot{ width:6px; height:6px; background: var(--ink); border-radius:50%; transition: background .5s var(--ease); }
+.cta-book::before{
+  content:""; position:absolute; inset:0;
+  background: var(--ink); border-radius: 999px;
+  transform: scaleY(0); transform-origin: bottom;
+  transition: transform .55s var(--ease-soft);
+  z-index:-1;
+}
+.cta-book:hover{ color: var(--pearl); }
+.cta-book:hover .dot{ background: var(--pearl); }
+.cta-book:hover::before{ transform: scaleY(1); transform-origin: top; }
+
+@media (max-width: 880px){ .nav-links{ display:none; } }
+
+/* =========================================================
+   5. SECTION 01 — HERO
+   ========================================================= */
+.hero{
+  position: relative;
+  min-height: 100vh;
+  padding-top: clamp(120px, 18vh, 200px);
+  padding-bottom: 8vh;
+  overflow: hidden;
+}
+.hero-grid{
+  position: relative;
+  display:grid;
+  grid-template-columns: 30% 70%;
+  align-items: stretch;
+  min-height: 78vh;
+}
+.hero-copy{
+  position: relative;
+  z-index: 3;
+  padding-left: var(--pad-x);
+  padding-right: 4vw;
+  display:flex; flex-direction: column; justify-content: flex-end;
+}
+.hero-copy .eyebrow-row{
+  display:flex; align-items:center; gap: 14px;
+  margin-bottom: 36px;
+}
+.hero-copy .eyebrow-row .num{
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+
+.hero-headline{
+  font-family: var(--serif);
+  font-size: clamp(72px, 13.5vw, 240px);
+  line-height: 0.86;
+  letter-spacing: -0.045em;
+  font-weight: 500;
+  position: relative;
+  z-index: 4;
+  white-space: nowrap;
+}
+.hero-headline em{
+  font-style: italic;
+  font-weight: 400;
+  display: inline-block;
+}
+.hero-headline .line2{
+  display:block;
+  margin-left: 22vw;     /* push deep into image area for overlap */
+  position: relative;
+  z-index: 5;
+}
+.hero-headline .line3{
+  display:block;
+  margin-left: 6vw;
+}
+
+.hero-image{
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  margin-right: var(--pad-x);
+  margin-top: 0;
+  height: 78vh;
+  align-self: end;
+}
+.hero-image img{
+  width:100%; height:100%; object-fit: cover;
+  transform-origin: center;
+  filter: saturate(0.92) contrast(1.02);
+}
+
+.hero-meta{
+  position:absolute; left: var(--pad-x); bottom: 6vh;
+  z-index: 4;
+  display:flex; gap: 64px;
+  max-width: 460px;
+}
+.hero-meta p{ font-size: 13px; line-height: 1.65; color: var(--ink-soft); max-width: 320px; }
+
+/* Rotating "Scroll to Explore" badge */
+.scroll-badge{
+  position: absolute;
+  right: calc(var(--pad-x) + 24px);
+  bottom: 6vh;
+  width: 124px; height: 124px;
+  z-index: 6;
+  display:flex; align-items:center; justify-content:center;
+}
+.scroll-badge svg{ position:absolute; inset:0; width:100%; height:100%; animation: spin 18s linear infinite; }
+.scroll-badge .arrow{
+  width:36px; height:36px;
+  border: 1px solid var(--ink);
+  border-radius: 50%;
+  display:flex; align-items:center; justify-content:center;
+  background: var(--pearl);
+  position: relative;
+  z-index: 2;
+}
+.scroll-badge .arrow svg.arr{ width:14px; height:14px; animation: none; position:static; }
+@keyframes spin{ to{ transform: rotate(360deg);} }
+
+@media (max-width: 980px){
+  .hero-grid{ grid-template-columns: 1fr; }
+  .hero-image{ margin: 32px var(--pad-x) 0; height: 60vh; order: 2; }
+  .hero-headline{ font-size: 18vw; white-space: normal; }
+  .hero-headline .line2{ margin-left: 0; }
+  .hero-headline .line3{ margin-left: 0; }
+  .hero-meta{ position: static; padding: 0 var(--pad-x); margin-top: 28px; }
+  .scroll-badge{ display:none; }
+}
+
+/* =========================================================
+   6. SECTION 02 — ETHOS
+   ========================================================= */
+.ethos{
+  position: relative;
+  padding: 22vh var(--pad-x) 24vh;
+  overflow: hidden;
+}
+.ethos .small-tag{
+  position:absolute; top: 14vh; left: var(--pad-x);
+  display:flex; align-items:center; gap: 14px;
+}
+.ethos .small-tag .bar{ width: 56px; height:1px; background: var(--ink); }
+
+.ethos-text{
+  font-family: var(--serif);
+  font-size: clamp(28px, 4.4vw, 68px);
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  max-width: 1100px;
+  margin: 0 auto;
+  font-weight: 400;
+}
+.ethos-text .word{ display: inline-block; opacity: 0.18; transition: opacity .2s linear; }
+.ethos-text em{ font-style: italic; }
+
+.ethos-sig{
+  margin: 14vh auto 0;
+  max-width: 1100px;
+  display:flex; justify-content: space-between; align-items: flex-end;
+  border-top: 1px solid var(--hair);
+  padding-top: 28px;
+}
+.ethos-sig p{ font-size: 12px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--ink-soft); }
+.ethos-sig .sig{
+  font-family: var(--serif); font-style: italic; font-size: 36px;
+}
+
+/* Floating detail images (parallax) */
+.floater{
+  position: absolute;
+  width: 180px; height: 240px;
+  overflow:hidden;
+  box-shadow: 0 30px 60px -30px rgba(26,26,26,0.25);
+  z-index: 4;
+  will-change: transform;
+}
+.floater img{ width:100%; height:100%; object-fit: cover; }
+.f1{ top: 12vh; right: 8vw; width: 200px; height: 260px; }
+.f2{ bottom: 10vh; left: 6vw; width: 220px; height: 160px; }
+.f3{ top: 50%; right: 16vw; width: 140px; height: 180px; }
+
+@media (max-width: 768px){
+  .floater{ display:none; }
+  .ethos{ padding: 16vh var(--pad-x); }
+}
+
+/* =========================================================
+   7. SECTION 03 — SERVICES (asymmetrical journey)
+   ========================================================= */
+.services{
+  position: relative;
+  padding: 18vh 0 22vh;
+  overflow: hidden;
+}
+.services-head{
+  display:flex; justify-content: space-between; align-items: flex-end;
+  padding: 0 var(--pad-x);
+  margin-bottom: 18vh;
+  border-bottom: 1px solid var(--hair);
+  padding-bottom: 28px;
+}
+.services-head h2{
+  font-size: clamp(48px, 7vw, 120px);
+  font-style: italic;
+  font-weight: 500;
+}
+.services-head p{ max-width: 360px; font-size: 13px; color: var(--ink-soft); line-height:1.7; }
+
+.svc-list{
+  position: relative;
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 0 var(--pad-x);
+}
+.svc-list::before{
+  /* the vertical hairline connecting the staggered list */
+  content:"";
+  position:absolute;
+  top: 0; bottom:0;
+  left: 50%;
+  width:1px; background: var(--hair);
+}
+.svc-row{
+  position: relative;
+  display:flex;
+  padding: 7vh 0;
+  border-bottom: 1px solid var(--hair);
+  cursor: pointer;
+}
+.svc-row:last-child{ border-bottom: none; }
+.svc-row .svc-inner{
+  width: 50%;
+  padding-right: 4vw;
+}
+.svc-row.right .svc-inner{
+  margin-left: 50%;
+  padding-left: 6vw;
+  padding-right: 0;
+  text-align: left;
+}
+.svc-row.right.deep .svc-inner{ margin-left: 56%; }    /* heavy indent */
+.svc-row.left.shallow .svc-inner{ margin-left: 4vw; }
+
+.svc-num{
+  font-family: var(--sans); font-size: 11px;
+  letter-spacing: 0.36em; text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 18px;
+  display:flex; align-items:center; gap: 10px;
+}
+.svc-num .dotline{ width: 28px; height:1px; background: var(--ink-soft); }
+.svc-title{
+  font-size: clamp(40px, 5.8vw, 96px);
+  letter-spacing: -0.03em;
+  font-weight: 500;
+  line-height: 0.95;
+  transition: transform .8s var(--ease-soft), letter-spacing .8s var(--ease-soft);
+}
+.svc-title em{ font-style: italic; }
+.svc-row:hover .svc-title{ transform: translateX(14px); }
+.svc-desc{
+  margin-top: 22px;
+  max-width: 360px;
+  color: var(--ink-soft);
+  font-size: 13px;
+  line-height: 1.7;
+}
+.svc-meta{
+  margin-top: 26px;
+  display:flex; gap: 28px;
+  font-size: 11px; letter-spacing: 0.28em; text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+/* hover-image follower */
+.svc-hover-img{
+  position: fixed;
+  top:0; left:0;
+  width: 280px; height: 360px;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%,-50%) scale(0.92);
+  transition: opacity .4s var(--ease), transform .6s var(--ease-soft);
+  z-index: 60;
+  overflow: hidden;
+  box-shadow: 0 40px 80px -30px rgba(26,26,26,0.4);
+}
+.svc-hover-img img{ width:100%; height:100%; object-fit: cover; }
+.svc-hover-img.is-on{ opacity: 1; transform: translate(-50%,-50%) scale(1); }
+
+@media (max-width: 880px){
+  .svc-list::before{ display:none; }
+  .svc-row{ padding: 4vh 0; }
+  .svc-row .svc-inner,
+  .svc-row.right .svc-inner,
+  .svc-row.right.deep .svc-inner,
+  .svc-row.left.shallow .svc-inner{
+    width:100%; margin-left:0; padding: 0;
+  }
+  .svc-hover-img{ display:none; }
+}
+
+/* =========================================================
+   8. SECTION 04 — IMMERSIVE DEPTH (2D-as-3D)
+   ========================================================= */
+.depth{
+  position: relative;
+  height: 130vh;
+  overflow: hidden;
+  background: var(--ink);
+  color: var(--pearl);
+}
+.depth .layer{
+  position: absolute; inset: -10% -2%;
+  width: 104%;
+  background-size: cover;
+  background-position: center;
+  will-change: transform;
+}
+.depth .l-bg{
+  background-image: url('https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=2400&q=80');
+  filter: brightness(0.85) contrast(1.05);
+}
+.depth .l-mid{
+  background-image: url('https://images.unsplash.com/photo-1465056836041-7f43ac27dcb5?auto=format&fit=crop&w=2400&q=80');
+  mix-blend-mode: multiply;
+  opacity: 0.6;
+}
+.depth .l-fg{
+  background-image: url('https://images.unsplash.com/photo-1509721434272-b79147e0e708?auto=format&fit=crop&w=2400&q=80');
+  background-size: contain;
+  background-position: bottom center;
+  background-repeat: no-repeat;
+  opacity: 0.85;
+}
+.depth .veil{
+  position:absolute; inset:0;
+  background: linear-gradient(180deg, rgba(26,26,26,0.0) 0%, rgba(26,26,26,0.55) 100%);
+}
+.depth .copy{
+  position: absolute; left: 50%; top: 50%;
+  transform: translate(-50%,-50%);
+  text-align: center;
+  z-index: 5;
+  width: min(1100px, 90vw);
+}
+.depth .copy h2{
+  font-size: clamp(56px, 10vw, 180px);
+  color: var(--pearl);
+  letter-spacing: -0.03em;
+  font-weight: 500;
+  line-height: 0.92;
+}
+.depth .copy h2 em{ font-style: italic; }
+.depth .copy p{
+  margin-top: 28px;
+  font-size: 13px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(249,249,246,0.7);
+}
+
+/* =========================================================
+   9. SECTION 05 — CURATED APOTHECARY (horizontal scroll)
+   ========================================================= */
+.shop{
+  position: relative;
+  padding: 18vh 0 0;
+  overflow: hidden;
+}
+.shop-head{
+  display:flex; justify-content: space-between; align-items: flex-end;
+  padding: 0 var(--pad-x);
+  margin-bottom: 8vh;
+}
+.shop-head h2{
+  font-size: clamp(48px, 7.4vw, 130px);
+  letter-spacing: -0.03em;
+  font-weight: 500;
+}
+.shop-head h2 em{ font-style: italic; }
+.shop-head p{ max-width: 320px; color: var(--ink-soft); font-size: 13px; line-height: 1.7; }
+
+.shop-track-wrap{ position: relative; height: 100vh; }
+.shop-track{
+  position: absolute; top: 0; left: 0;
+  display: flex;
+  gap: 6vw;
+  padding: 0 var(--pad-x);
+  height: 100%;
+  align-items: center;
+  will-change: transform;
+}
+.product{
+  flex: 0 0 auto;
+  width: 28vw; min-width: 320px;
+  position: relative;
+}
+.product .p-frame{
+  width: 100%;
+  aspect-ratio: 4/5;
+  background: var(--stone);
+  position: relative;
+  overflow: hidden;
+}
+.product .p-frame img{
+  position: absolute; inset: 8% 14%;
+  width: 72%; height: 84%; object-fit: contain;
+  transition: transform .9s var(--ease-soft);
+  filter: drop-shadow(0 30px 35px rgba(26,26,26,0.18));
+}
+.product:hover .p-frame img{ transform: translateY(-12px) scale(1.04); }
+.product .p-meta{
+  display:flex; justify-content: space-between; align-items: flex-start;
+  margin-top: 22px;
+}
+.product .p-name{
+  font-family: var(--serif);
+  font-size: 22px;
+  letter-spacing: -0.01em;
+}
+.product .p-name small{
+  display:block;
+  font-family: var(--sans);
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-top: 6px;
+  font-weight: 500;
+}
+.product .p-price{
+  font-family: var(--sans); font-size: 13px;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+.bag{
+  margin-top: 18px;
+  display:inline-flex; align-items:center; gap: 10px;
+  font-size: 11px; letter-spacing: 0.28em; text-transform: uppercase;
+  font-weight: 500;
+  position: relative;
+  padding: 4px 0;
+}
+.bag::after{
+  content:""; position:absolute; left:0; bottom:0;
+  width: 24px; height:1px; background: var(--ink);
+  transition: width .5s var(--ease);
+}
+.product:hover .bag::after{ width:100%; }
+.bag .plus{
+  width: 22px; height: 22px;
+  border: 1px solid var(--ink);
+  border-radius: 50%;
+  display:inline-flex; align-items:center; justify-content:center;
+  font-size: 12px;
+  transition: background .4s var(--ease), color .4s var(--ease), transform .5s var(--ease);
+}
+.product:hover .bag .plus{ background: var(--ink); color: var(--pearl); transform: rotate(90deg); }
+
+/* =========================================================
+  10. SECTION 06 — EXPERTS
+   ========================================================= */
+.experts{
+  position: relative;
+  padding: 24vh 0 22vh;
+  overflow: hidden;
+}
+.experts-bg{
+  position: absolute; top: 8vh; left: 0;
+  white-space: nowrap;
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(120px, 22vw, 360px);
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  color: transparent;
+  -webkit-text-stroke: 1px var(--hair-strong);
+  pointer-events: none;
+  will-change: transform;
+  z-index: 0;
+}
+.experts-head{
+  position: relative;
+  display:flex; justify-content: space-between; align-items: flex-end;
+  padding: 0 var(--pad-x);
+  margin-bottom: 14vh;
+  z-index: 2;
+}
+.experts-head h2{
+  font-size: clamp(40px, 5.6vw, 80px);
+  font-weight: 500;
+}
+.experts-head h2 em{ font-style: italic; }
+.experts-head p{ max-width: 340px; color: var(--ink-soft); font-size: 13px; line-height: 1.7; }
+
+.experts-grid{
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 32px;
+  padding: 0 var(--pad-x);
+  z-index: 2;
+}
+.expert{
+  position: relative;
+}
+.expert .e-frame{
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3/4;
+  background: var(--stone);
+  overflow: visible;
+}
+.expert .e-frame .e-clip{
+  position:absolute; inset: 8% 0 0 0;
+  height: 92%;
+  overflow: hidden;
+}
+.expert .e-frame img{
+  width:100%; height: 116%;     /* breaks out of frame top */
+  object-fit: cover;
+  position: absolute; left:0; bottom: 0;
+  transform: translateY(0);
+}
+.expert .e-frame .e-overflow{
+  position: absolute;
+  top: -10%;
+  left: 0; right: 0;
+  height: 22%;
+  overflow: hidden;
+}
+.expert .e-frame .e-overflow img{
+  width:100%; height: 600%;
+  object-fit: cover;
+  object-position: center top;
+  position: absolute; top: 0;
+}
+.expert .e-meta{
+  display:flex; justify-content: space-between; align-items: baseline;
+  margin-top: 22px;
+  border-top: 1px solid var(--hair);
+  padding-top: 14px;
+}
+.expert .e-name{
+  font-family: var(--serif);
+  font-size: 22px;
+}
+.expert .e-name em{ font-style: italic; }
+.expert .e-role{
+  font-size: 10px; letter-spacing: 0.28em; text-transform: uppercase;
+  color: var(--ink-soft); font-weight: 500;
+}
+
+/* asymmetrical placements */
+.expert.e1{ grid-column: 1 / span 4; transform: translateY(0); }
+.expert.e2{ grid-column: 6 / span 4; transform: translateY(80px); }
+.expert.e3{ grid-column: 10 / span 3; transform: translateY(-40px); }
+
+@media (max-width: 880px){
+  .experts-grid{ grid-template-columns: repeat(2, 1fr); }
+  .expert.e1, .expert.e2, .expert.e3{ grid-column: span 1; transform: none; }
+}
+
+/* =========================================================
+  11. SECTION 07 — TESTIMONIALS
+   ========================================================= */
+.tests{
+  position: relative;
+  height: 300vh;             /* tall scroll runway */
+}
+.tests-pin{
+  position: relative;
+  height: 100vh;
+  display:flex; align-items: center; justify-content: center;
+  padding: 0 var(--pad-x);
+  text-align: center;
+}
+.tests-stack{
+  position: relative;
+  width: min(1100px, 92vw);
+}
+.test-quote{
+  position: absolute;
+  inset: 0;
+  display:flex; flex-direction: column; align-items: center; justify-content: center;
+  opacity: 0;
+}
+.test-quote.is-on{ opacity: 1; }
+.test-quote .qmark{
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 64px;
+  color: var(--ink);
+  margin-bottom: 8px;
+  opacity: 0.6;
+}
+.test-quote h3{
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(28px, 4.6vw, 70px);
+  line-height: 1.16;
+  letter-spacing: -0.015em;
+}
+.test-quote h3 em{ font-style: italic; }
+.test-quote .who{
+  margin-top: 36px;
+  font-size: 11px; letter-spacing: 0.32em;
+  text-transform: uppercase; color: var(--ink-soft);
+}
+
+/* =========================================================
+  12. FOOTER — BEGIN takeover
+   ========================================================= */
+.footer{
+  position: relative;
+  height: 100vh;
+  background: var(--pearl);
+  display:flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  border-top: 1px solid var(--hair);
+}
+.footer .f-meta{
+  position: absolute; top: 4vh; left: var(--pad-x); right: var(--pad-x);
+  display:flex; justify-content: space-between;
+  font-size: 11px; letter-spacing: 0.28em; text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.footer .f-bottom{
+  position: absolute; bottom: 4vh; left: var(--pad-x); right: var(--pad-x);
+  display:flex; justify-content: space-between; align-items: flex-end;
+  font-size: 11px; letter-spacing: 0.28em; text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.footer .f-bottom .cols{ display:flex; gap: 56px; }
+.footer .f-bottom a{ display:block; padding: 4px 0; }
+
+#beginBtn{
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: clamp(140px, 26vw, 480px);   /* ~80vw cap via clamp */
+  line-height: 0.9;
+  letter-spacing: -0.05em;
+  display: inline-block;
+  position: relative;
+  font-style: italic;
+}
+#beginBtn .char{ display: inline-block; transform-origin: 50% 70%; }
+#beginBtn::after{
+  content:"";
+  position:absolute; left: 0; right: 0; bottom: 8%;
+  height: 1px; background: var(--ink);
+  transform: scaleX(0); transform-origin: left;
+  transition: transform .9s var(--ease-soft);
+}
+#beginBtn:hover::after{ transform: scaleX(1); }
+
+/* =========================================================
+  13. TAKEOVER MODAL (multi-step form)
+   ========================================================= */
+.takeover{
+  position: fixed; inset: 0;
+  background: var(--ink);
+  color: var(--pearl);
+  z-index: 800;
+  display: none;
+  overflow: hidden;
+}
+.takeover .panel{
+  position: absolute; inset:0;
+  background: var(--ink);
+  transform: translateY(100%);
+}
+.takeover-inner{
+  position: relative;
+  height: 100%;
+  display: flex; flex-direction: column;
+  padding: 28px var(--pad-x) 36px;
+  z-index: 2;
+}
+.takeover-top{
+  display:flex; justify-content: space-between; align-items: center;
+  font-size: 11px; letter-spacing: 0.28em; text-transform: uppercase;
+  color: rgba(249,249,246,0.6);
+}
+.takeover-top .brand{
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 22px;
+  color: var(--pearl);
+  letter-spacing: 0.01em;
+  text-transform: none;
+}
+.close-btn{
+  width: 56px; height: 56px;
+  border: 1px solid rgba(249,249,246,0.4);
+  border-radius: 50%;
+  display:flex; align-items:center; justify-content:center;
+  transition: background .4s var(--ease), border-color .4s var(--ease);
+}
+.close-btn:hover{ background: rgba(249,249,246,0.08); border-color: var(--pearl); }
+.close-btn svg{ width: 16px; height: 16px; }
+
+.takeover-body{
+  flex:1;
+  display: grid;
+  grid-template-columns: 36% 1fr;
+  gap: 8vw;
+  padding-top: 8vh;
+}
+.takeover-aside{
+  display:flex; flex-direction: column; justify-content: space-between;
+  border-right: 1px solid rgba(249,249,246,0.14);
+  padding-right: 4vw;
+}
+.takeover-aside h3{
+  color: var(--pearl);
+  font-size: clamp(40px, 4.4vw, 76px);
+  font-weight: 400;
+  line-height: 0.96;
+}
+.takeover-aside h3 em{ font-style: italic; }
+.takeover-aside .steps{
+  display:flex; flex-direction: column; gap: 14px;
+  margin-top: 6vh;
+}
+.step-pill{
+  display:flex; align-items:center; gap: 16px;
+  font-size: 11px; letter-spacing: 0.28em; text-transform: uppercase;
+  color: rgba(249,249,246,0.45);
+  transition: color .4s var(--ease);
+}
+.step-pill .pn{
+  width: 28px; height:28px; border-radius:50%;
+  border: 1px solid rgba(249,249,246,0.3);
+  display:flex; align-items:center; justify-content:center;
+  font-size: 12px;
+}
+.step-pill.active{ color: var(--pearl); }
+.step-pill.active .pn{ background: var(--pearl); color: var(--ink); border-color: var(--pearl); }
+
+.takeover-form{
+  position: relative;
+  padding-bottom: 4vh;
+}
+.f-step{
+  position: absolute; inset: 0;
+  display:flex; flex-direction: column; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity .5s var(--ease);
+}
+.f-step.active{ opacity: 1; pointer-events: auto; position: relative; min-height: 56vh; }
+
+.f-label{
+  font-size: 11px; letter-spacing: 0.32em; text-transform: uppercase;
+  color: rgba(249,249,246,0.55); margin-bottom: 36px;
+  display:flex; align-items:center; gap: 14px;
+}
+.f-label .lbar{ width: 36px; height:1px; background: rgba(249,249,246,0.5); }
+
+.f-input{
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(249,249,246,0.25);
+  color: var(--pearl);
+  font-family: var(--serif);
+  font-size: clamp(34px, 4.4vw, 64px);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  padding: 14px 0 22px;
+  outline: none;
+  transition: border-color .4s var(--ease);
+}
+.f-input::placeholder{ color: rgba(249,249,246,0.25); font-style: italic; }
+.f-input:focus{ border-bottom-color: var(--pearl); }
+
+.chip-row{ display:flex; flex-wrap: wrap; gap: 14px; margin-top: 12px; }
+.chip{
+  padding: 14px 22px;
+  border: 1px solid rgba(249,249,246,0.25);
+  border-radius: 999px;
+  font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: rgba(249,249,246,0.85);
+  cursor: pointer;
+  transition: background .35s var(--ease), color .35s var(--ease), border-color .35s var(--ease);
+}
+.chip:hover{ border-color: var(--pearl); }
+.chip.on{ background: var(--pearl); color: var(--ink); border-color: var(--pearl); }
+
+.f-nav{
+  display:flex; justify-content: space-between; align-items: center;
+  margin-top: 6vh;
+  padding-top: 28px;
+  border-top: 1px solid rgba(249,249,246,0.14);
+}
+.f-back, .f-next, .f-submit{
+  font-size: 11px; letter-spacing: 0.32em; text-transform: uppercase;
+  font-weight: 500;
+  display:inline-flex; align-items:center; gap: 14px;
+}
+.f-back{ color: rgba(249,249,246,0.55); }
+.f-next, .f-submit{
+  color: var(--pearl);
+  border: 1px solid var(--pearl);
+  border-radius: 999px;
+  padding: 16px 26px;
+  transition: background .4s var(--ease), color .4s var(--ease);
+}
+.f-next:hover, .f-submit:hover{ background: var(--pearl); color: var(--ink); }
+.f-back:disabled{ opacity: 0.25; cursor: not-allowed; }
+
+.takeover-success{
+  position: absolute; inset: 0;
+  display:flex; align-items: center; justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  opacity: 0; pointer-events: none;
+  background: var(--ink);
+  z-index: 5;
+}
+.takeover-success.is-on{ opacity:1; pointer-events:auto; }
+.takeover-success h3{
+  color: var(--pearl);
+  font-size: clamp(48px, 7vw, 110px);
+  font-style: italic;
+  font-weight: 400;
+}
+.takeover-success p{ margin-top: 20px; color: rgba(249,249,246,0.6); font-size: 12px; letter-spacing: 0.28em; text-transform: uppercase; }
+
+@media (max-width: 880px){
+  .takeover-body{ grid-template-columns: 1fr; gap: 32px; padding-top: 4vh; }
+  .takeover-aside{ border-right: none; border-bottom: 1px solid rgba(249,249,246,0.14); padding-bottom: 24px; }
+}
+
+/* =========================================================
+  14. UTILITIES
+   ========================================================= */
+.no-scroll{ overflow: hidden !important; }
+.reveal-mask{ overflow: hidden; display: inline-block; }
+.reveal-mask > span{ display: inline-block; transform: translateY(110%); }
+
+</style>
+</head>
+
+<body>
+
+<!-- ============================================================
+     CUSTOM CURSOR
+     ============================================================ -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-dot" id="cursorDot"></div>
+
+<!-- ============================================================
+     PRELOADER
+     ============================================================ -->
+<section id="preloader" aria-hidden="true">
+  <div class="pl-mark">Lumen<span style="font-style:normal;">.</span></div>
+  <div class="pl-counter">
+    <span class="pl-label">Calibrating</span>
+    <span class="pl-num" id="plNum">00</span>
+  </div>
+  <div class="pl-curtain" id="plCurtain"></div>
+</section>
+
+<!-- ============================================================
+     NAV
+     ============================================================ -->
+<nav class="nav" id="nav">
+  <div class="brand">
+    Maison&nbsp;Lumen
+    <small>Est. MMXIX — Geneva</small>
+  </div>
+  <div class="nav-links">
+    <a href="#ethos">Philosophy</a>
+    <a href="#services">Practice</a>
+    <a href="#shop">Apothecary</a>
+    <a href="#experts">Masters</a>
+    <a href="#tests">Letters</a>
+  </div>
+  <button class="cta-book" data-open-modal>
+    <span class="dot"></span>
+    Book Consultation
+  </button>
+</nav>
+
+<!-- ============================================================
+     SECTION 01 — HERO
+     ============================================================ -->
+<header class="hero" id="hero">
+  <div class="hero-grid">
+
+    <div class="hero-copy">
+      <div class="eyebrow-row">
+        <span class="num">01 — The Practice</span>
+        <span class="hair" style="flex:1; max-width:140px;"></span>
+      </div>
+      <h1 class="hero-headline">
+        <span class="line1">The art</span>
+        <span class="line2"><em>of living</em></span>
+        <span class="line3">slowly.</span>
+      </h1>
+    </div>
+
+    <div class="hero-image" id="heroImg">
+      <img src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1800&q=80" alt="An interior of a tranquil longevity sanctuary" />
+    </div>
+  </div>
+
+  <div class="hero-meta">
+    <div>
+      <p class="eyebrow" style="margin-bottom: 14px;">A Longevity Practice</p>
+      <p>Diagnostic medicine, restorative architecture, and the discipline of unhurried care — practiced across two private residences in Geneva and Kyoto.</p>
+    </div>
+  </div>
+
+  <a href="#ethos" class="scroll-badge" aria-label="Scroll to explore">
+    <svg viewBox="0 0 200 200">
+      <defs>
+        <path id="circ" d="M 100, 100 m -78, 0 a 78,78 0 1,1 156,0 a 78,78 0 1,1 -156,0" fill="none"/>
+      </defs>
+      <text fill="#1A1A1A" font-family="Inter, sans-serif" font-size="11" letter-spacing="6">
+        <textPath href="#circ">SCROLL · TO · EXPLORE · MAISON · LUMEN ·  </textPath>
+      </text>
+    </svg>
+    <span class="arrow">
+      <svg class="arr" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="1.4">
+        <path d="M12 4v16M6 14l6 6 6-6"/>
+      </svg>
+    </span>
+  </a>
+</header>
+
+<!-- ============================================================
+     SECTION 02 — ETHOS
+     ============================================================ -->
+<section class="ethos" id="ethos">
+  <div class="small-tag">
+    <span class="bar"></span>
+    <span class="eyebrow">02 — Ethos</span>
+  </div>
+
+  <div class="floater f1"><img src="https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=600&q=80" alt="" /></div>
+  <div class="floater f2"><img src="https://images.unsplash.com/photo-1519682337058-a94d519337bc?auto=format&fit=crop&w=800&q=80" alt="" /></div>
+  <div class="floater f3"><img src="https://images.unsplash.com/photo-1502082553048-f009c37129b9?auto=format&fit=crop&w=600&q=80" alt="" /></div>
+
+  <p class="ethos-text" id="ethosText">
+    We do not prescribe trends. We prescribe <em>time</em>. Each protocol is a conversation between architecture, biology, and ritual — drawn slowly, in small notations, across years rather than appointments. The body remembers what the calendar forgets.
+  </p>
+
+  <div class="ethos-sig">
+    <p>The Practice — Vol. I</p>
+    <span class="sig">— Dr. A. Hadley</span>
+    <p>MMXXVI</p>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 03 — SERVICES
+     ============================================================ -->
+<section class="services" id="services">
+  <div class="services-head">
+    <h2><em>Disciplines</em></h2>
+    <p>Six practices, drawn from medicine, architecture and ritual. Each is studied in isolation and prescribed in concert.</p>
+  </div>
+
+  <div class="svc-list" id="svcList">
+
+    <div class="svc-row left" data-img="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=800&q=80">
+      <div class="svc-inner">
+        <div class="svc-num"><span class="dotline"></span>I — Diagnostic</div>
+        <h3 class="svc-title">Cellular <em>Cartography</em></h3>
+        <p class="svc-desc">A 9-hour intake mapping cellular age, micro-inflammation and methylation drift. Issued as a printed atlas of you.</p>
+        <div class="svc-meta"><span>9 hrs</span><span>Geneva · Kyoto</span></div>
+      </div>
+    </div>
+
+    <div class="svc-row right deep" data-img="https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=80">
+      <div class="svc-inner">
+        <div class="svc-num"><span class="dotline"></span>II — Restorative</div>
+        <h3 class="svc-title">The <em>Quiet</em> Protocol</h3>
+        <p class="svc-desc">Twelve nights in residence. Engineered light, breath cadence and a private chef. We do nothing, very precisely.</p>
+        <div class="svc-meta"><span>12 nights</span><span>By referral</span></div>
+      </div>
+    </div>
+
+    <div class="svc-row left shallow" data-img="https://images.unsplash.com/photo-1556228578-8c89e6adf883?auto=format&fit=crop&w=800&q=80">
+      <div class="svc-inner">
+        <div class="svc-num"><span class="dotline"></span>III — Cutaneous</div>
+        <h3 class="svc-title">Architectural <em>Skin</em></h3>
+        <p class="svc-desc">A non-invasive resurfacing built around the geometry of your face. We never apologise for restraint.</p>
+        <div class="svc-meta"><span>2 hrs</span><span>Per quarter</span></div>
+      </div>
+    </div>
+
+    <div class="svc-row right" data-img="https://images.unsplash.com/photo-1519823551278-64ac92734fb1?auto=format&fit=crop&w=800&q=80">
+      <div class="svc-inner">
+        <div class="svc-num"><span class="dotline"></span>IV — Movement</div>
+        <h3 class="svc-title">Slow <em>Strength</em></h3>
+        <p class="svc-desc">Supervised hypertrophy at the pace of architecture. Mass is built like cathedral walls — over decades.</p>
+        <div class="svc-meta"><span>Weekly</span><span>1:1</span></div>
+      </div>
+    </div>
+
+    <div class="svc-row left" data-img="https://images.unsplash.com/photo-1559561853-08451507cbe7?auto=format&fit=crop&w=800&q=80">
+      <div class="svc-inner">
+        <div class="svc-num"><span class="dotline"></span>V — Ritual</div>
+        <h3 class="svc-title">The <em>Hour</em> Before</h3>
+        <p class="svc-desc">A standing pre-sleep ritual choreographed for your nervous system. Chamomile is involved. Optional.</p>
+        <div class="svc-meta"><span>Nightly</span><span>At home</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- cursor-following hover image -->
+  <div class="svc-hover-img" id="svcHover"><img src="" alt="" /></div>
+</section>
+
+<!-- ============================================================
+     SECTION 04 — IMMERSIVE DEPTH
+     ============================================================ -->
+<section class="depth" id="depth">
+  <div class="layer l-bg" data-speed="0.05"></div>
+  <div class="layer l-mid" data-speed="0.18"></div>
+  <div class="layer l-fg" data-speed="0.45"></div>
+  <div class="veil"></div>
+  <div class="copy">
+    <h2>A practice that <em>moves</em><br/>at the pace of stone.</h2>
+    <p>— A study in slowness</p>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 05 — APOTHECARY
+     ============================================================ -->
+<section class="shop" id="shop">
+  <div class="shop-head">
+    <h2>The <em>Apothecary</em></h2>
+    <p>Twelve formulations. Made in small batches at our laboratory above Lake Léman. Numbered by hand.</p>
+  </div>
+
+  <div class="shop-track-wrap" id="shopWrap">
+    <div class="shop-track" id="shopTrack">
+
+      <article class="product">
+        <div class="p-frame"><img src="https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?auto=format&fit=crop&w=900&q=80" alt="" /></div>
+        <div class="p-meta"><div class="p-name">Eau de Repos<small>N°01 · Tonic</small></div><div class="p-price">€ 168</div></div>
+        <button class="bag"><span class="plus">+</span> Add to Bag</button>
+      </article>
+
+      <article class="product">
+        <div class="p-frame"><img src="https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?auto=format&fit=crop&w=900&q=80" alt="" /></div>
+        <div class="p-meta"><div class="p-name">Sérum Lumière<small>N°02 · Resurfacing</small></div><div class="p-price">€ 240</div></div>
+        <button class="bag"><span class="plus">+</span> Add to Bag</button>
+      </article>
+
+      <article class="product">
+        <div class="p-frame"><img src="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=900&q=80" alt="" /></div>
+        <div class="p-meta"><div class="p-name">Huile Nocturne<small>N°03 · Reparative</small></div><div class="p-price">€ 195</div></div>
+        <button class="bag"><span class="plus">+</span> Add to Bag</button>
+      </article>
+
+      <article class="product">
+        <div class="p-frame"><img src="https://images.unsplash.com/photo-1571781926291-c477ebfd024b?auto=format&fit=crop&w=900&q=80" alt="" /></div>
+        <div class="p-meta"><div class="p-name">Crème Cellulaire<small>N°04 · Day</small></div><div class="p-price">€ 286</div></div>
+        <button class="bag"><span class="plus">+</span> Add to Bag</button>
+      </article>
+
+      <article class="product">
+        <div class="p-frame"><img src="https://images.unsplash.com/photo-1611080626919-7cf5a9dbab5b?auto=format&fit=crop&w=900&q=80" alt="" /></div>
+        <div class="p-meta"><div class="p-name">Tisane d'Hiver<small>N°05 · Botanical</small></div><div class="p-price">€ 64</div></div>
+        <button class="bag"><span class="plus">+</span> Add to Bag</button>
+      </article>
+
+      <article class="product">
+        <div class="p-frame"><img src="https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&w=900&q=80" alt="" /></div>
+        <div class="p-meta"><div class="p-name">Bain de Sel<small>N°06 · Mineral</small></div><div class="p-price">€ 88</div></div>
+        <button class="bag"><span class="plus">+</span> Add to Bag</button>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 06 — EXPERTS
+     ============================================================ -->
+<section class="experts" id="experts">
+  <div class="experts-bg" id="expertsBg">OUR&nbsp;MASTERS&nbsp;·&nbsp;OUR&nbsp;MASTERS&nbsp;·&nbsp;OUR&nbsp;MASTERS&nbsp;·&nbsp;</div>
+
+  <div class="experts-head">
+    <h2>The <em>Masters</em></h2>
+    <p>Three quiet practitioners. A combined ninety-two years of looking, listening and prescribing nothing in haste.</p>
+  </div>
+
+  <div class="experts-grid">
+
+    <article class="expert e1">
+      <div class="e-frame">
+        <div class="e-overflow"><img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=900&q=80" alt="Portrait" /></div>
+        <div class="e-clip"><img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=900&q=80" alt="Portrait" /></div>
+      </div>
+      <div class="e-meta">
+        <span class="e-name">Dr. <em>Aleksandra</em> Hadley</span>
+        <span class="e-role">Director · Longevity</span>
+      </div>
+    </article>
+
+    <article class="expert e2">
+      <div class="e-frame">
+        <div class="e-overflow"><img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=900&q=80" alt="Portrait" /></div>
+        <div class="e-clip"><img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=900&q=80" alt="Portrait" /></div>
+      </div>
+      <div class="e-meta">
+        <span class="e-name"><em>Hideki</em> Mori</span>
+        <span class="e-role">Atelier · Kyoto</span>
+      </div>
+    </article>
+
+    <article class="expert e3">
+      <div class="e-frame">
+        <div class="e-overflow"><img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=900&q=80" alt="Portrait" /></div>
+        <div class="e-clip"><img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=900&q=80" alt="Portrait" /></div>
+      </div>
+      <div class="e-meta">
+        <span class="e-name">Dr. <em>Iris</em> Lange</span>
+        <span class="e-role">Cutaneous · Geneva</span>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 07 — TESTIMONIALS
+     ============================================================ -->
+<section class="tests" id="tests">
+  <div class="tests-pin" id="testsPin">
+    <div class="tests-stack" id="testsStack">
+
+      <div class="test-quote is-on">
+        <span class="qmark">“</span>
+        <h3>The <em>only</em> place I have visited where the practitioners spoke less than I did.</h3>
+        <p class="who">— A. Beaumont · Author</p>
+      </div>
+
+      <div class="test-quote">
+        <span class="qmark">“</span>
+        <h3>I left, finally, with the <em>silence</em> I had been quietly buying everywhere else.</h3>
+        <p class="who">— M. Sato · Architect</p>
+      </div>
+
+      <div class="test-quote">
+        <span class="qmark">“</span>
+        <h3>An act of <em>care</em>, calibrated to the millimetre. Worth the year-long wait.</h3>
+        <p class="who">— H. Okonkwo · Composer</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     FOOTER — BEGIN
+     ============================================================ -->
+<footer class="footer">
+  <div class="f-meta">
+    <span>Maison Lumen — MMXXVI</span>
+    <span>Geneva · Kyoto</span>
+  </div>
+
+  <button id="beginBtn" data-open-modal aria-label="Begin your consultation">
+    <span class="char">B</span><span class="char">e</span><span class="char">g</span><span class="char">i</span><span class="char">n</span><span class="char">.</span>
+  </button>
+
+  <div class="f-bottom">
+    <span>© All rights reserved</span>
+    <div class="cols">
+      <div>
+        <a href="#">Instagram</a>
+        <a href="#">Are.na</a>
+      </div>
+      <div>
+        <a href="#">Press</a>
+        <a href="#">Imprint</a>
+      </div>
+      <div>
+        <a href="#">contact@maisonlumen.co</a>
+        <a href="#">+41 22 000 00 00</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ============================================================
+     TAKEOVER MODAL
+     ============================================================ -->
+<div class="takeover" id="takeover" aria-hidden="true">
+  <div class="panel" id="panel1"></div>
+  <div class="panel" id="panel2" style="background:#0f0f0e;"></div>
+  <div class="panel" id="panel3" style="background:#0a0a09;"></div>
+
+  <div class="takeover-inner">
+    <div class="takeover-top">
+      <span>Private Consultation · Step <span id="stepLabel">01</span> of 03</span>
+      <span class="brand">Maison Lumen</span>
+      <button class="close-btn" id="closeBtn" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#F9F9F6" stroke-width="1.4"><path d="M5 5l14 14M19 5L5 19"/></svg>
+      </button>
+    </div>
+
+    <div class="takeover-body">
+      <aside class="takeover-aside">
+        <h3>Begin your <em>practice</em>.</h3>
+        <div class="steps">
+          <div class="step-pill active" data-step="1"><span class="pn">1</span> Your Name</div>
+          <div class="step-pill" data-step="2"><span class="pn">2</span> Your Focus</div>
+          <div class="step-pill" data-step="3"><span class="pn">3</span> Your Hour</div>
+        </div>
+        <p style="font-size:11px; letter-spacing:0.28em; text-transform:uppercase; color:rgba(249,249,246,0.45);">
+          Replies — within 48 hours, by hand.
+        </p>
+      </aside>
+
+      <form class="takeover-form" id="takeoverForm" novalidate>
+
+        <div class="f-step active" data-step="1">
+          <div class="f-label"><span class="lbar"></span>And you are —</div>
+          <input class="f-input" type="text" id="fName" placeholder="Your full name" autocomplete="name" />
+          <div class="f-nav">
+            <button type="button" class="f-back" disabled>← Previous</button>
+            <button type="button" class="f-next" data-go="2">Continue →</button>
+          </div>
+        </div>
+
+        <div class="f-step" data-step="2">
+          <div class="f-label"><span class="lbar"></span>What draws you here —</div>
+          <div class="chip-row" id="chips">
+            <button type="button" class="chip">Longevity</button>
+            <button type="button" class="chip">Restoration</button>
+            <button type="button" class="chip">Cutaneous</button>
+            <button type="button" class="chip">Movement</button>
+            <button type="button" class="chip">Sleep</button>
+            <button type="button" class="chip">Ritual</button>
+          </div>
+          <input class="f-input" type="email" id="fEmail" placeholder="Your email address" autocomplete="email" style="margin-top: 6vh;" />
+          <div class="f-nav">
+            <button type="button" class="f-back" data-go="1">← Previous</button>
+            <button type="button" class="f-next" data-go="3">Continue →</button>
+          </div>
+        </div>
+
+        <div class="f-step" data-step="3">
+          <div class="f-label"><span class="lbar"></span>When may we write —</div>
+          <input class="f-input" type="text" id="fWhen" placeholder="A morning, a season, a year" />
+          <div class="f-nav">
+            <button type="button" class="f-back" data-go="2">← Previous</button>
+            <button type="submit" class="f-submit">Send the letter →</button>
+          </div>
+        </div>
+
+      </form>
+    </div>
+
+    <div class="takeover-success" id="takeoverSuccess">
+      <h3>A letter is on its way.</h3>
+      <p>We reply within 48 hours, by hand.</p>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     SCRIPT
+     ============================================================ -->
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+/* ===========================================================
+   1. CUSTOM CURSOR
+   =========================================================== */
+const cursor = document.getElementById('cursor');
+const cursorDot = document.getElementById('cursorDot');
+let mouseX = window.innerWidth/2, mouseY = window.innerHeight/2;
+let curX = mouseX, curY = mouseY;
+let dotX = mouseX, dotY = mouseY;
+
+window.addEventListener('mousemove', (e) => {
+  mouseX = e.clientX; mouseY = e.clientY;
+  dotX = mouseX; dotY = mouseY;
+  cursorDot.style.transform = `translate(${dotX}px, ${dotY}px) translate(-50%,-50%)`;
+});
+
+gsap.ticker.add(() => {
+  curX += (mouseX - curX) * 0.18;
+  curY += (mouseY - curY) * 0.18;
+  cursor.style.transform = `translate(${curX}px, ${curY}px) translate(-50%,-50%)`;
+});
+
+document.querySelectorAll('a, button, [data-open-modal], .svc-row, .product, #beginBtn').forEach(el => {
+  el.addEventListener('mouseenter', () => cursor.classList.add('is-hover'));
+  el.addEventListener('mouseleave', () => cursor.classList.remove('is-hover'));
+});
+
+/* ===========================================================
+   2. LENIS — smooth scroll + GSAP integration
+   =========================================================== */
+const lenis = new Lenis({
+  duration: 1.25,
+  easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+  smoothWheel: true,
+  smoothTouch: false,
+});
+lenis.on('scroll', ScrollTrigger.update);
+gsap.ticker.add((time) => { lenis.raf(time * 1000); });
+gsap.ticker.lagSmoothing(0);
+
+// Anchor links use Lenis
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', (e) => {
+    const id = a.getAttribute('href');
+    const target = document.querySelector(id);
+    if (target){ e.preventDefault(); lenis.scrollTo(target, { offset: 0, duration: 1.4 }); }
+  });
+});
+
+/* ===========================================================
+   3. PRELOADER
+   =========================================================== */
+const plNum = document.getElementById('plNum');
+const plCurtain = document.getElementById('plCurtain');
+const preloader = document.getElementById('preloader');
+
+const plObj = { v: 0 };
+const plTl = gsap.timeline({
+  onComplete: () => {
+    document.body.classList.remove('no-scroll');
+    runHeroIntro();
+  }
+});
+document.body.classList.add('no-scroll');
+lenis.stop();
+
+plTl.to(plObj, {
+  v: 100, duration: 2.0, ease: 'power2.inOut',
+  onUpdate: () => plNum.textContent = String(Math.floor(plObj.v)).padStart(2,'0')
+})
+.to('#preloader .pl-mark, #preloader .pl-counter', {
+  yPercent: -120, opacity: 0, duration: 0.8, ease: 'power3.inOut', stagger: 0.06
+}, '-=0.2')
+.to(plCurtain, { height: '100%', duration: 0.9, ease: 'power3.inOut' }, '-=0.4')
+.set(preloader, { display: 'none' })
+.add(() => lenis.start());
+
+/* ===========================================================
+   4. HERO INTRO
+   =========================================================== */
+function runHeroIntro(){
+  const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+
+  // image scale-down (from oversize -> resting size)
+  tl.fromTo('#heroImg img',
+    { scale: 1.35, filter: 'blur(8px) saturate(0.7)' },
+    { scale: 1, filter: 'blur(0px) saturate(0.92)', duration: 1.6 }
+  );
+
+  // headline lines stagger up
+  tl.from('.hero-headline > span', {
+    yPercent: 110, opacity: 0, duration: 1.1, stagger: 0.09, ease: 'power4.out'
+  }, '-=1.2');
+
+  // meta + badge fade
+  tl.from('.hero-meta, .scroll-badge', { opacity: 0, y: 30, duration: 0.9, stagger: 0.1 }, '-=0.7');
+
+  // nav fade
+  tl.from('.nav', { opacity: 0, y: -20, duration: 0.7 }, '-=0.6');
+}
+
+/* ===========================================================
+   5. NAV — blur on scroll
+   =========================================================== */
+const nav = document.getElementById('nav');
+ScrollTrigger.create({
+  start: 60, end: 99999,
+  onUpdate: (self) => {
+    nav.classList.toggle('scrolled', self.scroll() > 60);
+  }
+});
+
+/* ===========================================================
+   6. ETHOS — scrub word reveal + floater parallax
+   =========================================================== */
+const ethosText = document.getElementById('ethosText');
+// Walk text nodes and wrap each word in <span class="word">.
+// Italics (<em>) are preserved by recursing into element children.
+(function splitWords(root){
+  const walk = (node) => {
+    const kids = [...node.childNodes];
+    kids.forEach(child => {
+      if (child.nodeType === Node.TEXT_NODE){
+        const text = child.nodeValue;
+        if (!text.trim()) return;
+        const frag = document.createDocumentFragment();
+        const parts = text.split(/(\s+)/);
+        parts.forEach(p => {
+          if (/^\s+$/.test(p)){
+            frag.appendChild(document.createTextNode(p));
+          } else if (p.length){
+            const span = document.createElement('span');
+            span.className = 'word';
+            // preserve italic if parent is <em>
+            if (node.tagName === 'EM'){
+              const em = document.createElement('em');
+              em.textContent = p;
+              span.appendChild(em);
+            } else {
+              span.textContent = p;
+            }
+            frag.appendChild(span);
+          }
+        });
+        node.replaceChild(frag, child);
+      } else if (child.nodeType === Node.ELEMENT_NODE){
+        walk(child);
+      }
+    });
+  };
+  walk(root);
+})(ethosText);
+
+gsap.utils.toArray('.ethos-text .word').forEach((w, i, arr) => {
+  gsap.to(w, {
+    opacity: 1,
+    ease: 'none',
+    scrollTrigger: {
+      trigger: '.ethos-text',
+      start: 'top 80%',
+      end: 'bottom 30%',
+      scrub: true,
+      onUpdate: self => {
+        // reveal words sequentially based on progress
+        const idx = Math.floor(self.progress * arr.length);
+        arr.forEach((el, j) => el.style.opacity = j <= idx ? 1 : 0.18);
+      }
+    }
+  });
+});
+
+// Floating parallax detail images
+gsap.utils.toArray('.floater').forEach((f, i) => {
+  const speed = [-120, 80, -180][i] || -100;
+  gsap.to(f, {
+    y: speed,
+    ease: 'none',
+    scrollTrigger: {
+      trigger: '.ethos',
+      start: 'top bottom',
+      end: 'bottom top',
+      scrub: true
+    }
+  });
+});
+
+/* ===========================================================
+   7. SERVICES — hover image follower
+   =========================================================== */
+const svcHover = document.getElementById('svcHover');
+const svcHoverImg = svcHover.querySelector('img');
+let svcHoverX = 0, svcHoverY = 0, svcHoverTX = 0, svcHoverTY = 0;
+let svcActive = false;
+
+document.querySelectorAll('.svc-row').forEach(row => {
+  row.addEventListener('mouseenter', () => {
+    svcHoverImg.src = row.dataset.img;
+    svcHover.classList.add('is-on');
+    svcActive = true;
+  });
+  row.addEventListener('mouseleave', () => {
+    svcHover.classList.remove('is-on');
+    svcActive = false;
+  });
+  row.addEventListener('mousemove', (e) => {
+    svcHoverTX = e.clientX; svcHoverTY = e.clientY;
+  });
+});
+gsap.ticker.add(() => {
+  svcHoverX += (svcHoverTX - svcHoverX) * 0.12;
+  svcHoverY += (svcHoverTY - svcHoverY) * 0.12;
+  if (svcActive){
+    svcHover.style.left = svcHoverX + 'px';
+    svcHover.style.top  = svcHoverY + 'px';
+  }
+});
+
+// Reveal service titles on scroll
+gsap.utils.toArray('.svc-row').forEach((row, i) => {
+  gsap.from(row.querySelector('.svc-title'), {
+    yPercent: 80, opacity: 0, duration: 1.1, ease: 'power4.out',
+    scrollTrigger: { trigger: row, start: 'top 80%' }
+  });
+  gsap.from(row.querySelectorAll('.svc-num, .svc-desc, .svc-meta'), {
+    y: 24, opacity: 0, duration: 0.9, stagger: 0.08, ease: 'power3.out',
+    scrollTrigger: { trigger: row, start: 'top 78%' }
+  });
+});
+
+/* ===========================================================
+   8. DEPTH — severe layered parallax
+   =========================================================== */
+gsap.utils.toArray('.depth .layer').forEach(layer => {
+  const speed = parseFloat(layer.dataset.speed);
+  gsap.fromTo(layer,
+    { yPercent: -speed * 30 },
+    {
+      yPercent: speed * 60,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: '.depth',
+        start: 'top bottom',
+        end: 'bottom top',
+        scrub: true
+      }
+    }
+  );
+});
+
+// Depth copy fade
+gsap.from('.depth .copy', {
+  opacity: 0, y: 60, duration: 1.4, ease: 'power3.out',
+  scrollTrigger: { trigger: '.depth', start: 'top 60%' }
+});
+
+/* ===========================================================
+   9. APOTHECARY — pinned horizontal scroll
+   =========================================================== */
+const shopWrap = document.getElementById('shopWrap');
+const shopTrack = document.getElementById('shopTrack');
+
+function setupShop(){
+  const trackWidth = shopTrack.scrollWidth;
+  const distance = trackWidth - window.innerWidth;
+  if (distance <= 0) return;
+
+  gsap.to(shopTrack, {
+    x: -distance,
+    ease: 'none',
+    scrollTrigger: {
+      trigger: shopWrap,
+      start: 'top top',
+      end: () => `+=${distance}`,
+      pin: true,
+      scrub: 0.6,
+      anticipatePin: 1,
+      invalidateOnRefresh: true
+    }
+  });
+}
+window.addEventListener('load', setupShop);
+
+/* ===========================================================
+  10. EXPERTS — opposite-direction scrolling background type
+   =========================================================== */
+gsap.to('#expertsBg', {
+  xPercent: -50,            // scrolls leftward as user scrolls down
+  ease: 'none',
+  scrollTrigger: {
+    trigger: '.experts',
+    start: 'top bottom',
+    end: 'bottom top',
+    scrub: true
+  }
+});
+
+// Portrait reveals
+gsap.utils.toArray('.expert').forEach((e, i) => {
+  gsap.from(e.querySelector('.e-clip img'), {
+    yPercent: 30, scale: 1.1, duration: 1.4, ease: 'power3.out',
+    scrollTrigger: { trigger: e, start: 'top 80%' }
+  });
+  gsap.from(e.querySelector('.e-meta'), {
+    y: 30, opacity: 0, duration: 0.9, ease: 'power3.out', delay: 0.15,
+    scrollTrigger: { trigger: e, start: 'top 80%' }
+  });
+});
+
+/* ===========================================================
+  11. TESTIMONIALS — pinned morph between quotes
+   =========================================================== */
+const tests = document.getElementById('tests');
+const testQuotes = document.querySelectorAll('.test-quote');
+
+ScrollTrigger.create({
+  trigger: tests,
+  start: 'top top',
+  end: 'bottom bottom',
+  pin: '#testsPin',
+  pinSpacing: false,
+  onUpdate: (self) => {
+    const p = self.progress;
+    const idx = Math.min(testQuotes.length - 1, Math.floor(p * testQuotes.length));
+    testQuotes.forEach((q, i) => {
+      // soft cross-fade
+      const distance = Math.abs(i - (p * testQuotes.length - 0.5));
+      const opacity = Math.max(0, 1 - distance);
+      q.style.opacity = opacity;
+      q.style.transform = `translateY(${(i - (p * testQuotes.length - 0.5)) * 30}px)`;
+    });
+  }
+});
+
+/* ===========================================================
+  12. FOOTER — BEGIN char animation
+   =========================================================== */
+gsap.from('#beginBtn .char', {
+  yPercent: 110,
+  opacity: 0,
+  duration: 1.1,
+  ease: 'power4.out',
+  stagger: 0.05,
+  scrollTrigger: { trigger: '.footer', start: 'top 70%' }
+});
+
+document.querySelectorAll('#beginBtn .char').forEach(c => {
+  c.addEventListener('mouseenter', () => {
+    gsap.to(c, { y: -10, rotate: -4, duration: 0.5, ease: 'power3.out' });
+  });
+  c.addEventListener('mouseleave', () => {
+    gsap.to(c, { y: 0, rotate: 0, duration: 0.6, ease: 'power3.out' });
+  });
+});
+
+/* ===========================================================
+  13. TAKEOVER MODAL
+   =========================================================== */
+const takeover = document.getElementById('takeover');
+const closeBtn = document.getElementById('closeBtn');
+const panels = ['#panel1','#panel2','#panel3'];
+
+function openTakeover(){
+  takeover.style.display = 'block';
+  takeover.setAttribute('aria-hidden','false');
+  document.body.classList.add('no-scroll');
+  lenis.stop();
+
+  const tl = gsap.timeline();
+  tl.set(panels, { yPercent: 100 })
+    .to(panels, { yPercent: 0, duration: 0.9, ease: 'power4.inOut', stagger: 0.08 })
+    .from('.takeover-top', { y: -30, opacity: 0, duration: 0.6, ease: 'power3.out' }, '-=0.3')
+    .from('.takeover-aside h3', { yPercent: 80, opacity: 0, duration: 0.9, ease: 'power4.out' }, '-=0.4')
+    .from('.takeover-aside .step-pill', { x: -30, opacity: 0, duration: 0.5, stagger: 0.08, ease: 'power3.out' }, '-=0.5')
+    .from('.takeover-form .f-step.active > *', { y: 30, opacity: 0, duration: 0.6, stagger: 0.06, ease: 'power3.out' }, '-=0.4');
+}
+
+function closeTakeover(){
+  const tl = gsap.timeline({
+    onComplete: () => {
+      takeover.style.display = 'none';
+      takeover.setAttribute('aria-hidden','true');
+      document.body.classList.remove('no-scroll');
+      lenis.start();
+      // reset form to step 1
+      goStep(1);
+      document.getElementById('takeoverSuccess').classList.remove('is-on');
+      document.getElementById('takeoverForm').reset();
+      document.querySelectorAll('.chip.on').forEach(c => c.classList.remove('on'));
+    }
+  });
+  tl.to([...panels].reverse(), {
+    yPercent: -100, duration: 0.7, ease: 'power4.inOut', stagger: 0.06
+  });
+}
+
+document.querySelectorAll('[data-open-modal]').forEach(b => b.addEventListener('click', openTakeover));
+closeBtn.addEventListener('click', closeTakeover);
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && takeover.style.display === 'block') closeTakeover(); });
+
+/* ----- multi-step navigation ----- */
+function goStep(n){
+  document.querySelectorAll('.f-step').forEach(s => s.classList.toggle('active', +s.dataset.step === n));
+  document.querySelectorAll('.step-pill').forEach(s => s.classList.toggle('active', +s.dataset.step === n));
+  document.getElementById('stepLabel').textContent = String(n).padStart(2,'0');
+  // animate in
+  gsap.from(`.f-step[data-step="${n}"] > *`, {
+    y: 24, opacity: 0, duration: 0.6, stagger: 0.06, ease: 'power3.out'
+  });
+}
+document.querySelectorAll('.f-next, .f-back').forEach(b => {
+  b.addEventListener('click', () => {
+    const n = +b.dataset.go;
+    if (!isNaN(n)) goStep(n);
+  });
+});
+
+// chips
+document.querySelectorAll('#chips .chip').forEach(c => {
+  c.addEventListener('click', () => c.classList.toggle('on'));
+});
+
+// submit
+document.getElementById('takeoverForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const success = document.getElementById('takeoverSuccess');
+  gsap.timeline()
+    .to('.takeover-form, .takeover-aside', { opacity: 0, y: -20, duration: 0.5, ease: 'power3.in' })
+    .add(() => success.classList.add('is-on'))
+    .from(success.querySelectorAll('h3, p'), { y: 40, opacity: 0, duration: 0.9, stagger: 0.12, ease: 'power4.out' });
+});
+
+/* ===========================================================
+  14. RESPONSIVE refresh
+   =========================================================== */
+window.addEventListener('resize', () => ScrollTrigger.refresh());
+
+</script>
+</body>
+</html>
