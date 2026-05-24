@@ -1,0 +1,435 @@
+<!-- EXPERIMENTAL MODULES - Injected via iframe or copy-paste into index.html -->
+<!-- Module A: Cinematic Hero | Module B: 3D Jelly Bean Scroller | Module C: Masters Fix -->
+<!-- Place these sections AFTER the existing hero and BEFORE the footer -->
+
+<style>
+/* --- EXPERIMENTAL SYSTEM TOKENS --- */
+:root {
+  --hairline-light: rgba(249, 249, 246, 0.15);
+  --ink-muted: rgba(26, 26, 26, 0.6);
+  --transition-smooth: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* --- GLOBAL STICKY CTA UPGRADE --- */
+.global-sticky-cta {
+  position: fixed;
+  z-index: 999;
+  font-family: var(--sans);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  border: none;
+}
+@media (min-width: 769px) {
+  .global-sticky-cta {
+    bottom: 40px; right: 40px;
+    background: var(--ink); color: var(--pearl);
+    padding: 16px 32px; border-radius: 999px;
+    border: 1px solid transparent;
+  }
+  .global-sticky-cta:hover {
+    background: transparent; color: var(--ink);
+    border-color: var(--ink); transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.05);
+  }
+}
+@media (max-width: 768px) {
+  .global-sticky-cta {
+    bottom: 0; left: 0; width: 100%;
+    background: var(--ink); color: var(--pearl);
+    padding: 20px; text-align: center;
+    border-radius: 0; box-shadow: 0 -10px 30px rgba(0,0,0,0.1);
+  }
+}
+
+/* --- MODULE A: CINEMATIC HERO --- */
+.premium-hero {
+  position: relative; width: 100%; min-height: 100vh;
+  background: var(--pearl);
+  display: flex; flex-direction: column; justify-content: space-between;
+  overflow: hidden; padding: 120px clamp(24px, 5vw, 96px) 40px;
+}
+.hero-grid-core {
+  display: grid; grid-template-columns: 4.5fr 7.5fr;
+  gap: 40px; align-items: center; flex-grow: 1;
+}
+.hero-left-editorial { position: relative; z-index: 10; }
+.hero-title-reveal {
+  font-family: var(--serif);
+  font-size: clamp(48px, 6.5vw, 90px);
+  line-height: 0.95; letter-spacing: -0.03em;
+  color: var(--ink); margin-bottom: 30px;
+}
+.hero-title-reveal span { display: inline-block; will-change: transform; }
+.hero-para-container { max-width: 380px; margin-top: 20px; }
+.hero-right-visual-stage {
+  position: relative; width: 100%; height: 65vh;
+  background: var(--stone); border-radius: 4px; overflow: hidden;
+}
+.hero-video-pane {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  object-fit: cover; opacity: 0.85;
+}
+.hero-matte-overlay {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  background: linear-gradient(90deg, var(--pearl) 0%, rgba(249,249,246,0) 40%);
+  z-index: 2; pointer-events: none;
+}
+.hero-3d-interactive-wrapper {
+  position: absolute; top: 50%; left: 40%;
+  transform: translate(-50%, -50%);
+  width: 280px; height: 420px; z-index: 5;
+  perspective: 1200px; pointer-events: none;
+}
+.hero-3d-asset {
+  width: 100%; height: 100%;
+  background-image: url('https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=800&q=80');
+  background-size: cover; background-position: center;
+  border-radius: 140px;
+  box-shadow: 0 50px 100px -20px rgba(26,26,26,0.3);
+  will-change: transform;
+}
+.hero-circular-badge-wrap {
+  position: absolute; bottom: 24px; right: 24px;
+  z-index: 6; width: 100px; height: 100px; pointer-events: none;
+}
+.rotating-svg-text {
+  width: 100%; height: 100%;
+  animation: spinBadge 24s linear infinite;
+}
+@keyframes spinBadge { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.hero-quick-nav {
+  display: flex; gap: 40px;
+  border-top: 1px solid rgba(26,26,26,0.1);
+  padding-top: 30px; margin-top: 40px; z-index: 10;
+}
+.q-nav-item {
+  font-family: var(--sans); font-size: 11px;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--ink-muted); text-decoration: none;
+  display: flex; align-items: center; gap: 8px;
+  transition: var(--transition-smooth);
+}
+.q-nav-item:hover { color: var(--ink); transform: translateY(-2px); }
+.q-nav-item::before {
+  content: ''; width: 6px; height: 6px;
+  background: var(--ink); border-radius: 50%;
+  opacity: 0; transition: var(--transition-smooth);
+}
+.q-nav-item:hover::before { opacity: 1; }
+@media (max-width: 992px) {
+  .hero-grid-core { grid-template-columns: 1fr; gap: 40px; }
+  .hero-matte-overlay { background: linear-gradient(180deg, var(--pearl) 0%, rgba(249,249,246,0) 30%); }
+  .hero-3d-interactive-wrapper { width: 180px; height: 270px; left: 50%; }
+  .hero-quick-nav { display: none; }
+}
+
+/* --- MODULE B: 3D JELLY BEAN SCROLLER --- */
+.jelly-scroller-section {
+  position: relative; background: var(--ink); color: var(--pearl);
+  padding: 140px 0; overflow: hidden;
+}
+.jelly-scroller-header { padding: 0 clamp(24px, 5vw, 96px); margin-bottom: 60px; }
+.jelly-tabs-container {
+  display: flex; gap: 12px; overflow-x: auto;
+  scrollbar-width: none; margin-top: 30px;
+}
+.jelly-tabs-container::-webkit-scrollbar { display: none; }
+.jelly-pill-btn {
+  padding: 14px 28px; border: 1px solid var(--hairline-light);
+  border-radius: 999px; font-family: var(--sans);
+  font-size: 10px; font-weight: 500; letter-spacing: 0.25em;
+  text-transform: uppercase; color: rgba(249,249,246,0.5);
+  cursor: pointer; background: transparent;
+  transition: var(--transition-smooth); white-space: nowrap;
+}
+.jelly-pill-btn:hover { border-color: var(--pearl); color: var(--pearl); }
+.jelly-pill-btn.is-active { background: var(--pearl); color: var(--ink); border-color: var(--pearl); }
+.spatial-gallery-envelope {
+  position: relative; width: 100%;
+  perspective: 1400px; padding: 20px 0;
+}
+.spatial-gallery-track {
+  display: flex; gap: 5vw; width: max-content;
+  padding-left: clamp(24px, 5vw, 96px); will-change: transform;
+}
+.spatial-card-3d {
+  position: relative; width: 340px; height: 500px;
+  transform-style: preserve-3d; will-change: transform, opacity;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.spatial-card-media {
+  width: 100%; height: 100%; object-fit: cover;
+  border-radius: 2px; transition: filter 0.6s ease;
+}
+.spatial-card-3d:hover .spatial-card-media { filter: contrast(1.05) brightness(0.95); }
+.spatial-card-details {
+  position: absolute; bottom: -45px; left: 0;
+  font-family: var(--serif); font-size: 22px; color: var(--pearl);
+}
+.spatial-card-details span {
+  display: block; font-family: var(--sans); font-size: 10px;
+  text-transform: uppercase; letter-spacing: 0.15em;
+  color: rgba(249,249,246,0.4); margin-top: 6px;
+}
+@media (max-width: 768px) { .spatial-card-3d { width: 260px; height: 380px; } }
+
+/* --- MODULE C: MASTERS & QUOTES FIX --- */
+.editorial-masters-block {
+  position: relative; width: 100%; min-height: 100vh;
+  background: var(--pearl); padding: 120px clamp(24px, 5vw, 96px);
+  overflow: hidden; isolation: isolate;
+}
+.masters-monolith-text {
+  position: absolute; top: 35%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--sans); font-weight: 900;
+  font-size: clamp(80px, 14vw, 240px); color: var(--pearl);
+  text-transform: uppercase; letter-spacing: -0.02em;
+  pointer-events: none; z-index: 10;
+  mix-blend-mode: difference; white-space: nowrap; will-change: transform;
+}
+.masters-portrait-deck {
+  display: flex; justify-content: space-around; align-items: center;
+  gap: 40px; margin-top: 80px; position: relative; z-index: 2;
+}
+.portrait-frame {
+  position: relative; width: 300px; height: 420px;
+  overflow: hidden; background: var(--stone);
+  backdrop-filter: blur(8px); border-radius: 2px;
+}
+.portrait-frame img {
+  width: 100%; height: 100%; object-fit: cover;
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.portrait-frame:hover img { transform: scale(1.04); }
+.synchronized-quotes-deck {
+  position: relative; max-width: 900px; margin: 120px auto 0;
+  height: 180px; display: flex; align-items: center; justify-content: center;
+}
+.synced-quote-card {
+  position: absolute; width: 100%; text-align: center;
+  font-family: var(--serif); font-size: clamp(24px, 3.5vw, 42px);
+  line-height: 1.3; color: var(--ink);
+  opacity: 0; pointer-events: none; will-change: transform, opacity;
+}
+@media (max-width: 768px) {
+  .masters-portrait-deck { flex-direction: column; gap: 60px; }
+  .portrait-frame { width: 100%; height: 360px; }
+  .synchronized-quotes-deck { height: 260px; }
+}
+</style>
+
+<!-- ============================================================
+     GLOBAL STICKY CTA (UPGRADED)
+     ============================================================ -->
+<div class="global-sticky-cta" onclick="document.querySelectorAll('[data-open-modal]')[0].click()">
+  <span>Book Consultation</span>
+</div>
+
+<!-- ============================================================
+     MODULE A: PREMIUM CINEMATIC HERO
+     ============================================================ -->
+<section class="premium-hero" id="premiumHero">
+  <div class="hero-grid-core">
+    <div class="hero-left-editorial">
+      <h1 class="hero-title-reveal" id="heroTitle">
+        <span>Calibrated</span><br><span>Longevity.</span>
+      </h1>
+      <div class="hero-para-container">
+        <p style="font-size:14px; line-height:1.7; color:var(--ink-muted);">An ultra-private editorial system built for bespoke physical optimization, clinical diagnostics, and timeless wellness recovery.</p>
+      </div>
+    </div>
+    <div class="hero-right-visual-stage" id="heroVisualStage">
+      <div class="hero-matte-overlay"></div>
+      <img class="hero-video-pane" src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=80" alt="Cinematic wellness interior">
+      <div class="hero-3d-interactive-wrapper">
+        <div class="hero-3d-asset" id="heroInteractiveObj"></div>
+      </div>
+      <div class="hero-circular-badge-wrap">
+        <svg class="rotating-svg-text" viewBox="0 0 100 100">
+          <path id="circlePath2" d="M 50,50 m -40,0 a 40,40 0 1,1 80,0 a 40,40 0 1,1 -80,0" fill="none"/>
+          <text font-family="Inter" font-size="7.5" letter-spacing="3.5" fill="#1A1A1A">
+            <textPath href="#circlePath2">SCROLL &#x2022; TO &#x2022; EXPLORE &#x2022; MAISON &#x2022; </textPath>
+          </text>
+        </svg>
+      </div>
+    </div>
+  </div>
+  <div class="hero-quick-nav">
+    <a href="#disciplines" class="q-nav-item"><span>01</span> Disciplines</a>
+    <a href="#apothecary" class="q-nav-item"><span>02</span> Apothecary</a>
+    <a href="#masters" class="q-nav-item"><span>03</span> The Masters</a>
+    <a href="#inquire" class="q-nav-item"><span>04</span> Inquire</a>
+  </div>
+</section>
+
+<!-- ============================================================
+     MODULE B: 3D JELLY BEAN SCROLLER
+     ============================================================ -->
+<section class="jelly-scroller-section" id="disciplines">
+  <div class="jelly-scroller-header">
+    <h2 style="font-family:var(--serif); font-size:clamp(36px,4vw,56px); margin:0; color:var(--pearl);">Systemic Modalities</h2>
+    <div class="jelly-tabs-container">
+      <button class="jelly-pill-btn is-active" data-filter="all">All Modules</button>
+      <button class="jelly-pill-btn" data-filter="diagnostics">Clinical Diagnostics</button>
+      <button class="jelly-pill-btn" data-filter="therapeutics">Therapeutics</button>
+      <button class="jelly-pill-btn" data-filter="restoration">Restoration</button>
+    </div>
+  </div>
+  <div class="spatial-gallery-envelope">
+    <div class="spatial-gallery-track" id="kineticTrack">
+      <div class="spatial-card-3d" data-cat="diagnostics">
+        <img class="spatial-card-media" src="https://images.unsplash.com/photo-1519823551278-64ac92734fb1?auto=format&fit=crop&w=700&q=80" alt="Diagnostics">
+        <div class="spatial-card-details">Cellular Extraction <span>Diagnostics</span></div>
+      </div>
+      <div class="spatial-card-3d" data-cat="therapeutics">
+        <img class="spatial-card-media" src="https://images.unsplash.com/photo-1556228578-8c89e6adf883?auto=format&fit=crop&w=700&q=80" alt="Therapeutics">
+        <div class="spatial-card-details">Somatic Sculpting <span>Therapeutics</span></div>
+      </div>
+      <div class="spatial-card-3d" data-cat="restoration">
+        <img class="spatial-card-media" src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=700&q=80" alt="Restoration">
+        <div class="spatial-card-details">Thermal Chamber <span>Restoration</span></div>
+      </div>
+      <div class="spatial-card-3d" data-cat="diagnostics">
+        <img class="spatial-card-media" src="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=700&q=80" alt="Diagnostics">
+        <div class="spatial-card-details">Apothecary Assay <span>Diagnostics</span></div>
+      </div>
+      <div class="spatial-card-3d" data-cat="restoration">
+        <img class="spatial-card-media" src="https://images.unsplash.com/photo-1616627547584-bf28cee262db?auto=format&fit=crop&w=700&q=80" alt="Restoration">
+        <div class="spatial-card-details">Hyperbaric Sleep <span>Restoration</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     MODULE C: RE-ENGINEERED MASTERS + QUOTES
+     ============================================================ -->
+<section class="editorial-masters-block" id="masters">
+  <div class="masters-monolith-text" id="monolithScroll">OUR MASTERS</div>
+  <div class="masters-portrait-deck">
+    <div class="portrait-frame">
+      <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80" alt="Master Practitioner">
+    </div>
+    <div class="portrait-frame" style="margin-top: 60px;">
+      <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=600&q=80" alt="Master Researcher">
+    </div>
+  </div>
+  <div class="synchronized-quotes-deck" id="quotesSequenceSection">
+    <div class="synced-quote-card" style="opacity:1">"An act of complete structural care, calibrated perfectly down to the single millimetre."</div>
+    <div class="synced-quote-card">"We treat time not as an unyielding linear march, but as a parameter to safely recalibrate."</div>
+    <div class="synced-quote-card">"The absolute architectural integration of modern longevity diagnostics and pristine luxury wellness."</div>
+  </div>
+</section>
+
+<!-- ============================================================
+     EXPERIMENTAL MODULES JS ENGINE
+     ============================================================ -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  if (typeof gsap === 'undefined') return;
+  gsap.registerPlugin(ScrollTrigger);
+
+  // --- MODULE A: Hero Text Reveal + Mouse Parallax ---
+  gsap.from("#heroTitle span", {
+    y: 80, opacity: 0, duration: 1.2,
+    stagger: 0.15, ease: "power4.out",
+    scrollTrigger: { trigger: ".premium-hero", start: "top 80%" }
+  });
+
+  const interactObj = document.getElementById('heroInteractiveObj');
+  if (interactObj) {
+    let mx = 0, my = 0, cx = 0, cy = 0;
+    window.addEventListener('mousemove', (e) => {
+      mx = (e.clientX / window.innerWidth - 0.5) * 2;
+      my = (e.clientY / window.innerHeight - 0.5) * 2;
+    });
+    gsap.ticker.add(() => {
+      cx += (mx - cx) * 0.06;
+      cy += (my - cy) * 0.06;
+      gsap.set(interactObj, {
+        x: cx * 45, y: cy * 45,
+        rotateX: -cy * 20, rotateY: cx * 20
+      });
+    });
+  }
+
+  // --- MODULE B: 3D Kinetic Scroller ---
+  const track = document.getElementById('kineticTrack');
+  const cards = gsap.utils.toArray('.spatial-card-3d');
+  if (track && cards.length > 0) {
+    let horizontalTween = gsap.to(track, {
+      x: () => -(track.scrollWidth - window.innerWidth + window.innerWidth * 0.15),
+      ease: "none",
+      scrollTrigger: {
+        trigger: ".jelly-scroller-section",
+        pin: true, scrub: 1,
+        start: "top top",
+        end: () => "+=" + track.scrollWidth,
+        invalidateOnRefresh: true
+      }
+    });
+
+    cards.forEach((card) => {
+      gsap.to(card, {
+        rotateY: -20, scale: 0.9, opacity: 0.6, ease: "none",
+        scrollTrigger: {
+          trigger: card, containerAnimation: horizontalTween,
+          start: "left center", end: "right left", scrub: true
+        }
+      });
+    });
+
+    // Jelly Bean Filter
+    document.querySelectorAll('.jelly-pill-btn').forEach(pill => {
+      pill.addEventListener('click', () => {
+        document.querySelectorAll('.jelly-pill-btn').forEach(p => p.classList.remove('is-active'));
+        pill.classList.add('is-active');
+        const fv = pill.getAttribute('data-filter');
+        gsap.to(cards, {
+          opacity: 0, scale: 0.7, rotateY: 45, duration: 0.4, stagger: 0.05,
+          onComplete: () => {
+            cards.forEach(card => {
+              const cat = card.getAttribute('data-cat');
+              if (fv === 'all' || cat === fv) {
+                card.style.display = 'block';
+                gsap.to(card, { opacity: 1, scale: 1, rotateY: 0, duration: 0.6, ease: "power3.out" });
+              } else { card.style.display = 'none'; }
+            });
+            ScrollTrigger.refresh();
+          }
+        });
+      });
+    });
+  }
+
+  // --- MODULE C: Masters Parallax + Quote Timeline ---
+  gsap.to("#monolithScroll", {
+    x: "-15%", ease: "none",
+    scrollTrigger: {
+      trigger: ".editorial-masters-block",
+      start: "top bottom", end: "bottom top", scrub: true
+    }
+  });
+
+  const seqQuotes = gsap.utils.toArray('.synced-quote-card');
+  if (seqQuotes.length > 0) {
+    const qtl = gsap.timeline({
+      scrollTrigger: {
+        trigger: "#quotesSequenceSection",
+        start: "top 75%", end: "bottom 30%", scrub: 1
+      }
+    });
+    seqQuotes.forEach((quote, i) => {
+      if (i < seqQuotes.length - 1) {
+        qtl.to(quote, { opacity: 0, y: -30, duration: 1, ease: "power2.inOut" }, "+=1")
+           .fromTo(seqQuotes[i + 1], { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 1, ease: "power2.inOut" }, "<");
+      }
+    });
+  }
+});
+</script>

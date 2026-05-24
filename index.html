@@ -2029,5 +2029,31 @@ document.getElementById('takeoverForm').addEventListener('submit', (e) => {
 window.addEventListener('resize', () => ScrollTrigger.refresh());
 
 </script>
+
+<!-- ============================================================
+     EXPERIMENTAL MODULES (Cinematic Hero, 3D Scroller, Masters Fix)
+     Loaded as inline include from modules.html
+     ============================================================ -->
+<script>
+fetch('modules.html').then(r=>r.text()).then(html=>{
+  const container = document.createElement('div');
+  container.innerHTML = html;
+  // Insert new sections before the footer
+  const footer = document.querySelector('.footer');
+  if(footer){
+    container.querySelectorAll('section, .global-sticky-cta').forEach(el => {
+      document.body.insertBefore(el.cloneNode(true), footer);
+    });
+  }
+  // Execute style
+  container.querySelectorAll('style').forEach(s => document.head.appendChild(s.cloneNode(true)));
+  // Execute scripts
+  container.querySelectorAll('script').forEach(s => {
+    const ns = document.createElement('script');
+    ns.textContent = s.textContent;
+    document.body.appendChild(ns);
+  });
+}).catch(()=>{/* modules.html not found — sections are standalone */});
+</script>
 </body>
 </html>
