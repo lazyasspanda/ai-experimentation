@@ -25,11 +25,14 @@
     theme: {
       extend: {
         colors: {
-          'void': '#060606',
+          'void': '#0d0d0d',
           'slate-surface': '#121212',
-          'chalk': '#f5f5f5',
-          'cement': '#7a7a7a',
-          'crimson': '#d60a1b',
+          'chalk': '#f9f9f9',
+          'cement': '#8e8e93',
+          'crimson': '#c50e1f',
+          'stone': '#f4f4f0',
+          'ink': '#1a1a1a',
+          'muted-light': '#636366',
         },
         fontFamily: {
           'sans': ['Inter', 'sans-serif'],
@@ -44,14 +47,27 @@
 <style>
 /* ===== DESIGN TOKENS ===== */
 :root{
-  --bg-void:        #060606;
-  --surface-slate:  #121212;
-  --text-chalk:     #f5f5f5;
-  --text-cement:    #7a7a7a;
-  --accent-crimson: #d60a1b;
-  --border-hairline: rgba(255, 255, 255, 0.08);
+  /* Dark Sections (1, 4, 5) */
+  --bg-dark-void:     #0d0d0d;
+  --text-dark-chalk:  #f9f9f9;
+  --text-dark-muted:  #8e8e93;
+
+  /* Light Sections (2, 3) */
+  --bg-light-stone:   #f4f4f0;
+  --text-light-ink:   #1a1a1a;
+  --text-light-muted: #636366;
+
+  /* Universal */
+  --accent-crimson:   #c50e1f;
+  --border-hairline:  rgba(142, 142, 147, 0.2);
   --font-sans: 'Inter', sans-serif;
   --font-serif: 'Instrument Serif', serif;
+
+  /* Back-compat aliases (existing rules reference these) */
+  --bg-void:        #0d0d0d;
+  --surface-slate:  #121212;
+  --text-chalk:     #f9f9f9;
+  --text-cement:    #8e8e93;
 }
 *{ margin:0; padding:0; box-sizing:border-box; }
 html{ background: var(--bg-void); }
@@ -78,7 +94,7 @@ body.loading{ cursor: wait; }
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: #080808;
+  background: #161616;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -89,7 +105,7 @@ body.loading{ cursor: wait; }
   top: 0;
   width: 50%;
   height: 100%;
-  background: #080808;
+  background: #161616;
   z-index: 2;
 }
 .preloader-half.left{ left: 0; }
@@ -131,6 +147,9 @@ body.loading{ cursor: wait; }
   border: none;
 }
 .nav-item.active{ color: var(--text-chalk); }
+/* Light-section nav coloring (toggled via JS on sections 2 & 3) */
+.nav-item.light-mode{ color: var(--text-light-muted); }
+.nav-item.light-mode.active{ color: var(--text-light-ink); }
 .nav-indicator{
   width: 0;
   height: 2px;
@@ -192,22 +211,170 @@ body.loading{ cursor: wait; }
   color: #fff;
 }
 
-/* ===== PRACTICE RING (Section 2) ===== */
-.practice-ring-item{
-  position: absolute;
+/* ===== SECTION 2 — EDITORIAL SERVICE LIST ===== */
+.section-2-layout{
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  max-width: 1200px;
+  padding: 0 4rem;
+}
+.services-list-column{
+  width: 480px;
+  flex-shrink: 0;
+}
+.service-item{
+  border-top: 1px solid var(--border-hairline);
+  padding: 1.25rem 0;
+  cursor: pointer;
+  transition: padding-left 0.3s ease;
+}
+.service-item:hover, .service-item:focus{
+  padding-left: 0.75rem;
+  outline: none;
+}
+.service-label{
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-light-muted);
+  transition: color 0.3s ease;
+  display: block;
+}
+.service-item:hover .service-label,
+.service-item:focus .service-label{ color: var(--accent-crimson); }
+.service-desc{
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--text-light-muted);
+  max-height: 0;
+  overflow: hidden;
+  margin-top: 0;
+  transition: max-height 0.45s ease, margin-top 0.3s ease, opacity 0.3s ease;
+  opacity: 0;
+}
+.service-item:hover .service-desc,
+.service-item:focus .service-desc,
+.service-item.active .service-desc{
+  max-height: 120px;
+  margin-top: 0.75rem;
+  opacity: 1;
+}
+
+/* ===== SECTION 3 — TWO-COLUMN PHILOSOPHY ===== */
+.section-3-layout{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6rem;
+  max-width: 1200px;
+  width: 100%;
+  padding: 0 4rem;
+  align-items: start;
+}
+.philosophy-header{ padding-top: 1rem; }
+.philosophy-body{ display: flex; flex-direction: column; gap: 1.75rem; padding-top: 0.5rem; }
+.philosophy-para{
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.85;
+  font-weight: 300;
+}
+.philosophy-cta{
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent-crimson);
+  text-decoration: none;
+  border-bottom: 1px solid var(--accent-crimson);
+  padding-bottom: 3px;
+  width: fit-content;
+  transition: opacity 0.3s ease;
+}
+.philosophy-cta:hover{ opacity: 0.7; }
+
+/* ===== SECTION 5 — COUNCIL INTAKE TERMINAL ===== */
+.intake-layout{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5rem;
+  max-width: 1100px;
+  width: 100%;
+  padding: 0 4rem;
+  align-items: center;
+}
+.intake-form-frame{
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  border: 1px solid var(--border-hairline);
+  padding: 2.5rem;
+  backdrop-filter: blur(12px);
+  background: rgba(255,255,255,0.03);
+}
+.intake-field-group{
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.intake-label{
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--text-dark-muted);
+}
+.intake-input{
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border-hairline);
+  color: var(--text-dark-chalk);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  padding: 0.65rem 0;
+  outline: none;
+  transition: border-color 0.3s ease;
+  width: 100%;
+}
+.intake-input::placeholder{ color: var(--text-dark-muted); }
+.intake-input:focus{
+  border-color: var(--accent-crimson);
+  outline: 2px solid transparent;
+  box-shadow: 0 1px 0 0 var(--accent-crimson);
+}
+.intake-select{
+  appearance: none;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238e8e93' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0 center;
+}
+.intake-select option{ background: #1a1a1a; color: var(--text-dark-chalk); }
+.intake-submit{
+  background: var(--accent-crimson);
+  color: #fff;
   font-family: var(--font-sans);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.25em;
   text-transform: uppercase;
-  color: var(--text-cement);
+  padding: 1rem 2rem;
+  border: none;
   cursor: pointer;
-  transition: color 0.4s ease, transform 0.4s ease;
-  white-space: nowrap;
+  transition: background 0.3s ease, transform 0.2s ease;
+  align-self: flex-start;
+  margin-top: 0.5rem;
 }
-.practice-ring-item:hover{
-  color: var(--accent-crimson);
-  transform: scale(1.15);
+.intake-submit:hover{ background: #fff; color: #000; transform: scale(1.03); }
+.intake-submit:focus-visible{
+  outline: 2px solid var(--accent-crimson);
+  outline-offset: 3px;
 }
 
 
@@ -268,10 +435,87 @@ body.loading{ cursor: wait; }
 }
 .fixed-ui{ position: fixed; z-index: 50; }
 
+/* ===== FOCUS STATES (WCAG AA) ===== */
+:focus-visible{
+  outline: 2px solid var(--accent-crimson);
+  outline-offset: 3px;
+  border-radius: 1px;
+}
+a:focus-visible, button:focus-visible{
+  outline: 2px solid var(--accent-crimson);
+  outline-offset: 4px;
+}
+
+/* Skip-to-content link */
+.skip-link{
+  position: absolute;
+  top: -100%;
+  left: 1rem;
+  background: var(--accent-crimson);
+  color: #fff;
+  padding: 0.5rem 1rem;
+  font-size: 13px;
+  font-weight: 600;
+  z-index: 99999;
+  transition: top 0.2s ease;
+}
+.skip-link:focus{ top: 1rem; }
+
+/* ===== MOBILE BREAKPOINT < 768px ===== */
+@media (max-width: 767px){
+  /* Kill fixed horizontal track — go vertical */
+  .horizontal-scroll-container{
+    position: relative !important;
+    flex-direction: column !important;
+    height: auto !important;
+    transform: none !important;
+    will-change: unset !important;
+  }
+  .section-panel{
+    width: 100vw !important;
+    height: auto !important;
+    min-height: 100svh;
+    padding: 6rem 1.5rem 4rem;
+    text-align: left;
+  }
+  /* WebGL canvas — shrink to top portion */
+  .webgl-canvas{
+    position: fixed !important;
+    top: 0 !important;
+    height: 45vh !important;
+  }
+  /* Section layouts go single-column */
+  .section-2-layout,
+  .section-3-layout,
+  .intake-layout{
+    grid-template-columns: 1fr !important;
+    gap: 2rem !important;
+    padding: 0 1.5rem !important;
+  }
+  .services-list-column{ width: 100% !important; }
+  /* Typography scale-down */
+  h1{ font-size: 3rem !important; }
+  h2{ font-size: 2.5rem !important; }
+  /* Verdict grid */
+  .grid-cols-3{ grid-template-columns: 1fr !important; }
+  /* Nav — hide on mobile, use scroll-hint only */
+  #vertical-nav{ display: none !important; }
+  /* Light sections need a solid light bg on mobile (theme-swap JS is desktop-only) */
+  .section-panel[data-section="1"],
+  .section-panel[data-section="2"]{ background: var(--bg-light-stone); }
+  /* Dark sections stay transparent so the canvas backdrop shows through */
+  .section-panel[data-section="0"],
+  .section-panel[data-section="3"],
+  .section-panel[data-section="4"]{ background: transparent; }
+}
+
 
 </style>
 </head>
 <body class="loading">
+
+<!-- ════════════ SKIP TO CONTENT ════════════ -->
+<a href="#horizontal-scroll" class="skip-link">Skip to main content</a>
 
 <!-- ════════════ KINETIC LOADING MATRIX ════════════ -->
 <div class="preloader-flash" id="preloader-flash"></div>
@@ -297,22 +541,26 @@ body.loading{ cursor: wait; }
 
 
 <!-- ════════════ VERTICAL NAVIGATION TRACK ════════════ -->
-<nav class="fixed-ui left-8 top-1/2 -translate-y-1/2 flex flex-col gap-6" id="vertical-nav">
-  <button class="nav-item active" data-index="0">
+<nav class="fixed-ui left-8 top-1/2 -translate-y-1/2 flex flex-col gap-6" id="vertical-nav" role="navigation" aria-label="Section navigation">
+  <button class="nav-item active" data-index="0" aria-label="Navigate to Sovereign Overview section">
     <span>01 // OVERVIEW</span>
-    <div class="nav-indicator"></div>
+    <div class="nav-indicator" aria-hidden="true"></div>
   </button>
-  <button class="nav-item" data-index="1">
+  <button class="nav-item" data-index="1" aria-label="Navigate to Jurisdictions Matrix section">
     <span>02 // JURISDICTIONS</span>
-    <div class="nav-indicator"></div>
+    <div class="nav-indicator" aria-hidden="true"></div>
   </button>
-  <button class="nav-item" data-index="2">
+  <button class="nav-item" data-index="2" aria-label="Navigate to Foundational Legacy section">
     <span>03 // FOUNDATION</span>
-    <div class="nav-indicator"></div>
+    <div class="nav-indicator" aria-hidden="true"></div>
   </button>
-  <button class="nav-item" data-index="3">
+  <button class="nav-item" data-index="3" aria-label="Navigate to Verdict Matrix section">
     <span>04 // VERDICTS</span>
-    <div class="nav-indicator"></div>
+    <div class="nav-indicator" aria-hidden="true"></div>
+  </button>
+  <button class="nav-item" data-index="4" aria-label="Navigate to Council Intake section">
+    <span>05 // INTAKE</span>
+    <div class="nav-indicator" aria-hidden="true"></div>
   </button>
 </nav>
 
@@ -330,7 +578,7 @@ body.loading{ cursor: wait; }
 
 
 <!-- ════════════ HORIZONTAL SCROLL CONTAINER ════════════ -->
-<div class="horizontal-scroll-container" id="horizontal-scroll">
+<div class="horizontal-scroll-container" id="horizontal-scroll" role="main">
 
   <!-- ───── SECTION 1: THE SOVEREIGN OVERVIEW ───── -->
   <section class="section-panel" data-section="0">
@@ -343,46 +591,77 @@ body.loading{ cursor: wait; }
       A sovereign legal institution engineered for absolute dominance in high-stakes litigation, corporate warfare, and constitutional precedent. We do not negotiate from weakness — we architect the verdict.
     </p>
     <div class="flex justify-center gap-6 flex-wrap">
-      <a href="#" class="btn-primary px-8 py-4 text-xs tracking-widest font-bold uppercase">Request Council ↗</a>
-      <a href="#" class="btn-secondary text-xs uppercase tracking-widest text-cement pb-1">View Case Portfolio</a>
+      <a href="#" class="btn-primary px-8 py-4 text-xs tracking-widest font-bold uppercase" aria-label="Request legal counsel from Sovereign & Partners">Request Council ↗</a>
+      <a href="#" class="btn-secondary text-xs uppercase tracking-widest text-cement pb-1" aria-label="View our case portfolio">View Case Portfolio</a>
     </div>
   </section>
 
 
   <!-- ───── SECTION 2: THE JURISDICTIONS MATRIX ───── -->
-  <section class="section-panel" data-section="1">
-    <p class="text-xs font-sans tracking-[0.4em] uppercase text-crimson mb-6">// Jurisdictions Matrix</p>
-    <h2 class="text-5xl md:text-7xl font-sans font-black tracking-tighter uppercase leading-[0.9] mb-6 text-chalk">
-      Practice <span class="serif-italic">domains</span>
-    </h2>
-    <p class="text-sm max-w-lg text-cement font-light leading-relaxed mx-auto">
-      Five pillars of jurisdiction. Hover a domain to channel the light onto the scales of balance.
-    </p>
-    <!-- Circular practice ring -->
-    <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-      <div class="relative w-[520px] h-[520px] pointer-events-auto" id="practice-ring">
-        <span class="practice-ring-item" data-mesh="justice" style="top:0;left:50%;transform:translateX(-50%);">Civil</span>
-        <span class="practice-ring-item" data-mesh="justice" style="top:30%;right:0;">Criminal</span>
-        <span class="practice-ring-item" data-mesh="justice" style="bottom:8%;right:8%;">Family</span>
-        <span class="practice-ring-item" data-mesh="justice" style="bottom:8%;left:8%;">Corporate</span>
-        <span class="practice-ring-item" data-mesh="justice" style="top:30%;left:0;">Intellectual Property</span>
+  <section class="section-panel" data-section="1" aria-labelledby="sec2-heading">
+    <!-- Left: interactive service list -->
+    <div class="section-2-layout">
+      <div class="services-list-column" role="list" aria-label="Practice areas">
+        <p class="text-xs font-sans tracking-[0.4em] uppercase mb-8" style="color: var(--accent-crimson);">// Jurisdictions Matrix</p>
+        <h2 id="sec2-heading" class="text-5xl font-sans font-black tracking-tighter uppercase leading-[0.9] mb-10" style="color: var(--text-light-ink);">
+          Practice <span class="serif-italic">domains</span>
+        </h2>
+
+        <div class="service-item" data-service="civil" role="listitem" tabindex="0" aria-expanded="false">
+          <span class="service-label">01 — Civil Litigation</span>
+          <p class="service-desc">We handle complex civil disputes involving multi-party liability, class actions, and tortious interference with precision architecture that dismantles opposing counsel at deposition.</p>
+        </div>
+
+        <div class="service-item" data-service="criminal" role="listitem" tabindex="0" aria-expanded="false">
+          <span class="service-label">02 — Criminal Defense</span>
+          <p class="service-desc">From white-collar federal prosecution to capital defense, our criminal practice is built on constitutional rigor. We treat every case as a structural engineering problem — isolating the load-bearing weaknesses in the State's case.</p>
+        </div>
+
+        <div class="service-item" data-service="family" role="listitem" tabindex="0" aria-expanded="false">
+          <span class="service-label">03 — Family & Estate</span>
+          <p class="service-desc">High-net-worth asset protection, international custody matters, and contested trust litigation. We approach family law with the discretion of a private vault and the precision of a forensic accountant.</p>
+        </div>
+
+        <div class="service-item" data-service="corporate" role="listitem" tabindex="0" aria-expanded="false">
+          <span class="service-label">04 — Corporate Warfare</span>
+          <p class="service-desc">M&A disputes, hostile takeovers, derivative suits, and board governance crises. When the boardroom becomes a battlefield, our institutional litigation practice becomes the decisive strategic advantage.</p>
+        </div>
+
+        <div class="service-item" data-service="ip" role="listitem" tabindex="0" aria-expanded="false">
+          <span class="service-label">05 — Intellectual Property</span>
+          <p class="service-desc">Patent litigation, trade secret enforcement, and rights of publicity — spanning both trial and appellate courts. We've set precedent at the Federal Circuit and have never lost a preliminary injunction in the last decade.</p>
+        </div>
       </div>
     </div>
   </section>
 
 
   <!-- ───── SECTION 3: THE FOUNDATIONAL LEGACY ───── -->
-  <section class="section-panel" data-section="2">
-    <p class="text-xs font-sans tracking-[0.4em] uppercase text-crimson mb-6">// Foundational Legacy</p>
-    <h2 class="text-5xl md:text-7xl font-sans font-black tracking-tighter uppercase leading-[0.9] mb-8 text-chalk">
-      Built on <span class="serif-italic">precedent</span>
-    </h2>
-    <p class="reveal-text text-base md:text-lg max-w-2xl text-chalk font-light leading-relaxed mx-auto mb-4">
-      For three decades we have engineered the architecture of modern law — structuring arguments like load-bearing columns and treating every brief as a monument cut from raw concrete.
-    </p>
-    <p class="reveal-text text-sm max-w-xl text-cement font-light leading-relaxed mx-auto">
-      Our philosophy is structural, not ornamental. We do not decorate the truth; we build it to withstand pressure.
-    </p>
+  <section class="section-panel" data-section="2" aria-labelledby="sec3-heading">
+    <div class="section-3-layout">
+      <!-- Left column: heading + label -->
+      <div class="philosophy-header">
+        <p class="text-xs font-sans tracking-[0.4em] uppercase mb-6" style="color: var(--accent-crimson);">// Foundational Philosophy</p>
+        <h2 id="sec3-heading" class="text-6xl font-sans font-black tracking-tighter uppercase leading-[0.88]" style="color: var(--text-light-ink);">
+          Built on<br/><span class="serif-italic">precedent.</span><br/>Argued<br/>with<br/><span class="serif-italic">architecture.</span>
+        </h2>
+        <div style="width: 48px; height: 2px; background: var(--accent-crimson); margin-top: 2.5rem;"></div>
+      </div>
+
+      <!-- Right column: narrative paragraphs -->
+      <div class="philosophy-body">
+        <p class="reveal-text philosophy-para" style="color: var(--text-light-ink);">
+          For three decades, Sovereign & Partners has treated legal defense not as an act of reaction, but as an act of construction. We approach every case the way a structural engineer approaches a load-bearing problem — identifying the precise point at which the opposition's argument will collapse under its own weight.
+        </p>
+        <p class="reveal-text philosophy-para" style="color: var(--text-light-muted);">
+          Our briefs are not documents. They are monuments. Each paragraph is load-tested for logical integrity before it reaches the court record. We do not use ornamental language — we use language that builds, that holds, that does not yield under cross-examination or appellate scrutiny.
+        </p>
+        <p class="reveal-text philosophy-para" style="color: var(--text-light-muted);">
+          This structural philosophy has produced a 30-year record of precedent-setting outcomes: two decisions affirmed by the Supreme Court, four landmark circuit opinions cited in academic law journals, and an institutional win rate that has never dipped below 94%. The method is architectural. The result is absolute.
+        </p>
+        <a href="#" class="philosophy-cta" aria-label="Learn more about our legal philosophy">Read Our Philosophy Manifesto →</a>
+      </div>
+    </div>
   </section>
 
 
@@ -393,21 +672,76 @@ body.loading{ cursor: wait; }
       The <span class="serif-italic">record</span> speaks
     </h2>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-5xl w-full">
-      <div class="verdict-card p-8 text-left">
-        <p class="text-4xl font-sans font-black text-chalk tracking-tighter mb-3">$420M</p>
-        <p class="text-[11px] uppercase tracking-[0.25em] text-cement">Record Verdict / Antitrust</p>
+      <div class="verdict-card p-8 text-left" role="article" aria-label="Record verdict in antitrust case">
+        <p class="text-[10px] uppercase tracking-[0.3em] mb-4" style="color: var(--accent-crimson);">Antitrust // 2019</p>
+        <p class="text-5xl font-sans font-black tracking-tighter mb-3" style="color: var(--text-dark-chalk);">$420M</p>
+        <p class="text-[11px] uppercase tracking-[0.25em] mb-4" style="color: var(--text-dark-muted);">Record Verdict</p>
+        <p class="text-xs leading-relaxed" style="color: var(--text-dark-muted);">Largest single antitrust verdict in the Eastern District in a decade. Affirmed on appeal without modification.</p>
       </div>
-      <div class="verdict-card p-8 text-left">
-        <p class="text-4xl font-sans font-black text-chalk tracking-tighter mb-3">SCOTUS</p>
-        <p class="text-[11px] uppercase tracking-[0.25em] text-cement">Precedent Set / Supreme Court</p>
+      <div class="verdict-card p-8 text-left" role="article" aria-label="Supreme Court precedent">
+        <p class="text-[10px] uppercase tracking-[0.3em] mb-4" style="color: var(--accent-crimson);">Constitutional // 2021</p>
+        <p class="text-5xl font-sans font-black tracking-tighter mb-3" style="color: var(--text-dark-chalk);">SCOTUS</p>
+        <p class="text-[11px] uppercase tracking-[0.25em] mb-4" style="color: var(--text-dark-muted);">Precedent Set</p>
+        <p class="text-xs leading-relaxed" style="color: var(--text-dark-muted);">Argued and won before the United States Supreme Court. Opinion cited in 14 subsequent circuit decisions.</p>
       </div>
-      <div class="verdict-card p-8 text-left">
-        <p class="text-4xl font-sans font-black text-chalk tracking-tighter mb-3">98.4%</p>
-        <p class="text-[11px] uppercase tracking-[0.25em] text-cement">Trial Success Rate / 30 Yrs</p>
+      <div class="verdict-card p-8 text-left" role="article" aria-label="Trial success rate over 30 years">
+        <p class="text-[10px] uppercase tracking-[0.3em] mb-4" style="color: var(--accent-crimson);">Institutional // 30 Years</p>
+        <p class="text-5xl font-sans font-black tracking-tighter mb-3" style="color: var(--text-dark-chalk);">98.4%</p>
+        <p class="text-[11px] uppercase tracking-[0.25em] mb-4" style="color: var(--text-dark-muted);">Trial Success Rate</p>
+        <p class="text-xs leading-relaxed" style="color: var(--text-dark-muted);">Across 847 tried cases spanning three decades, our verdict record remains the benchmark for institutional litigation in North America.</p>
       </div>
     </div>
     <div class="mt-12">
       <a href="#" class="btn-primary px-8 py-4 text-xs tracking-widest font-bold uppercase">Commission the Firm ↗</a>
+    </div>
+  </section>
+
+  <!-- ───── SECTION 5: THE COUNCIL INTAKE TERMINAL ───── -->
+  <section class="section-panel" data-section="4" aria-labelledby="sec5-heading">
+    <div class="intake-layout">
+      <div class="intake-header">
+        <p class="text-xs font-sans tracking-[0.4em] uppercase mb-6" style="color: var(--accent-crimson);">// Council Intake Terminal</p>
+        <h2 id="sec5-heading" class="text-5xl font-sans font-black tracking-tighter uppercase leading-[0.9] mb-4" style="color: var(--text-dark-chalk);">
+          Commission the <span class="serif-italic">Firm</span>
+        </h2>
+        <p class="text-sm font-light leading-relaxed" style="color: var(--text-dark-muted); max-width: 380px;">
+          Sovereign & Partners accepts new mandates by referral and direct inquiry. Complete the intake terminal below to initiate first contact.
+        </p>
+      </div>
+
+      <div class="intake-form-frame" role="form" aria-label="Council intake form">
+        <div class="intake-field-group">
+          <label class="intake-label" for="intake-name">Full Name</label>
+          <input type="text" id="intake-name" class="intake-input" placeholder="First & Last Name" autocomplete="name" aria-required="true" />
+        </div>
+
+        <div class="intake-field-group">
+          <label class="intake-label" for="intake-email">Corporate Email</label>
+          <input type="email" id="intake-email" class="intake-input" placeholder="name@organization.com" autocomplete="email" aria-required="true" />
+        </div>
+
+        <div class="intake-field-group">
+          <label class="intake-label" for="intake-scope">Case Scope Area</label>
+          <select id="intake-scope" class="intake-input intake-select" aria-required="true">
+            <option value="" disabled selected>Select a jurisdiction</option>
+            <option value="civil">Civil Litigation</option>
+            <option value="criminal">Criminal Defense</option>
+            <option value="family">Family & Estate</option>
+            <option value="corporate">Corporate Warfare</option>
+            <option value="ip">Intellectual Property</option>
+            <option value="constitutional">Constitutional Precedent</option>
+          </select>
+        </div>
+
+        <div class="intake-field-group">
+          <label class="intake-label" for="intake-brief">Brief Overview</label>
+          <textarea id="intake-brief" class="intake-input" rows="3" placeholder="Describe the nature of your matter in 2–3 sentences." aria-required="false" style="resize: none;"></textarea>
+        </div>
+
+        <button type="button" class="intake-submit" aria-label="Submit intake form to Sovereign & Partners" onclick="handleIntakeSubmit()">
+          Transmit Mandate ↗
+        </button>
+      </div>
     </div>
   </section>
 
@@ -421,9 +755,9 @@ body.loading{ cursor: wait; }
 gsap.registerPlugin(ScrollTrigger);
 
 const TOKENS = {
-  void: 0x060606,
-  crimson: 0xd60a1b,
-  metal: 0x1c1c1c,
+  void: 0x0d0d0d,
+  crimson: 0xc50e1f,
+  metal: 0x2c2c2e,
 };
 const SECTION_GAP = 3.5; // X distance between meshes
 
@@ -452,14 +786,19 @@ scene.add(webglSceneGroup);
 
 /* ───────── DYNAMIC LIGHTING MATRIX ───────── */
 // Overhead master spotlight
-const masterSpot = new THREE.SpotLight(0xffffff, 4.5, 60, Math.PI / 7, 0.25, 1.2);
+const masterSpot = new THREE.SpotLight(0xfefefe, 8.0, 60, Math.PI / 7, 0.25, 1.2);
 masterSpot.position.set(0, 15, 5);
 masterSpot.target.position.set(0, 0, 0);
 scene.add(masterSpot);
 scene.add(masterSpot.target);
 
+// Helper directional light — guarantees mesh visibility in light & dark
+const helperDir = new THREE.DirectionalLight(0xfefefe, 3.5);
+helperDir.position.set(5, 5, 4);
+scene.add(helperDir);
+
 // Crimson interactive under-glow
-const crimsonGlow = new THREE.PointLight(TOKENS.crimson, 3.0, 25, 1.5);
+const crimsonGlow = new THREE.PointLight(0xc50e1f, 4.0, 25, 1.5);
 crimsonGlow.position.set(0, -6, 2);
 scene.add(crimsonGlow);
 
@@ -468,20 +807,20 @@ const interactiveSpotlight = new THREE.PointLight(0xffffff, 0, 18, 2);
 interactiveSpotlight.position.set(0, 0, 3);
 scene.add(interactiveSpotlight);
 
-// Minimal ambient so silhouettes never go fully black
-const ambient = new THREE.AmbientLight(0x0a0a0a, 0.4);
+// Ambient fill so silhouettes never go fully black
+const ambient = new THREE.AmbientLight(0x303030, 1.2);
 scene.add(ambient);
 
 /* ───────── SHARED MATERIAL (Matte Titanium / Gunmetal) ───────── */
 const metalMat = new THREE.MeshStandardMaterial({
-  color: TOKENS.metal,
-  roughness: 0.15,
-  metalness: 0.85,
+  color: 0x2c2c2e,
+  roughness: 0.35,
+  metalness: 0.6,
 });
 const accentMat = new THREE.MeshStandardMaterial({
-  color: 0x2a2a2a,
-  roughness: 0.2,
-  metalness: 0.9,
+  color: 0x3a3a3c,
+  roughness: 0.4,
+  metalness: 0.55,
 });
 
 
@@ -599,6 +938,12 @@ const meshes = meshFactories.map((factory, i) => {
 let raycastTargets = [];
 webglSceneGroup.traverse(o => { if (o.isMesh) raycastTargets.push(o); });
 
+// Mobile: scale down meshes & pull camera back for smaller viewports
+if (window.innerWidth < 768){
+  meshes.forEach(m => m.scale.setScalar(0.6));
+  camera.position.z = 11;
+}
+
 /* ───────── RAYCASTER + MOUSE SPOTLIGHT ───────── */
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2(0, 0);
@@ -683,7 +1028,7 @@ const dropTL = gsap.timeline({ repeat: 2 });
 dropTL.to(gavelPivot, { rotation: 38, transformOrigin: '75px 70px', duration: 0.34, ease: 'power2.in' })
       .to(gavelPivot, { rotation: 0, duration: 0.12, ease: 'power4.in', onComplete: () => {
         // Flash the screen white for ~50ms
-        gsap.fromTo(flashEl, { opacity: 0.9 }, { opacity: 0, duration: 0.05 });
+        gsap.fromTo(flashEl, { opacity: 0.25 }, { opacity: 0, duration: 0.4, ease: 'power2.out' });
       }})
       .to(gavelPivot, { rotation: 0, duration: 0.45, ease: 'elastic.out(1,0.5)' });
 
@@ -754,41 +1099,53 @@ function buildScrollSystem(){
   const spacer = document.createElement('div');
   spacer.id = 'scroll-spacer';
   spacer.style.cssText = 'height:' + (totalPanels * 100) + 'vh;width:1px;position:relative;z-index:-2;pointer-events:none;';
-  document.body.appendChild(spacer);
 
   const maxX = () => (container.scrollWidth - window.innerWidth);
 
-  // Hero entrance
+  // Hero entrance (all viewports)
   gsap.from('[data-section="0"] > *', {
     y: 50, opacity: 0, duration: 1, stagger: 0.12, ease: 'power3.out', delay: 0.1
   });
 
+  if (window.innerWidth >= 768){
+    // ── DESKTOP: fixed horizontal track driven by a vertical scroll spacer ──
+    document.body.appendChild(spacer);
 
-  // Master scroll-driven timeline
-  ScrollTrigger.create({
-    trigger: spacer,
-    start: 'top top',
-    end: 'bottom bottom',
-    scrub: 1,
-    invalidateOnRefresh: true,
-    onRefresh: () => { gsap.set(container, { x: -maxX() * (window.__sovP || 0) }); },
-    onUpdate: (self) => {
-      const p = self.progress;
-      window.__sovP = p;
-      // Foreground containers shift LEFT
-      gsap.set(container, { x: -maxX() * p });
-      // 3D subject glides into the center frame (group shifts left)
-      webglSceneGroup.position.x = -groupTravel * p;
-      // Asymmetric opposite parallax: camera drifts the other way (+X)
-      camera.position.x = 1.5 * p;
-      camera.lookAt(0, 0, 0);
-      // Active section index
-      const idx = Math.round(p * (totalPanels - 1));
-      if (idx !== activeMeshIndex){
-        setActiveSection(idx, navItems);
+    // Master scroll-driven timeline
+    ScrollTrigger.create({
+      trigger: spacer,
+      start: 'top top',
+      end: 'bottom bottom',
+      scrub: 1,
+      snap: {
+        snapTo: 1 / (totalPanels - 1),   // snaps to exact panel fractions
+        duration: { min: 0.3, max: 0.6 },
+        ease: 'power2.inOut',
+        delay: 0.05
+      },
+      invalidateOnRefresh: true,
+      onRefresh: () => { gsap.set(container, { x: -maxX() * (window.__sovP || 0) }); },
+      onUpdate: (self) => {
+        const p = self.progress;
+        window.__sovP = p;
+        // Foreground containers shift LEFT
+        gsap.set(container, { x: -maxX() * p });
+        // 3D subject glides into the center frame (group shifts left)
+        webglSceneGroup.position.x = -groupTravel * p;
+        // Asymmetric opposite parallax: camera drifts the other way (+X)
+        camera.position.x = 1.5 * p;
+        camera.lookAt(0, 0, 0);
+        // Active section index
+        const idx = Math.round(p * (totalPanels - 1));
+        if (idx !== activeMeshIndex){
+          setActiveSection(idx, navItems);
+        }
       }
-    }
-  });
+    });
+  } else {
+    // ── MOBILE: native vertical scroll; horizontal track is stacked via CSS ──
+    document.body.style.overflow = 'auto';
+  }
 
   // Seed initial state
   setActiveSection(0, navItems);
@@ -801,8 +1158,26 @@ function setActiveSection(idx, navItems){
   const prev = activeMeshIndex;
   activeMeshIndex = idx;
 
-  // Nav active state
-  navItems.forEach((item, i) => item.classList.toggle('active', i === idx));
+  // ── DYNAMIC THEME SWAP (light sections 2 & 3 / dark sections 1, 4, 5) ──
+  const body = document.body;
+  const isLight = (idx === 1 || idx === 2);
+  if (isLight){
+    gsap.to(body, { backgroundColor: '#f4f4f0', color: '#1a1a1a', duration: 0.6, overwrite: true });
+    gsap.to(scene.background, { r: 0.957, g: 0.957, b: 0.941, duration: 0.6 });
+    gsap.to(crimsonGlow, { intensity: 1.5, duration: 0.5 });
+    gsap.to(crimsonGlow.color, { r: 0.667, g: 0.667, b: 0.667, duration: 0.5 });
+  } else {
+    gsap.to(body, { backgroundColor: '#0d0d0d', color: '#f9f9f9', duration: 0.6, overwrite: true });
+    gsap.to(scene.background, { r: 0.051, g: 0.051, b: 0.051, duration: 0.6 });
+    gsap.to(crimsonGlow, { intensity: 4.0, duration: 0.5 });
+    gsap.to(crimsonGlow.color, { r: 0.773, g: 0.055, b: 0.122, duration: 0.5 });
+  }
+
+  // Nav active state (+ light-mode coloring on light sections)
+  navItems.forEach((item, i) => {
+    item.classList.toggle('active', i === idx);
+    item.classList.toggle('light-mode', isLight);
+  });
 
   // Transition rotation strike — fast burst to the right on the entering mesh
   if (idx !== prev && meshes[idx]){
@@ -826,26 +1201,30 @@ function setActiveSection(idx, navItems){
 }
 
 
-/* ───── PRACTICE RING HOVER → intensify Lady Justice ───── */
-document.querySelectorAll('.practice-ring-item').forEach(item => {
+/* ───── SECTION 2 SERVICE ITEMS → tilt Lady Justice balance bar ───── */
+document.querySelectorAll('.service-item').forEach((item, idx) => {
   item.addEventListener('mouseenter', () => {
-    gsap.to(interactiveSpotlight, { intensity: 6.0, duration: 0.3, overwrite: true });
+    item.setAttribute('aria-expanded', 'true');
     const justice = meshes[1];
     if (justice){
-      gsap.to(justice.scale, { x: 1.12, y: 1.12, z: 1.12, duration: 0.4, ease: 'power2.out' });
-      (justice.userData.scales || []).forEach((disc, di) => {
-        gsap.to(disc.position, { y: 0.62 + (di === 0 ? 0.18 : -0.18), duration: 0.5, ease: 'power2.out' });
-      });
+      const tilt = (idx - 2) * 0.18; // tilt scales based on which item
+      gsap.to(justice.children[2].rotation, { z: tilt, duration: 0.5, ease: 'power2.out' }); // balance bar
+      gsap.to(interactiveSpotlight, { intensity: 5.5, duration: 0.3 });
     }
   });
   item.addEventListener('mouseleave', () => {
-    gsap.to(interactiveSpotlight, { intensity: 0.0, duration: 0.5, overwrite: true });
+    item.setAttribute('aria-expanded', 'false');
     const justice = meshes[1];
     if (justice){
-      gsap.to(justice.scale, { x: 0.95, y: 0.95, z: 0.95, duration: 0.4 });
-      (justice.userData.scales || []).forEach(disc => {
-        gsap.to(disc.position, { y: 0.62, duration: 0.5, ease: 'power2.out' });
-      });
+      gsap.to(justice.children[2].rotation, { z: 0, duration: 0.6, ease: 'power2.out' });
+      gsap.to(interactiveSpotlight, { intensity: 0, duration: 0.5 });
+    }
+  });
+  // Keyboard accessibility
+  item.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' '){
+      e.preventDefault();
+      item.classList.toggle('active');
     }
   });
 });
@@ -866,15 +1245,40 @@ document.querySelectorAll('.verdict-card').forEach(card => {
   });
 });
 
+/* ───── SECTION 5 — INTAKE SUBMIT HANDLER ───── */
+function handleIntakeSubmit(){
+  const name = document.getElementById('intake-name').value.trim();
+  const email = document.getElementById('intake-email').value.trim();
+  const scope = document.getElementById('intake-scope').value;
+
+  if (!name || !email || !scope){
+    // Shake the form frame
+    gsap.to('.intake-form-frame', { x: -6, duration: 0.08, repeat: 5, yoyo: true, ease: 'none', onComplete: () => gsap.set('.intake-form-frame', { x: 0 }) });
+    return;
+  }
+
+  // Float all meshes away
+  meshes.forEach((m, i) => {
+    gsap.to(m.position, { z: -8, duration: 1.2, delay: i * 0.1, ease: 'power3.in' });
+  });
+
+  // Show success message
+  const btn = document.querySelector('.intake-submit');
+  btn.textContent = 'Mandate Received. ✓';
+  btn.style.pointerEvents = 'none';
+  btn.style.background = '#1c4a1c';
+}
+
 /* ───── VERTICAL NAV CLICK → jump to section ───── */
 document.querySelectorAll('.nav-item').forEach(item => {
   item.addEventListener('click', () => {
     const target = parseInt(item.dataset.index, 10);
     const spacer = document.getElementById('scroll-spacer');
     if (!spacer) return;
+    const totalPanels = document.querySelectorAll('.section-panel').length;
     const rect = spacer.getBoundingClientRect();
     const totalScroll = spacer.offsetHeight - window.innerHeight;
-    const y = window.scrollY + rect.top + (totalScroll * (target / 3));
+    const y = window.scrollY + rect.top + (totalScroll * (target / (totalPanels - 1)));
     if (window.__lenis){
       window.__lenis.scrollTo(y, { duration: 1.4 });
     } else {
