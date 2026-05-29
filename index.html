@@ -455,9 +455,11 @@ function buildGavel(){ const g=new THREE.Group(); const m=new THREE.Group();
 function buildScales(){ const g=new THREE.Group();
   g.add(new THREE.Mesh(new THREE.CylinderGeometry(0.13,0.2,3.6,32),obsidian()));
   const bar=new THREE.Mesh(new THREE.BoxGeometry(3.4,0.12,0.12),chrome()); bar.position.y=1.6; g.add(bar);
-  g.add(Object.assign(new THREE.Mesh(new THREE.SphereGeometry(0.22,32,32),chrome()),{position:new THREE.Vector3(0,1.95,0)}));
-  [-1.6,1.6].forEach(x=>{ g.add(Object.assign(new THREE.Mesh(new THREE.CylinderGeometry(0.015,0.015,0.95,8),obsidian()),{position:new THREE.Vector3(x,1.15,0)}));
-    g.add(Object.assign(new THREE.Mesh(new THREE.CylinderGeometry(0.6,0.6,0.07,48),chrome()),{position:new THREE.Vector3(x,0.64,0)})); });
+  const fin=new THREE.Mesh(new THREE.SphereGeometry(0.22,32,32),chrome()); fin.position.set(0,1.95,0); g.add(fin);
+  [-1.6,1.6].forEach(x=>{
+    const s=new THREE.Mesh(new THREE.CylinderGeometry(0.015,0.015,0.95,8),obsidian()); s.position.set(x,1.15,0); g.add(s);
+    const d=new THREE.Mesh(new THREE.CylinderGeometry(0.6,0.6,0.07,48),chrome()); d.position.set(x,0.64,0); g.add(d);
+  });
   g.userData.bar=bar; return g; }
 function buildCodex(){ const g=new THREE.Group(); const H=[3.0,3.5,2.7,3.3]; let xo=-1.7;
   H.forEach((h,i)=>{const w=0.72; const v=new THREE.Mesh(new THREE.BoxGeometry(w,h,1.7), i%2?chrome():obsidian()); v.position.set(xo,(h-3.5)/2,0); v.rotation.z=(i-1.5)*0.05; g.add(v); xo+=w+0.45;}); return g; }
@@ -644,7 +646,14 @@ function boot(){
       revealed.delete('sec-0');   // let the hero cascade play after the curtain lifts
     }});
 }
-addEventListener('load', boot);
+/* Boot immediately — CDN libs are blocking <head> scripts and the DOM is ready
+   here at the end of <body>. Waiting for window 'load' would stall on images. */
+if (window.THREE && window.gsap && window.Lenis) {
+  boot();
+} else {
+  // fallback if a CDN lib hasn't parsed yet
+  window.addEventListener('load', boot);
+}
 </script>
 </body>
 </html>
