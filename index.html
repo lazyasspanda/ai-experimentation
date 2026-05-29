@@ -4,12 +4,12 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>SOVEREIGN &amp; PARTNERS — The Courtroom Flythrough</title>
-<meta name="description" content="A continuous 3D camera journey through a virtual courtroom hallway. Litigation architects." />
+<meta name="description" content="A continuous 3D camera journey through a virtual courtroom. Litigation architects." />
 
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
 <!-- Motion + 3D stack -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -18,204 +18,352 @@
 <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
 
 <script>
-  tailwind.config = {
-    theme: { extend: {
-      colors: { 'crimson': '#d11829', 'chalk': '#f4f3ef', 'ink': '#141414', 'concrete': '#8a8a86' },
-      fontFamily: { 'sans': ['Inter','sans-serif'], 'serif': ['Instrument Serif','serif'] }
-    }}
-  }
+  tailwind.config = { theme: { extend: {
+    colors: { crimson:'#e11d2e', chalk:'#f2efe9', ink:'#161318', concrete:'#9a948c', steel:'#8fa3b8' },
+    fontFamily: { sans:['Inter','sans-serif'], serif:['Instrument Serif','serif'] }
+  }}}
 </script>
 
 
 <style>
 :root{
-  --crimson: #d11829;
-  --ui-text: #f4f3ef;      /* morphs with the light/dark theme via JS */
-  --ui-dim:  #8a8a86;
-  --font-sans: 'Inter', sans-serif;
-  --font-serif: 'Instrument Serif', serif;
+  --obsidian:#0b0a0d; --obsidian-2:#100e14;
+  --chalk:#f2efe9; --concrete:#9a948c; --steel:#8fa3b8;
+  --crimson:#e11d2e; --crimson-deep:#9e1024;
+  --line: rgba(242,239,233,0.12);
+  --ui-text:#f2efe9;   /* morphs with theme */
+  --ui-dim:#9a948c;    /* morphs with theme */
+  --font-sans:'Inter',sans-serif; --font-serif:'Instrument Serif',serif;
 }
 *{ margin:0; padding:0; box-sizing:border-box; }
-html{ background:#0a0a0a; }
+html{ background:var(--obsidian); }
 body{
-  height: 500vh;            /* tall scroll track for the flythrough */
-  background:#0a0a0a;
-  font-family: var(--font-sans);
-  -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
+  height: 680vh;                 /* long scroll track: 6 chapters */
+  background:var(--obsidian);
+  font-family:var(--font-sans);
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
 }
-::selection{ background: var(--crimson); color:#fff; }
+::selection{ background:var(--crimson); color:#fff; }
 
-/* ===== FIXED CANVAS ===== */
-#webgl{ position: fixed; inset:0; z-index:0; display:block; }
+/* fixed 3D canvas (LEFT-anchored meshes) */
+#webgl{ position:fixed; inset:0; z-index:0; display:block; }
 
-/* ===== UI OVERLAY ROOT ===== */
-.overlay{ position: fixed; inset:0; z-index:10; pointer-events:none; }
+/* SCRIM — subtle overlay so foreground UI reads over the 3D */
+.scrim{ position:fixed; inset:0; z-index:3; pointer-events:none;
+  background:
+    linear-gradient(90deg, rgba(11,10,13,0) 38%, rgba(11,10,13,0.55) 78%, rgba(11,10,13,0.72) 100%),
+    radial-gradient(120% 90% at 30% 50%, rgba(11,10,13,0) 45%, rgba(11,10,13,0.55) 100%);
+  transition: opacity .6s ease;
+}
 
-/* text colour follows the morphing theme */
-.ui-text{ color: var(--ui-text); transition: color .5s ease; }
-.ui-dim{ color: var(--ui-dim); transition: color .5s ease; }
+/* UI overlay root */
+.overlay{ position:fixed; inset:0; z-index:10; pointer-events:none; }
+.ui-text{ color:var(--ui-text); transition:color .5s ease; }
+.ui-dim{ color:var(--ui-dim); transition:color .5s ease; }
 
-/* ===== LOADER ===== */
-#loader{ position:fixed; inset:0; z-index:9999; background:#0a0a0a; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:1.2rem; transition:opacity .8s ease; }
-#loader .bar{ width:160px; height:1px; background:rgba(244,243,239,0.15); position:relative; overflow:hidden; }
-#loader .bar span{ position:absolute; inset:0; width:0; background:var(--crimson); }
-#loader .pct{ font-family:var(--font-serif); font-style:italic; font-size:2rem; color:#f4f3ef; font-variant-numeric:tabular-nums; }
+/* ===== LOADER (banging gavel + screen vibration) ===== */
+#loader{ position:fixed; inset:-24px; z-index:9999; background:var(--obsidian);
+  display:flex; align-items:center; justify-content:center; flex-direction:column; gap:1.8rem;
+  transition:opacity .8s ease; will-change:transform; }
+#loader .g-stroke{ stroke:var(--chalk); stroke-width:7; fill:none; stroke-linecap:round; stroke-linejoin:round; }
+#loader .g-fill{ fill:var(--crimson); }
+#loader .g-ring{ stroke:var(--crimson); stroke-width:3; fill:none; opacity:0; transform-origin:100px 158px; }
+#loader .pct{ font-family:var(--font-serif); font-style:italic; font-size:2.4rem; color:var(--chalk); font-variant-numeric:tabular-nums; }
+#loader .l-bar{ width:200px; height:2px; background:rgba(242,239,233,0.14); position:relative; overflow:hidden; }
+#loader .l-bar span{ position:absolute; inset:0; left:0; width:0; background:var(--crimson); }
+#loader .l-cap{ font-size:10px; letter-spacing:0.42em; text-transform:uppercase; color:var(--concrete); font-weight:600; }
 
+/* ===== TYPOGRAPHY (bolder) ===== */
+.eyebrow{ font-size:11px; letter-spacing:0.4em; text-transform:uppercase; color:var(--crimson); font-weight:700; }
+.kicker{ font-family:var(--font-serif); font-style:italic; color:var(--steel); font-size:1.05rem; }
+.display{ font-family:var(--font-sans); font-weight:800; line-height:0.95; letter-spacing:-0.02em;
+  text-transform:uppercase; font-size:clamp(2.6rem,6.4vw,6rem); }
+.display .ital{ font-family:var(--font-serif); font-weight:400; font-style:italic; text-transform:none;
+  letter-spacing:-0.01em; color:var(--crimson); }
+.lede{ font-size:15px; line-height:1.8; font-weight:400; }
+.body-copy{ font-size:13px; line-height:1.85; font-weight:400; }
+.casc{ will-change:transform,opacity; }
 
-/* ===== TYPOGRAPHY ===== */
-.eyebrow{ font-size:11px; letter-spacing:0.42em; text-transform:uppercase; color:var(--crimson); font-weight:500; }
-.display{ font-family:var(--font-serif); line-height:0.92; letter-spacing:-0.01em; font-weight:400;
-  font-size: clamp(2.6rem, 7vw, 7rem); }
-.display .ital{ font-style:italic; color:var(--crimson); }
-.body-copy{ font-size:13px; line-height:1.85; letter-spacing:0.01em; font-weight:300; }
 
 /* ===== LEFT VERTICAL NAV ===== */
-#vnav{ position:fixed; left:2.2rem; top:50%; transform:translateY(-50%); z-index:20; display:flex; flex-direction:column; gap:1.4rem; pointer-events:auto; }
+#vnav{ position:fixed; left:2.2rem; top:50%; transform:translateY(-50%); z-index:20; display:flex; flex-direction:column; gap:1.2rem; pointer-events:auto; }
 .vnav-item{ display:flex; align-items:center; gap:0.7rem; background:none; border:none; cursor:pointer;
-  font-size:10px; letter-spacing:0.28em; text-transform:uppercase; color:var(--ui-dim); font-weight:600; transition:color .4s ease; }
-.vnav-item .tick{ width:14px; height:1px; background:var(--ui-dim); transition:all .4s ease; }
+  font-size:10px; letter-spacing:0.26em; text-transform:uppercase; color:var(--ui-dim); font-weight:700; transition:color .4s ease; }
+.vnav-item .tick{ width:14px; height:2px; background:var(--ui-dim); transition:all .4s ease; }
 .vnav-item.active{ color:var(--ui-text); }
 .vnav-item.active .tick{ width:34px; background:var(--crimson); }
 .vnav-item:hover{ color:var(--ui-text); }
+.vnav-item:hover .tick{ width:26px; }
 
-/* ===== SECTION BLOCKS ===== */
-.section{ position:fixed; inset:0; display:flex; align-items:center; opacity:0; pointer-events:none;
-  will-change:opacity, transform; }
-.section .wrap{ width:100%; max-width:1180px; margin:0 auto; padding:0 7vw; }
-.section-right .wrap{ display:flex; justify-content:flex-end; }
-.section-center{ justify-content:center; text-align:center; }
-.section-center .wrap{ max-width:44rem; }
-
-/* progress / brand fixed UI */
-#brand{ position:fixed; left:2.2rem; top:1.8rem; z-index:20; font-family:var(--font-serif); font-style:italic; font-size:1.2rem; pointer-events:auto; }
+/* brand + progress + scroll cue */
+#brand{ position:fixed; left:2.2rem; top:1.8rem; z-index:20; font-family:var(--font-serif); font-style:italic; font-size:1.25rem; pointer-events:auto; }
 #progress{ position:fixed; right:2rem; top:50%; transform:translateY(-50%); z-index:20; display:flex; flex-direction:column; align-items:center; gap:0.5rem; }
-#progress .track{ width:1px; height:140px; background:rgba(138,138,134,0.3); position:relative; }
-#progress .fill{ position:absolute; top:0; left:0; width:100%; height:0; background:var(--crimson); }
+#progress .track{ width:2px; height:150px; background:rgba(154,148,140,0.28); position:relative; border-radius:2px; overflow:hidden; }
+#progress .fill{ position:absolute; top:0; left:0; width:100%; height:0; background:linear-gradient(var(--crimson),var(--crimson-deep)); }
 #progress .label{ font-size:9px; letter-spacing:0.2em; writing-mode:vertical-rl; color:var(--ui-dim); }
 .scroll-cue{ position:fixed; bottom:1.6rem; left:50%; transform:translateX(-50%); z-index:20; font-size:10px; letter-spacing:0.3em; text-transform:uppercase; color:var(--ui-dim); transition:opacity .5s ease; }
 
+/* ===== FIXED CTA ===== */
+#cta{ position:fixed; right:1.8rem; bottom:1.8rem; z-index:30; pointer-events:auto;
+  display:inline-flex; align-items:center; gap:0.6rem; padding:0.95rem 1.5rem; border-radius:50px;
+  background:linear-gradient(135deg,var(--crimson),var(--crimson-deep)); color:#fff; font-size:11px;
+  font-weight:700; letter-spacing:0.18em; text-transform:uppercase; cursor:pointer; border:none;
+  box-shadow:0 12px 40px rgba(225,29,46,0.35); transition:transform .35s ease, box-shadow .35s ease; }
+#cta:hover{ transform:translateY(-3px) scale(1.03); box-shadow:0 18px 50px rgba(225,29,46,0.5); }
+#cta .pulse{ width:8px; height:8px; border-radius:50%; background:#fff; box-shadow:0 0 0 0 rgba(255,255,255,0.6); animation:pulse 2s infinite; }
+@keyframes pulse{ 0%{box-shadow:0 0 0 0 rgba(255,255,255,0.5);} 70%{box-shadow:0 0 0 10px rgba(255,255,255,0);} 100%{box-shadow:0 0 0 0 rgba(255,255,255,0);} }
 
-/* ===== GLASSMORPHISM SERVICE CARDS ===== */
-.cards{ display:grid; grid-template-columns:repeat(2, 1fr); gap:1rem; width:100%; max-width:520px; perspective:1200px; }
-.card{
-  pointer-events:auto; position:relative; padding:1.6rem 1.5rem; border-radius:14px;
-  background:rgba(255,255,255,0.06); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
-  border:1px solid rgba(255,255,255,0.16); cursor:pointer; transform-style:preserve-3d;
-  transition:border-color .4s ease, background .4s ease; will-change:transform;
-}
-.card:nth-child(2){ margin-top:2.6rem; }
-.card:nth-child(3){ margin-top:-2.2rem; }
-.card .c-no{ font-size:10px; letter-spacing:0.2em; color:var(--crimson); }
-.card .c-title{ font-family:var(--font-serif); font-size:1.35rem; margin-top:0.4rem; color:var(--ui-text); transition:color .4s ease; }
-.card .c-desc{ font-size:11px; line-height:1.6; margin-top:0.5rem; color:var(--ui-dim); transition:color .4s ease; }
-.card:hover{ border-color:var(--crimson); background:rgba(209,24,41,0.08); }
+
+/* ===== SECTIONS (3D left · text right) ===== */
+.section{ position:fixed; inset:0; display:flex; align-items:center; justify-content:flex-end;
+  opacity:0; pointer-events:none; will-change:opacity,transform; }
+.section .wrap{ width:46%; max-width:600px; padding-right:6vw; padding-left:2vw; }
+@media(min-width:1500px){ .section .wrap{ padding-right:9vw; } }
+
+/* ===== BUTTONS / LINKS ===== */
+.btn{ pointer-events:auto; display:inline-flex; align-items:center; gap:0.5rem; background:var(--crimson); color:#fff; font-size:11px; letter-spacing:0.2em; text-transform:uppercase; font-weight:700; padding:0.95rem 1.8rem; border-radius:6px; transition:transform .35s ease, background .35s ease, color .35s ease; }
+.btn:hover{ transform:translateY(-2px); background:var(--chalk); color:#000; }
+.btn-ghost{ pointer-events:auto; display:inline-flex; align-items:center; gap:0.5rem; font-size:11px; letter-spacing:0.2em; text-transform:uppercase; font-weight:700; color:var(--ui-text); padding-bottom:4px; border-bottom:2px solid var(--concrete); transition:border-color .35s ease; }
+.btn-ghost:hover{ border-color:var(--crimson); }
+
+/* ===== GLASS SERVICE CARDS (with imagery, no overlap) ===== */
+.cards{ display:grid; grid-template-columns:repeat(2,1fr); gap:1rem; width:100%; perspective:1200px; }
+.card{ pointer-events:auto; position:relative; border-radius:16px; overflow:hidden; cursor:pointer;
+  background:rgba(255,255,255,0.055); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+  border:1px solid rgba(242,239,233,0.16); transform-style:preserve-3d; will-change:transform;
+  transition:border-color .4s ease, background .4s ease, box-shadow .4s ease; }
+.card:nth-child(even){ margin-top:1.8rem; }   /* clean asymmetry, no overlap */
+.card .c-img{ position:relative; height:96px; overflow:hidden; }
+.card .c-img img{ width:100%; height:100%; object-fit:cover; filter:grayscale(.3) brightness(.7); transition:transform .6s ease, filter .6s ease; }
+.card:hover .c-img img{ transform:scale(1.08); filter:grayscale(0) brightness(.9); }
+.card .c-body{ padding:1.1rem 1.2rem 1.3rem; }
+.card .c-no{ font-size:10px; letter-spacing:0.2em; color:var(--crimson); font-weight:700; }
+.card .c-title{ font-family:var(--font-sans); font-weight:700; font-size:1.05rem; margin-top:0.3rem; color:var(--ui-text); transition:color .4s ease; }
+.card .c-desc{ font-size:11px; line-height:1.6; margin-top:0.45rem; color:var(--ui-dim); transition:color .4s ease; }
+.card:hover{ border-color:var(--crimson); background:rgba(225,29,46,0.08); box-shadow:0 20px 50px rgba(0,0,0,0.4); }
+
+
+/* ===== FLOATING IMAGE/TEXT CARD ===== */
+.float-card{ pointer-events:auto; position:relative; width:230px; border-radius:14px; overflow:hidden;
+  border:1px solid rgba(242,239,233,0.16); background:rgba(255,255,255,0.05); backdrop-filter:blur(10px);
+  box-shadow:0 18px 50px rgba(0,0,0,0.45); animation:bob 6s ease-in-out infinite; transition:transform .4s ease, box-shadow .4s ease; }
+.float-card:hover{ transform:translateY(-8px) scale(1.03); box-shadow:0 28px 70px rgba(0,0,0,0.6); }
+.float-card img{ width:100%; height:130px; object-fit:cover; filter:grayscale(.2) brightness(.8); }
+.float-card .fc-body{ padding:0.85rem 1rem; }
+.float-card .fc-t{ font-weight:700; font-size:0.82rem; color:var(--ui-text); }
+.float-card .fc-s{ font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--crimson); margin-top:3px; font-weight:700; }
+@keyframes bob{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-12px); } }
 
 /* ===== VERDICT MINI-CARDS ===== */
-.verdicts{ display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:rgba(255,255,255,0.12); max-width:560px; }
-.verdict{ padding:1.6rem; background:rgba(10,10,10,0.55); backdrop-filter:blur(8px); transition:background .4s ease; }
-.verdict:hover{ background:rgba(209,24,41,0.12); }
-.verdict .v-fig{ font-family:var(--font-serif); font-size:clamp(1.6rem,2.6vw,2.4rem); color:var(--ui-text); transition:color .4s ease; }
-.verdict .v-cap{ font-size:10px; letter-spacing:0.15em; text-transform:uppercase; color:var(--ui-dim); margin-top:0.5rem; }
+.verdicts{ display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:10px; overflow:hidden; }
+.verdict{ padding:1.5rem 1.2rem; background:rgba(11,10,13,0.5); backdrop-filter:blur(8px); transition:background .4s ease, transform .4s ease; }
+.verdict:hover{ background:rgba(225,29,46,0.12); transform:translateY(-4px); }
+.verdict .v-fig{ font-family:var(--font-sans); font-weight:800; font-size:clamp(1.5rem,2.4vw,2.1rem); color:var(--ui-text); transition:color .4s ease; }
+.verdict .v-cap{ font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:var(--ui-dim); margin-top:0.5rem; }
 
-/* ===== BUTTONS ===== */
-.btn{ pointer-events:auto; display:inline-block; background:var(--crimson); color:#fff; font-size:11px; letter-spacing:0.22em; text-transform:uppercase; font-weight:600; padding:0.95rem 1.9rem; border-radius:6px; transition:transform .35s ease, background .35s ease; }
-.btn:hover{ transform:translateY(-2px); background:#fff; color:#000; }
+/* ===== PROCESS STEPS ===== */
+.step{ display:flex; gap:1.1rem; padding:1.1rem 0; border-top:1px solid var(--line); transition:padding-left .35s ease; cursor:default; }
+.step:hover{ padding-left:0.6rem; }
+.step .s-no{ font-family:var(--font-serif); font-style:italic; font-size:1.6rem; color:var(--crimson); line-height:1; width:2.4rem; flex-shrink:0; }
+.step .s-t{ font-weight:700; font-size:0.98rem; color:var(--ui-text); transition:color .35s ease; }
+.step:hover .s-t{ color:var(--crimson); }
+.step .s-d{ font-size:11.5px; line-height:1.65; color:var(--ui-dim); margin-top:0.25rem; }
+
+
+/* ===== INTAKE FORM ===== */
+.form-card{ pointer-events:auto; background:rgba(255,255,255,0.05); backdrop-filter:blur(14px);
+  border:1px solid rgba(242,239,233,0.16); border-radius:16px; padding:1.8rem; box-shadow:0 24px 60px rgba(0,0,0,0.45); }
+.f-row{ display:flex; flex-direction:column; gap:0.4rem; margin-bottom:1.1rem; }
+.f-label{ font-size:10px; letter-spacing:0.26em; text-transform:uppercase; color:var(--ui-dim); font-weight:700; }
+.f-input{ background:transparent; border:none; border-bottom:1px solid var(--line); color:var(--ui-text);
+  font-family:var(--font-sans); font-size:14px; padding:0.55rem 0; outline:none; transition:border-color .3s ease; width:100%; }
+.f-input::placeholder{ color:#5a564f; }
+.f-input:focus{ border-color:var(--crimson); }
+.f-input.f-select{ appearance:none; cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239a948c' stroke-width='1.6' fill='none'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right center; }
+.f-input.f-select option{ background:var(--obsidian-2); color:var(--chalk); }
+textarea.f-input{ resize:none; }
+.f-note{ font-size:11px; color:var(--ui-dim); margin-top:0.4rem; }
 
 :focus-visible{ outline:2px solid var(--crimson); outline-offset:3px; }
 
+
 /* ===== MOBILE ===== */
 @media (max-width:767px){
-  #vnav{ left:0; right:0; top:auto; bottom:0; transform:none; flex-direction:row; justify-content:center; gap:0.9rem; padding:0.8rem; background:rgba(10,10,10,0.6); backdrop-filter:blur(10px); flex-wrap:wrap; }
+  .scrim{ background:linear-gradient(180deg, rgba(11,10,13,0.35), rgba(11,10,13,0.78)); }
+  #vnav{ left:0; right:0; top:auto; bottom:0; transform:none; flex-direction:row; justify-content:center;
+    gap:0.7rem; padding:0.7rem; background:rgba(11,10,13,0.7); backdrop-filter:blur(10px); flex-wrap:wrap; }
   .vnav-item .tick{ display:none; }
-  .section .wrap, .section-right .wrap{ justify-content:center; padding:0 1.4rem; }
-  .section-right{ align-items:flex-start; padding-top:16vh; }
-  .cards{ grid-template-columns:1fr; max-width:100%; }
-  .card:nth-child(2),.card:nth-child(3){ margin-top:0; }
+  .section{ justify-content:center; align-items:flex-start; padding-top:13vh; }
+  .section .wrap{ width:100%; max-width:100%; padding:0 1.4rem; }
+  .cards{ grid-template-columns:1fr; gap:0.8rem; }
+  .card:nth-child(even){ margin-top:0; }
   .verdicts{ grid-template-columns:1fr; }
+  .float-card{ display:none; }
   #progress{ display:none; }
-  .display{ font-size:clamp(2.2rem,11vw,3.4rem); }
+  #cta{ right:1rem; bottom:4.6rem; padding:0.8rem 1.2rem; }
+  .display{ font-size:clamp(2.1rem,10vw,3.2rem); }
 }
-@media (prefers-reduced-motion:reduce){ #loader .bar span{ transition:none; } }
+@media (prefers-reduced-motion:reduce){
+  .float-card{ animation:none; }
+  #cta .pulse{ animation:none; }
+}
 </style>
 </head>
 
 <body>
 
-<!-- ===== LOADER ===== -->
+<!-- ===== LOADER (gavel strike + vibration) ===== -->
 <div id="loader">
+  <svg id="g-svg" viewBox="0 0 200 200" width="150" height="150" aria-hidden="true">
+    <g id="g-pivot" style="transform-origin:100px 70px;">
+      <rect x="58" y="42" width="84" height="28" rx="6" class="g-stroke"/>
+      <line x1="100" y1="70" x2="100" y2="150" class="g-stroke"/>
+    </g>
+    <rect x="62" y="156" width="76" height="12" rx="3" class="g-fill"/>
+    <circle id="g-ring" cx="100" cy="158" r="8" class="g-ring"/>
+  </svg>
   <div class="pct" id="loader-pct">0%</div>
-  <div class="bar"><span id="loader-bar"></span></div>
-  <div style="font-size:10px;letter-spacing:0.4em;text-transform:uppercase;color:#8a8a86">Entering the Courtroom</div>
+  <div class="l-bar"><span id="loader-bar"></span></div>
+  <div class="l-cap">Calling the Court to Order</div>
 </div>
 
-<!-- ===== 3D CANVAS ===== -->
+<!-- ===== 3D CANVAS + SCRIM ===== -->
 <canvas id="webgl"></canvas>
+<div class="scrim" id="scrim"></div>
 
 <!-- ===== FIXED UI ===== -->
 <div id="brand" class="ui-text">Sovereign &amp; Partners</div>
 
 <nav id="vnav" role="navigation" aria-label="Courtroom navigation">
-  <button class="vnav-item active" data-z="-10" data-i="0" aria-label="Go to Overview"><span class="tick"></span>Overview</button>
-  <button class="vnav-item" data-z="-35" data-i="1" aria-label="Go to Services"><span class="tick"></span>Services</button>
-  <button class="vnav-item" data-z="-60" data-i="2" aria-label="Go to Philosophy"><span class="tick"></span>Philosophy</button>
-  <button class="vnav-item" data-z="-85" data-i="3" aria-label="Go to Verdicts"><span class="tick"></span>Verdicts</button>
+  <button class="vnav-item active" data-i="0" aria-label="Overview"><span class="tick"></span>Overview</button>
+  <button class="vnav-item" data-i="1" aria-label="Services"><span class="tick"></span>Services</button>
+  <button class="vnav-item" data-i="2" aria-label="Philosophy"><span class="tick"></span>Philosophy</button>
+  <button class="vnav-item" data-i="3" aria-label="Process"><span class="tick"></span>Process</button>
+  <button class="vnav-item" data-i="4" aria-label="Verdicts"><span class="tick"></span>Verdicts</button>
+  <button class="vnav-item" data-i="5" aria-label="Contact"><span class="tick"></span>Contact</button>
 </nav>
 
 <div id="progress"><span class="label">Depth</span><div class="track"><div class="fill" id="progress-fill"></div></div></div>
 <div class="scroll-cue ui-dim" id="scroll-cue">Scroll to journey ↓</div>
+<button id="cta" class="nav-jump" data-i="5" aria-label="Request council"><span class="pulse"></span>Request Council</button>
 
 
 <!-- ===== SECTION OVERLAYS ===== -->
 <div class="overlay">
 
-  <!-- OVERVIEW · z=-10 -->
-  <section class="section section-right" data-z="-10" id="sec-0" aria-label="Overview">
-    <div class="wrap"><div style="max-width:30rem">
-      <p class="eyebrow mb-5">Chapter 01 — Overview</p>
-      <h1 class="display ui-text mb-7">We <span class="ital">command</span> precedent.</h1>
-      <p class="body-copy ui-dim mb-9">A litigation institution engineered for absolute dominance — high-stakes disputes, corporate warfare, and constitutional precedent. We do not negotiate from weakness. We architect the verdict.</p>
-      <a href="#" class="btn nav-jump" data-i="1">Enter the Practice ↗</a>
-    </div></div>
-  </section>
-
-  <!-- SERVICES · z=-35 -->
-  <section class="section section-right" data-z="-35" id="sec-1" aria-label="Services">
-    <div class="wrap"><div style="width:100%;max-width:560px">
-      <p class="eyebrow mb-4">Chapter 02 — Practice Domains</p>
-      <h2 class="display ui-text mb-8" style="font-size:clamp(2rem,4.4vw,3.4rem)">Five <span class="ital">disciplines.</span></h2>
-      <div class="cards">
-        <div class="card" tabindex="0"><div class="c-no">01</div><div class="c-title">Civil Litigation</div><p class="c-desc">Multi-party liability, class actions and tortious interference, dismantled at deposition.</p></div>
-        <div class="card" tabindex="0"><div class="c-no">02</div><div class="c-title">Criminal Defense</div><p class="c-desc">White-collar federal prosecution to capital defense, built on constitutional rigor.</p></div>
-        <div class="card" tabindex="0"><div class="c-no">03</div><div class="c-title">Corporate Warfare</div><p class="c-desc">M&amp;A disputes, hostile takeovers and governance crises. The boardroom advantage.</p></div>
-        <div class="card" tabindex="0"><div class="c-no">04</div><div class="c-title">Intellectual Property</div><p class="c-desc">Patent litigation and trade-secret enforcement. Precedent set at the Federal Circuit.</p></div>
-      </div>
-    </div></div>
-  </section>
-
-
-  <!-- PHILOSOPHY · z=-60 -->
-  <section class="section section-center" data-z="-60" id="sec-2" aria-label="Philosophy">
+  <!-- 0 · OVERVIEW -->
+  <section class="section" data-i="0" id="sec-0" aria-label="Overview">
     <div class="wrap">
-      <p class="eyebrow mb-5">Chapter 03 — Philosophy</p>
-      <h2 class="display ui-text mb-7" style="font-size:clamp(2.2rem,5.5vw,4.6rem)">Built on <span class="ital">precedent.</span> Argued like <span class="ital">architecture.</span></h2>
-      <p class="body-copy ui-text mb-4" style="max-width:34rem;margin:0 auto">For three decades we have treated defense not as reaction, but as construction — locating the precise point at which the opposition collapses under its own weight.</p>
-      <p class="body-copy ui-dim" style="max-width:32rem;margin:0 auto">Our briefs are not documents. They are monuments. The method is structural. The result is absolute.</p>
+      <p class="eyebrow mb-5 casc">Chapter 01 — Overview</p>
+      <h1 class="display ui-text mb-6 casc">We <span class="ital">command</span><br/>precedent.</h1>
+      <p class="lede ui-dim mb-8 casc" style="max-width:34rem">A litigation institution engineered for absolute dominance — high-stakes disputes, corporate warfare, and constitutional precedent. We do not negotiate from weakness. We architect the verdict.</p>
+      <div class="flex items-center gap-6 casc">
+        <a href="#" class="btn nav-jump" data-i="1">Enter the Practice ↗</a>
+        <a href="#" class="btn-ghost nav-jump" data-i="4">See the Record</a>
+      </div>
+      <div class="mt-10 casc" style="display:inline-block">
+        <div class="float-card">
+          <img src="https://images.unsplash.com/photo-1505664194779-8beaceb93744?q=80&w=700&auto=format&fit=crop" alt="Courthouse colonnade" onerror="this.style.display='none'"/>
+          <div class="fc-body"><div class="fc-s">Est. 1994</div><div class="fc-t">30 years at the bar</div></div>
+        </div>
+      </div>
     </div>
   </section>
 
-  <!-- VERDICTS · z=-85 -->
-  <section class="section section-right" data-z="-85" id="sec-3" aria-label="Verdicts">
-    <div class="wrap"><div style="max-width:560px">
-      <p class="eyebrow mb-4">Chapter 04 — The Record</p>
-      <h2 class="display ui-text mb-8" style="font-size:clamp(2rem,4.4vw,3.4rem)">The record <span class="ital">speaks.</span></h2>
-      <div class="verdicts">
+  <!-- 1 · SERVICES -->
+  <section class="section" data-i="1" id="sec-1" aria-label="Services">
+    <div class="wrap">
+      <p class="eyebrow mb-3 casc">Chapter 02 — Practice Domains</p>
+      <h2 class="display ui-text mb-7 casc" style="font-size:clamp(2rem,4.2vw,3.2rem)">Five <span class="ital">disciplines.</span></h2>
+      <div class="cards">
+        <div class="card casc" tabindex="0"><div class="c-img"><img src="https://images.unsplash.com/photo-1521587760476-6c12a4b040da?q=80&w=600&auto=format&fit=crop" alt="" onerror="this.parentNode.style.display='none'"/></div><div class="c-body"><div class="c-no">01</div><div class="c-title">Civil Litigation</div><p class="c-desc">Multi-party liability, class actions and tortious interference, dismantled at deposition.</p></div></div>
+        <div class="card casc" tabindex="0"><div class="c-img"><img src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?q=80&w=600&auto=format&fit=crop" alt="" onerror="this.parentNode.style.display='none'"/></div><div class="c-body"><div class="c-no">02</div><div class="c-title">Criminal Defense</div><p class="c-desc">White-collar federal prosecution to capital defense, built on constitutional rigor.</p></div></div>
+        <div class="card casc" tabindex="0"><div class="c-img"><img src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?q=80&w=600&auto=format&fit=crop" alt="" onerror="this.parentNode.style.display='none'"/></div><div class="c-body"><div class="c-no">03</div><div class="c-title">Corporate Warfare</div><p class="c-desc">M&amp;A disputes, hostile takeovers and governance crises. The boardroom advantage.</p></div></div>
+        <div class="card casc" tabindex="0"><div class="c-img"><img src="https://images.unsplash.com/photo-1453928582365-b6ad33cbcf64?q=80&w=600&auto=format&fit=crop" alt="" onerror="this.parentNode.style.display='none'"/></div><div class="c-body"><div class="c-no">04</div><div class="c-title">Intellectual Property</div><p class="c-desc">Patent litigation and trade-secret enforcement. Precedent set at the Federal Circuit.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- 2 · PHILOSOPHY -->
+  <section class="section" data-i="2" id="sec-2" aria-label="Philosophy">
+    <div class="wrap">
+      <p class="eyebrow mb-4 casc">Chapter 03 — Philosophy</p>
+      <h2 class="display ui-text mb-6 casc" style="font-size:clamp(2rem,4.6vw,3.6rem)">Argued like <span class="ital">architecture.</span></h2>
+      <p class="lede ui-text mb-4 casc" style="max-width:34rem">For three decades we have treated defense not as reaction, but as construction — locating the precise point at which the opposition collapses under its own weight.</p>
+      <p class="body-copy ui-dim mb-7 casc" style="max-width:32rem">Our briefs are not documents. They are monuments. The method is structural. The result is absolute.</p>
+      <div class="casc" style="display:inline-block">
+        <div class="float-card" style="width:260px">
+          <img src="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?q=80&w=700&auto=format&fit=crop" alt="Library of legal volumes" onerror="this.style.display='none'"/>
+          <div class="fc-body"><div class="fc-s">The Doctrine</div><div class="fc-t">Structure over ornament</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 · PROCESS (new) -->
+  <section class="section" data-i="3" id="sec-3" aria-label="Process">
+    <div class="wrap">
+      <p class="eyebrow mb-3 casc">Chapter 04 — The Method</p>
+      <h2 class="display ui-text mb-7 casc" style="font-size:clamp(2rem,4.2vw,3.2rem)">How we <span class="ital">build a case.</span></h2>
+      <div>
+        <div class="step casc"><div class="s-no">i</div><div><div class="s-t">Forensic Intake</div><div class="s-d">We map every fact, witness and document into a structural model of the dispute.</div></div></div>
+        <div class="step casc"><div class="s-no">ii</div><div><div class="s-t">Pressure Testing</div><div class="s-d">Each argument is load-tested against the strongest version of the opposition.</div></div></div>
+        <div class="step casc"><div class="s-no">iii</div><div><div class="s-t">Strategic Assembly</div><div class="s-d">We construct the narrative spine, then reinforce it with precedent and expert testimony.</div></div></div>
+        <div class="step casc"><div class="s-no">iv</div><div><div class="s-t">The Verdict</div><div class="s-d">We try the case we built — relentless, precise, and engineered to withstand appeal.</div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 · VERDICTS -->
+  <section class="section" data-i="4" id="sec-4" aria-label="Verdicts">
+    <div class="wrap">
+      <p class="eyebrow mb-3 casc">Chapter 05 — The Record</p>
+      <h2 class="display ui-text mb-7 casc" style="font-size:clamp(2rem,4.2vw,3.2rem)">The record <span class="ital">speaks.</span></h2>
+      <div class="verdicts casc">
         <div class="verdict"><div class="v-fig">$420M</div><div class="v-cap">Antitrust · 2019</div></div>
         <div class="verdict"><div class="v-fig">SCOTUS</div><div class="v-cap">Precedent · 2021</div></div>
         <div class="verdict"><div class="v-fig">98.4%</div><div class="v-cap">30-Yr Win Rate</div></div>
       </div>
-      <a href="#" class="btn nav-jump mt-9" data-i="1">Commission the Firm ↗</a>
-    </div></div>
+      <p class="body-copy ui-dim mt-6 casc" style="max-width:30rem">Across 847 tried cases over three decades — the benchmark for institutional litigation in North America.</p>
+    </div>
+  </section>
+
+
+  <!-- 5 · CONTACT / INTAKE FORM -->
+  <section class="section" data-i="5" id="sec-5" aria-label="Contact">
+    <div class="wrap">
+      <p class="eyebrow mb-3 casc">Chapter 06 — Council Intake</p>
+      <h2 class="display ui-text mb-5 casc" style="font-size:clamp(1.9rem,4vw,3rem)">Commission <span class="ital">the firm.</span></h2>
+      <p class="body-copy ui-dim mb-6 casc" style="max-width:30rem">We accept new mandates by referral and direct inquiry. Complete the brief below to initiate first contact.</p>
+      <form class="form-card casc" id="intake" role="form" aria-label="Council intake">
+        <div class="f-row">
+          <label class="f-label" for="f-name">Full Name</label>
+          <input class="f-input" id="f-name" type="text" placeholder="First &amp; Last" autocomplete="name" aria-required="true"/>
+        </div>
+        <div class="f-row">
+          <label class="f-label" for="f-email">Corporate Email</label>
+          <input class="f-input" id="f-email" type="email" placeholder="name@organization.com" autocomplete="email" aria-required="true"/>
+        </div>
+        <div class="f-row">
+          <label class="f-label" for="f-matter">Matter Type</label>
+          <select class="f-input f-select" id="f-matter" aria-required="true">
+            <option value="" disabled selected>Select a discipline</option>
+            <option>Civil Litigation</option><option>Criminal Defense</option>
+            <option>Corporate Warfare</option><option>Intellectual Property</option><option>Other</option>
+          </select>
+        </div>
+        <div class="f-row">
+          <label class="f-label" for="f-brief">Brief Overview</label>
+          <textarea class="f-input" id="f-brief" rows="2" placeholder="Describe the matter in two or three sentences."></textarea>
+        </div>
+        <button type="button" class="btn mt-2" id="intake-submit" aria-label="Transmit mandate">Transmit Mandate ↗</button>
+        <p class="f-note" id="f-note"></p>
+      </form>
+    </div>
   </section>
 
 </div>
@@ -223,21 +371,26 @@ body{
 
 <script>
 /* ═══════════════════════════════════════════════════════════
-   SOVEREIGN & PARTNERS — Courtroom Camera Flythrough
+   SOVEREIGN & PARTNERS — Flythrough (3D left · text right)
    ═══════════════════════════════════════════════════════════ */
 gsap.registerPlugin(ScrollTrigger);
 const IS_MOBILE = window.matchMedia('(max-width:767px)').matches;
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 
-const Z_START = 5, Z_END = -90;
-const MILESTONE = [-10, -35, -60, -85];   // gavel, scales, codex, rings
+const Z_START = 6, Z_END = -140;
+const MILESTONE = [-12, -37, -62, -87, -112, -134];   // 6 chapters
+const OBJ_X = -3.8;                                   // meshes live on the LEFT
+const PHIL = MILESTONE[2];
 
-/* ───── ENV MAP (procedural reflections) ───── */
+/* ───── ENV MAP ───── */
 function makeEnv(){
   const c=document.createElement('canvas'); c.width=512; c.height=256; const x=c.getContext('2d');
   const g=x.createLinearGradient(0,0,0,256);
-  g.addColorStop(0,'#3a3a40'); g.addColorStop(0.45,'#101013'); g.addColorStop(1,'#050506');
+  g.addColorStop(0,'#42424a'); g.addColorStop(0.45,'#121116'); g.addColorStop(1,'#070608');
   x.fillStyle=g; x.fillRect(0,0,512,256);
-  let r=x.createRadialGradient(360,50,4,360,50,140); r.addColorStop(0,'rgba(255,255,255,0.9)'); r.addColorStop(1,'rgba(255,255,255,0)');
+  let r=x.createRadialGradient(360,48,4,360,48,150); r.addColorStop(0,'rgba(255,255,255,0.95)'); r.addColorStop(1,'rgba(255,255,255,0)');
+  x.fillStyle=r; x.fillRect(0,0,512,256);
+  r=x.createRadialGradient(120,210,4,120,210,150); r.addColorStop(0,'rgba(225,29,46,0.6)'); r.addColorStop(1,'rgba(225,29,46,0)');
   x.fillStyle=r; x.fillRect(0,0,512,256);
   const t=new THREE.CanvasTexture(c); t.mapping=THREE.EquirectangularReflectionMapping; t.encoding=THREE.sRGBEncoding; return t;
 }
@@ -245,195 +398,168 @@ function makeEnv(){
 /* ───── SCENE / CAMERA / RENDERER ───── */
 const canvas=document.getElementById('webgl');
 const scene=new THREE.Scene();
-const DARK_BG=new THREE.Color(0x0a0a0a), LIGHT_BG=new THREE.Color(0xe8e6e0);
-const DARK_FOG=new THREE.Color(0x0a0a0a), LIGHT_FOG=new THREE.Color(0xdad8d2);
+const DARK_BG=new THREE.Color(0x0b0a0d), LIGHT_BG=new THREE.Color(0xece7df);
+const DARK_FOG=new THREE.Color(0x0b0a0d), LIGHT_FOG=new THREE.Color(0xd9d4cc);
 scene.background=DARK_BG.clone();
-scene.fog=new THREE.FogExp2(0x0a0a0a, 0.015);
+scene.fog=new THREE.FogExp2(0x0b0a0d, 0.013);
 const envTex=makeEnv(); scene.environment=envTex;
 
-const camera=new THREE.PerspectiveCamera(IS_MOBILE?62:50, innerWidth/innerHeight, 0.1, 300);
+const camera=new THREE.PerspectiveCamera(IS_MOBILE?64:50, innerWidth/innerHeight, 0.1, 320);
 camera.position.set(0, 1.3, Z_START);
 
 const renderer=new THREE.WebGLRenderer({canvas, antialias:true});
 renderer.setSize(innerWidth, innerHeight);
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));
-renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.05;
+renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.08;
 renderer.outputEncoding=THREE.sRGBEncoding;
 
 
 /* ───── LIGHTS ───── */
-const keyLight=new THREE.DirectionalLight(0xffffff, 3.2); keyLight.position.set(6,12,4); scene.add(keyLight);
-const fillLight=new THREE.DirectionalLight(0xbfc4ff, 0.8); fillLight.position.set(-6,4,-10); scene.add(fillLight);
-const ambient=new THREE.AmbientLight(0x404040, 1.0); scene.add(ambient);
-// travelling overhead lamps add rhythm to the hallway
-const lampLights=[];
-for(let z=0; z>=-100; z-=14){
-  const p=new THREE.PointLight(0xffffff, 1.3, 22, 2); p.position.set(0,7,z); scene.add(p); lampLights.push(p);
-}
-// crimson interactive spotlight (raycast-driven, hits the scales)
-const redSpot=new THREE.SpotLight(0xd11829, 0, 60, Math.PI/7, 0.4, 1.0);
-redSpot.position.set(0,9,-30); scene.add(redSpot);
-const redTarget=new THREE.Object3D(); redTarget.position.set(0,0,MILESTONE[1]); scene.add(redTarget); redSpot.target=redTarget;
+const keyLight=new THREE.DirectionalLight(0xffffff, 3.4); keyLight.position.set(4,12,4); scene.add(keyLight);
+const fillLight=new THREE.DirectionalLight(0xbfc4ff, 0.9); fillLight.position.set(-8,4,-10); scene.add(fillLight);
+const ambient=new THREE.AmbientLight(0x3a3a3a, 1.0); scene.add(ambient);
+for(let z=0; z>=-150; z-=14){ const p=new THREE.PointLight(0xffffff,1.2,22,2); p.position.set(0,7,z); scene.add(p); }
+const redSpot=new THREE.SpotLight(0xe11d2e, 0, 60, Math.PI/7, 0.4, 1.0);
+redSpot.position.set(OBJ_X,9,-30); scene.add(redSpot);
+const redTarget=new THREE.Object3D(); redTarget.position.set(OBJ_X,0,MILESTONE[1]); scene.add(redTarget); redSpot.target=redTarget;
 
 /* ───── MATERIALS ───── */
-function obsidian(){ return new THREE.MeshStandardMaterial({color:0x111111, roughness:0.12, metalness:0.9, envMap:envTex, envMapIntensity:1.2}); }
-function chrome(){ return new THREE.MeshStandardMaterial({color:0x202024, roughness:0.2, metalness:0.95, envMap:envTex, envMapIntensity:1.4}); }
-function stone(){ return new THREE.MeshStandardMaterial({color:0x6f6f6f, roughness:0.45, metalness:0.35, envMap:envTex, envMapIntensity:0.6}); }
+function obsidian(){ return new THREE.MeshStandardMaterial({color:0x111114, roughness:0.12, metalness:0.9, envMap:envTex, envMapIntensity:1.25}); }
+function chrome(){ return new THREE.MeshStandardMaterial({color:0x24242a, roughness:0.2, metalness:0.95, envMap:envTex, envMapIntensity:1.5}); }
+function stone(){ return new THREE.MeshStandardMaterial({color:0x6f6f72, roughness:0.45, metalness:0.35, envMap:envTex, envMapIntensity:0.6}); }
+function crimsonMat(){ return new THREE.MeshStandardMaterial({color:0xe11d2e, roughness:0.25, metalness:0.7, envMap:envTex, envMapIntensity:1.0, emissive:0x3a0008}); }
 
-/* ───── MARBLE FLOOR ───── */
-const floor=new THREE.Mesh(
-  new THREE.PlaneGeometry(60, 240),
-  new THREE.MeshStandardMaterial({color:0x0c0c0d, roughness:0.08, metalness:0.85, envMap:envTex, envMapIntensity:1.1})
-);
-floor.rotation.x=-Math.PI/2; floor.position.set(0,-1.6,-90); scene.add(floor);
-const ceiling=floor.clone(); ceiling.position.y=9; ceiling.rotation.x=Math.PI/2; scene.add(ceiling);
+/* ───── FLOOR + CEILING ───── */
+const floor=new THREE.Mesh(new THREE.PlaneGeometry(70,320),
+  new THREE.MeshStandardMaterial({color:0x0c0c0e, roughness:0.07, metalness:0.88, envMap:envTex, envMapIntensity:1.15}));
+floor.rotation.x=-Math.PI/2; floor.position.set(0,-1.7,-110); scene.add(floor);
+const ceiling=floor.clone(); ceiling.position.y=9.2; ceiling.rotation.x=Math.PI/2; scene.add(ceiling);
 
-
-/* ───── PILLAR HALLWAY (z = 0 → -100) ───── */
-const pillarGeo=new THREE.CylinderGeometry(0.7, 0.8, 11, 28, 1);
-const fluteGeo=new THREE.CylinderGeometry(0.74, 0.74, 11, 8, 1, true); // subtle outer detail
-for(let z=0; z>=-100; z-=8){
-  [-6, 6].forEach(x=>{
-    const p=new THREE.Mesh(pillarGeo, stone());
-    p.position.set(x, 2.9, z); scene.add(p);
-    // base + capital blocks
-    const base=new THREE.Mesh(new THREE.BoxGeometry(2,0.5,2), chrome()); base.position.set(x,-2.65,z); scene.add(base);
-    const cap=new THREE.Mesh(new THREE.BoxGeometry(2,0.5,2), chrome()); cap.position.set(x,8.4,z); scene.add(cap);
+/* ───── PILLAR HALLWAY (z 0 → -150) ───── */
+const pillarGeo=new THREE.CylinderGeometry(0.72,0.82,11,28,1);
+for(let z=0; z>=-150; z-=8){
+  [-6.5,6.5].forEach(x=>{
+    const p=new THREE.Mesh(pillarGeo, stone()); p.position.set(x,2.9,z); scene.add(p);
+    const base=new THREE.Mesh(new THREE.BoxGeometry(2,0.5,2),chrome()); base.position.set(x,-2.7,z); scene.add(base);
+    const cap=new THREE.Mesh(new THREE.BoxGeometry(2,0.5,2),chrome()); cap.position.set(x,8.45,z); scene.add(cap);
   });
 }
 
 
-/* ───── FOCAL OBJECTS ───── */
-function buildGavel(){
-  const g=new THREE.Group(); const mallet=new THREE.Group();
-  const head=new THREE.Mesh(new THREE.CylinderGeometry(0.4,0.4,1.8,48),obsidian()); head.rotation.z=Math.PI/2; mallet.add(head);
-  [-0.9,0.9].forEach(x=>{const c=new THREE.Mesh(new THREE.CylinderGeometry(0.46,0.46,0.2,48),chrome());c.rotation.z=Math.PI/2;c.position.x=x;mallet.add(c);});
-  const h=new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.13,2.1,32),obsidian()); h.position.y=-1.2; mallet.add(h);
-  mallet.rotation.z=0.34; g.add(mallet);
-  g.userData.spin=mallet; return g;
-}
-function buildScales(){
-  const g=new THREE.Group();
+/* ───── FOCAL OBJECTS (one per chapter) ───── */
+function buildGavel(){ const g=new THREE.Group(); const m=new THREE.Group();
+  const head=new THREE.Mesh(new THREE.CylinderGeometry(0.4,0.4,1.8,48),obsidian()); head.rotation.z=Math.PI/2; m.add(head);
+  [-0.9,0.9].forEach(x=>{const c=new THREE.Mesh(new THREE.CylinderGeometry(0.46,0.46,0.2,48),chrome()); c.rotation.z=Math.PI/2; c.position.x=x; m.add(c);});
+  const h=new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.13,2.1,32),obsidian()); h.position.y=-1.2; m.add(h);
+  m.rotation.z=0.34; g.add(m); g.userData.spin=m; return g; }
+function buildScales(){ const g=new THREE.Group();
   g.add(new THREE.Mesh(new THREE.CylinderGeometry(0.13,0.2,3.6,32),obsidian()));
   const bar=new THREE.Mesh(new THREE.BoxGeometry(3.4,0.12,0.12),chrome()); bar.position.y=1.6; g.add(bar);
-  const fin=new THREE.Mesh(new THREE.SphereGeometry(0.22,32,32),chrome()); fin.position.y=1.95; g.add(fin);
-  [-1.6,1.6].forEach(x=>{ const s=new THREE.Mesh(new THREE.CylinderGeometry(0.015,0.015,0.95,8),obsidian()); s.position.set(x,1.15,0); g.add(s);
-    const d=new THREE.Mesh(new THREE.CylinderGeometry(0.6,0.6,0.07,48),chrome()); d.position.set(x,0.64,0); g.add(d); });
-  g.userData.bar=bar; return g;
-}
-function buildCodex(){
-  const g=new THREE.Group(); const H=[3.0,3.5,2.7,3.3]; let xo=-1.7;
-  H.forEach((h,i)=>{const w=0.72; const v=new THREE.Mesh(new THREE.BoxGeometry(w,h,1.7), i%2?chrome():obsidian()); v.position.set(xo,(h-3.5)/2,0); v.rotation.z=(i-1.5)*0.05; g.add(v); xo+=w+0.45;});
-  return g;
-}
-function buildRings(){
-  const g=new THREE.Group();
-  [-1.35,0,1.35].forEach((x,i)=>{const r=new THREE.Mesh(new THREE.TorusGeometry(0.9,0.17,24,64), i===1?chrome():obsidian()); r.position.x=x; r.rotation.y=i%2?Math.PI/2:0; g.add(r);});
-  return g;
-}
+  const fin=new THREE.Mesh(new THREE.SphereGeometry(0.22,32,32),chrome()); fin.position.set(0,1.95,0); g.add(fin);
+  [-1.6,1.6].forEach(x=>{
+    const s=new THREE.Mesh(new THREE.CylinderGeometry(0.015,0.015,0.95,8),obsidian()); s.position.set(x,1.15,0); g.add(s);
+    const d=new THREE.Mesh(new THREE.CylinderGeometry(0.6,0.6,0.07,48),chrome()); d.position.set(x,0.64,0); g.add(d);
+  });
+  g.userData.bar=bar; return g; }
+function buildCodex(){ const g=new THREE.Group(); const H=[3.0,3.5,2.7,3.3]; let xo=-1.7;
+  H.forEach((h,i)=>{const w=0.72; const v=new THREE.Mesh(new THREE.BoxGeometry(w,h,1.7), i%2?chrome():obsidian()); v.position.set(xo,(h-3.5)/2,0); v.rotation.z=(i-1.5)*0.05; g.add(v); xo+=w+0.45;}); return g; }
+function buildObelisk(){ const g=new THREE.Group();
+  const ob=new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.95,5.2,4),chrome()); ob.position.y=0.4; g.add(ob);
+  const base=new THREE.Mesh(new THREE.BoxGeometry(1.8,0.5,1.8),obsidian()); base.position.y=-2.3; g.add(base);
+  g.userData.spin2=ob; return g; }
+function buildRings(){ const g=new THREE.Group();
+  [-1.35,0,1.35].forEach((x,i)=>{const r=new THREE.Mesh(new THREE.TorusGeometry(0.9,0.17,24,64), i===1?crimsonMat():obsidian()); r.position.x=x; r.rotation.y=i%2?Math.PI/2:0; g.add(r);}); return g; }
+function buildSeal(){ const g=new THREE.Group();
+  g.add(new THREE.Mesh(new THREE.TorusKnotGeometry(0.95,0.26,140,26,2,3),chrome()));
+  g.add(new THREE.Mesh(new THREE.TorusGeometry(1.7,0.04,16,80),crimsonMat())); return g; }
 
-const focal=[buildGavel(), buildScales(), buildCodex(), buildRings()];
-focal.forEach((f,i)=>{ f.position.set(0, 0.4, MILESTONE[i]); scene.add(f); });
-const scales=focal[1]; // referenced by the raycast spotlight
+const focal=[buildGavel(),buildScales(),buildCodex(),buildObelisk(),buildRings(),buildSeal()];
+focal.forEach((f,i)=>{ f.position.set(OBJ_X, 0.4, MILESTONE[i]); scene.add(f); });
+const scales=focal[1];
 
 
-/* ───── HELPERS ───── */
-const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+/* ───── THEME FACTOR (light peak at Philosophy) ───── */
 function lightFactor(z){
-  // triangle peaking at the Scales (z=-35): dark→white→dark
-  if(z>=MILESTONE[0]) return 0;
-  if(z>=MILESTONE[1]) return (MILESTONE[0]-z)/(MILESTONE[0]-MILESTONE[1]);     // -10..-35 → 0..1
-  if(z>=MILESTONE[2]) return 1-(MILESTONE[1]-z)/(MILESTONE[1]-MILESTONE[2]);   // -35..-60 → 1..0
+  if(z<=MILESTONE[1] && z>=MILESTONE[3]) return clamp(1-Math.abs(z-PHIL)/(MILESTONE[1]-PHIL),0,1);
   return 0;
 }
 const root=document.documentElement;
 const sections=[...document.querySelectorAll('.section')];
 const navItems=[...document.querySelectorAll('.vnav-item')];
+const scrim=document.getElementById('scrim');
+const revealed=new Set();
 
 /* ───── SCROLL → CAMERA (scrubbed) ───── */
 let progress=0, lenis;
 function initScroll(){
-  lenis=new Lenis({duration:1.2, smoothWheel:true, lerp:0.08});
+  lenis=new Lenis({duration:1.2, smoothWheel:true, lerp:0.085});
   window.__lenis=lenis;
   lenis.on('scroll', ScrollTrigger.update);
   gsap.ticker.add(t=>lenis.raf(t*1000));
   gsap.ticker.lagSmoothing(0);
-
-  gsap.to(camera.position, {
-    z: Z_END, ease:'none',
-    scrollTrigger:{ trigger:document.body, start:'top top', end:'bottom bottom', scrub:1,
-      onUpdate:self=>{ progress=self.progress; } }
-  });
+  gsap.to(camera.position,{ z:Z_END, ease:'none',
+    scrollTrigger:{ trigger:document.body, start:'top top', end:'bottom bottom', scrub:1, onUpdate:s=>{progress=s.progress;} }});
 }
 
-/* ───── THEME + TEXT MORPH (per frame) ───── */
-const FADE=11;
+/* ───── PER-FRAME UPDATE ───── */
+const FADE=13;
+function revealCasc(sec){
+  if(revealed.has(sec.id)) return; revealed.add(sec.id);
+  gsap.from(sec.querySelectorAll('.casc'),{ y:46, opacity:0, duration:0.95, stagger:0.11, ease:'power3.out' });
+}
 function updateScene(){
   const z=camera.position.z;
-  // floating / walking motion
-  camera.position.y = 1.3 + Math.sin(progress*Math.PI*8)*0.22;
-  camera.position.x = Math.sin(progress*Math.PI*5)*0.18;
-  camera.lookAt(0, 0.45, z - 14);
+  camera.position.y = 1.3 + Math.sin(progress*Math.PI*9)*0.2;
+  camera.position.x = Math.sin(progress*Math.PI*6)*0.14;
+  camera.lookAt(0, 0.45, z-14);
 
-  // light/dark morph
-  const t=clamp(lightFactor(z),0,1);
+  const t=lightFactor(z);
   scene.background.copy(DARK_BG).lerp(LIGHT_BG,t);
   scene.fog.color.copy(DARK_FOG).lerp(LIGHT_FOG,t);
-  scene.fog.density = 0.015 - t*0.006;
-  // high-contrast text flip (WCAG): light text on dark, dark text on light
-  const flip = clamp((t-0.4)/0.2, 0, 1);
-  root.style.setProperty('--ui-text', flip>0.5 ? '#141414' : '#f4f3ef');
-  root.style.setProperty('--ui-dim',  flip>0.5 ? '#4a4a48' : '#8a8a86');
+  scene.fog.density = 0.013 - t*0.005;
+  const flip = t>0.5;
+  root.style.setProperty('--ui-text', flip?'#161318':'#f2efe9');
+  root.style.setProperty('--ui-dim',  flip?'#4f4a52':'#9a948c');
+  scrim.style.opacity = String(1 - 0.55*t);
 
-  // section fade by proximity to milestone
   sections.forEach((sec,i)=>{
     const d=Math.abs(z-MILESTONE[i]);
     let op=clamp(1-(d/FADE),0,1);
-    // Overview is the landing scene: keep it lit at the very top, then hand off to proximity
-    if(i===0) op=Math.max(op, clamp(1-progress/0.12,0,1));
+    if(i===0) op=Math.max(op, clamp(1-progress/0.1,0,1));
     sec.style.opacity=op;
-    sec.style.pointerEvents = op>0.55 ? 'auto':'none';
-    sec.style.transform = 'translateY('+((1-op)*22)+'px)';
+    sec.style.pointerEvents = op>0.55?'auto':'none';
+    sec.style.transform='translateY('+((1-op)*26)+'px)';
+    if(op>0.55) revealCasc(sec);
   });
-  // active nav = nearest milestone
-  let near=0,best=1e9;
-  MILESTONE.forEach((mz,i)=>{const d=Math.abs(z-mz); if(d<best){best=d;near=i;}});
+  let near=0,best=1e9; MILESTONE.forEach((mz,i)=>{const d=Math.abs(z-mz); if(d<best){best=d;near=i;}});
   navItems.forEach((n,i)=>n.classList.toggle('active', i===near));
-  // progress bar + scroll cue
   document.getElementById('progress-fill').style.height=(progress*100)+'%';
-  document.getElementById('scroll-cue').style.opacity = progress>0.04 ? 0 : 0.7;
+  document.getElementById('scroll-cue').style.opacity = progress>0.03?0:0.7;
 }
 
 
-/* ───── RAYCASTER (card hover → red spotlight isolates the Scales) ───── */
+/* ───── RAYCASTER → red spotlight isolates the Scales ───── */
 const raycaster=new THREE.Raycaster();
 function strikeScales(on){
   if(on){
-    // cast from camera toward the scales; place the spotlight on the hit point
-    const dir=new THREE.Vector3().subVectors(scales.position, camera.position).normalize();
-    raycaster.set(camera.position, dir);
-    const hits=raycaster.intersectObject(scales, true);
-    const p = hits.length ? hits[0].point : scales.position;
-    redTarget.position.copy(p);
-    redSpot.position.set(p.x, p.y+8, p.z+5);
-    gsap.to(redSpot,{intensity:9, duration:0.45, overwrite:true});
-  } else {
-    gsap.to(redSpot,{intensity:0, duration:0.6, overwrite:true});
-  }
+    const dir=new THREE.Vector3().subVectors(scales.position,camera.position).normalize();
+    raycaster.set(camera.position,dir);
+    const hits=raycaster.intersectObject(scales,true);
+    const p=hits.length?hits[0].point:scales.position;
+    redTarget.position.copy(p); redSpot.position.set(p.x,p.y+8,p.z+5);
+    gsap.to(redSpot,{intensity:9,duration:0.45,overwrite:true});
+  } else gsap.to(redSpot,{intensity:0,duration:0.6,overwrite:true});
 }
 
-/* ───── CARD HOVER (tilt + crimson) ───── */
+/* ───── CARD HOVER (3D tilt + crimson + spotlight) ───── */
 document.querySelectorAll('.card').forEach(card=>{
-  card.addEventListener('mousemove', e=>{
-    const r=card.getBoundingClientRect();
-    const rx=((e.clientY-r.top)/r.height-0.5)*-12;
-    const ry=((e.clientX-r.left)/r.width-0.5)*12;
-    gsap.to(card,{rotateX:rx, rotateY:ry, transformPerspective:900, duration:0.3, ease:'power2.out'});
-  });
-  card.addEventListener('mouseenter', ()=>strikeScales(true));
-  card.addEventListener('focus', ()=>strikeScales(true));
-  card.addEventListener('mouseleave', ()=>{ gsap.to(card,{rotateX:0,rotateY:0,duration:0.5,ease:'power2.out'}); strikeScales(false); });
-  card.addEventListener('blur', ()=>{ gsap.to(card,{rotateX:0,rotateY:0,duration:0.5}); strikeScales(false); });
+  card.addEventListener('mousemove',e=>{ const r=card.getBoundingClientRect();
+    const rx=((e.clientY-r.top)/r.height-0.5)*-10, ry=((e.clientX-r.left)/r.width-0.5)*10;
+    gsap.to(card,{rotateX:rx,rotateY:ry,transformPerspective:900,duration:0.3,ease:'power2.out'}); });
+  card.addEventListener('mouseenter',()=>strikeScales(true));
+  card.addEventListener('focus',()=>strikeScales(true));
+  card.addEventListener('mouseleave',()=>{ gsap.to(card,{rotateX:0,rotateY:0,duration:0.5,ease:'power2.out'}); strikeScales(false); });
+  card.addEventListener('blur',()=>{ gsap.to(card,{rotateX:0,rotateY:0,duration:0.5}); strikeScales(false); });
 });
 
 /* ───── RENDER LOOP ───── */
@@ -441,46 +567,93 @@ const clock=new THREE.Clock();
 function render(){
   requestAnimationFrame(render);
   const t=clock.getElapsedTime();
-  focal[0].userData.spin && (focal[0].userData.spin.rotation.z = 0.34 + Math.sin(t*1.2)*0.05);
-  focal[0].rotation.y = Math.sin(t*0.3)*0.4;
-  focal[1].rotation.y = Math.sin(t*0.25)*0.3;
-  focal[2].rotation.y += 0.0018;
-  focal[3].rotation.y += 0.006;
+  focal[0].userData.spin && (focal[0].userData.spin.rotation.z=0.34+Math.sin(t*1.2)*0.05);
+  focal[0].rotation.y=Math.sin(t*0.3)*0.4;
+  focal[1].rotation.y=Math.sin(t*0.25)*0.3;
+  focal[2].rotation.y+=0.0018;
+  focal[3].rotation.y+=0.004;
+  focal[4].rotation.y+=0.006;
+  focal[5].rotation.y+=0.008; focal[5].rotation.x=Math.sin(t*0.4)*0.2;
   updateScene();
   renderer.render(scene,camera);
 }
 
 
-/* ───── NAV WARP (smooth scroll → scrub drives camera, no jumps) ───── */
+/* ───── NAV WARP ───── */
 function warpTo(i){
-  const zT=MILESTONE[i];
-  const frac=clamp((zT-Z_START)/(Z_END-Z_START),0,1);
-  const maxScroll=document.body.scrollHeight - window.innerHeight;
-  if(window.__lenis) window.__lenis.scrollTo(frac*maxScroll, {duration:1.6});
-  else window.scrollTo({top:frac*maxScroll, behavior:'smooth'});
+  const frac=clamp((MILESTONE[i]-Z_START)/(Z_END-Z_START),0,1);
+  const maxScroll=document.body.scrollHeight-window.innerHeight;
+  if(window.__lenis) window.__lenis.scrollTo(frac*maxScroll,{duration:1.7});
+  else window.scrollTo({top:frac*maxScroll,behavior:'smooth'});
 }
-document.querySelectorAll('.vnav-item').forEach(n=> n.addEventListener('click', ()=>warpTo(parseInt(n.dataset.i,10))));
-document.querySelectorAll('.nav-jump').forEach(a=> a.addEventListener('click', e=>{ e.preventDefault(); warpTo(parseInt(a.dataset.i,10)); }));
+document.querySelectorAll('.vnav-item').forEach(n=>n.addEventListener('click',()=>warpTo(parseInt(n.dataset.i,10))));
+document.querySelectorAll('.nav-jump').forEach(a=>a.addEventListener('click',e=>{ e.preventDefault(); warpTo(parseInt(a.dataset.i,10)); }));
+
+/* ───── INTAKE FORM ───── */
+document.getElementById('intake-submit').addEventListener('click',()=>{
+  const name=document.getElementById('f-name').value.trim();
+  const email=document.getElementById('f-email').value.trim();
+  const matter=document.getElementById('f-matter').value;
+  const note=document.getElementById('f-note');
+  if(!name||!email||!matter){
+    gsap.fromTo('#intake',{x:-7},{x:0,duration:0.45,ease:'elastic.out(1,0.3)'});
+    note.style.color='#e11d2e'; note.textContent='Please complete name, email and matter type.'; return;
+  }
+  const btn=document.getElementById('intake-submit');
+  btn.textContent='Mandate Received ✓'; btn.style.pointerEvents='none'; btn.style.background='#1c4a1c';
+  note.style.color='var(--ui-dim)'; note.textContent='Our intake council will respond within one business day.';
+  if(focal[5]) gsap.to(focal[5].rotation,{y:'+='+Math.PI*2,duration:1.4,ease:'power3.out'});
+});
 
 /* ───── RESIZE ───── */
-window.addEventListener('resize', ()=>{
+addEventListener('resize',()=>{
   camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix();
   renderer.setSize(innerWidth,innerHeight); renderer.setPixelRatio(Math.min(devicePixelRatio,2));
   ScrollTrigger.refresh();
 });
 
-/* ───── BOOT / LOADER ───── */
-function boot(){
-  initScroll();
-  render();
-  const obj={v:0};
-  gsap.to(obj,{v:100,duration:1.6,ease:'power1.inOut',
-    onUpdate:()=>{ const v=Math.floor(obj.v); document.getElementById('loader-pct').textContent=v+'%'; document.getElementById('loader-bar').style.width=v+'%'; },
-    onComplete:()=>{ const l=document.getElementById('loader'); l.style.opacity='0'; setTimeout(()=>l.style.display='none',800);
-      gsap.from('#sec-0 .wrap > div > *',{y:40,opacity:0,duration:1,stagger:0.1,ease:'power3.out'}); }
-  });
+
+/* ───── LOADER: banging gavel + screen vibration ───── */
+const loaderEl=document.getElementById('loader');
+let loading=true; const shakeObj={amp:0.6};
+function shakeLoop(){
+  if(!loading){ loaderEl.style.transform=''; return; }
+  const a=shakeObj.amp;
+  loaderEl.style.transform='translate('+((Math.random()-0.5)*a)+'px,'+((Math.random()-0.5)*a)+'px)';
+  requestAnimationFrame(shakeLoop);
 }
-window.addEventListener('load', boot);
+function impact(){
+  gsap.fromTo('#g-ring',{attr:{r:8},opacity:0.9},{attr:{r:46},opacity:0,duration:0.6,ease:'power2.out'});
+  shakeObj.amp=8; gsap.to(shakeObj,{amp:0.6,duration:0.45,ease:'power2.out'});  // strong jolt → settle
+}
+function startGavel(){
+  return gsap.timeline({repeat:-1})
+    .set('#g-pivot',{rotation:-42,transformOrigin:'100px 70px'})
+    .to('#g-pivot',{rotation:6,duration:0.2,ease:'power3.in'})
+    .add(impact)
+    .to('#g-pivot',{rotation:-42,duration:0.55,ease:'power2.out'});
+}
+
+/* ───── BOOT ───── */
+function boot(){
+  initScroll(); render(); shakeLoop();
+  const gtl=startGavel();
+  const o={v:0};
+  gsap.to(o,{v:100,duration:2.6,ease:'power1.inOut',
+    onUpdate:()=>{ const v=Math.floor(o.v); document.getElementById('loader-pct').textContent=v+'%'; document.getElementById('loader-bar').style.width=v+'%'; },
+    onComplete:()=>{ loading=false; gtl.kill(); loaderEl.style.transform='';
+      loaderEl.style.opacity='0'; setTimeout(()=>{ loaderEl.style.display='none'; },800);
+      revealed.delete('sec-0');   // let the hero cascade play after the curtain lifts
+    }});
+}
+/* Boot immediately — CDN libs are blocking <head> scripts and the DOM is ready
+   here at the end of <body>. Waiting for window 'load' would stall on images. */
+if (window.THREE && window.gsap && window.Lenis) {
+  boot();
+} else {
+  // fallback if a CDN lib hasn't parsed yet
+  window.addEventListener('load', boot);
+}
 </script>
 </body>
 </html>
