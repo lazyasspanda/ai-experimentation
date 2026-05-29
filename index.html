@@ -3,18 +3,15 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>SOVEREIGN &amp; PARTNERS — Litigation Architects</title>
-<meta name="description" content="A hyper-premium editorial legal practice. Polished obsidian, chalk white, anodized crimson." />
+<title>SOVEREIGN &amp; PARTNERS — The Courtroom Flythrough</title>
+<meta name="description" content="A continuous 3D camera journey through a virtual courtroom hallway. Litigation architects." />
 
-<!-- Utility-first CSS -->
 <script src="https://cdn.tailwindcss.com"></script>
-
-<!-- Typography -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-<!-- Global Motion Stack -->
+<!-- Motion + 3D stack -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
@@ -22,794 +19,468 @@
 
 <script>
   tailwind.config = {
-    theme: {
-      extend: {
-        colors: {
-          'obsidian': '#070707',
-          'obsidian-soft': '#0e0e0e',
-          'chalk': '#f4f3ef',
-          'concrete': '#8a8a86',
-          'crimson': '#d11829',
-        },
-        fontFamily: {
-          'sans': ['Inter', 'sans-serif'],
-          'serif': ['Instrument Serif', 'serif'],
-        }
-      }
-    }
+    theme: { extend: {
+      colors: { 'crimson': '#d11829', 'chalk': '#f4f3ef', 'ink': '#141414', 'concrete': '#8a8a86' },
+      fontFamily: { 'sans': ['Inter','sans-serif'], 'serif': ['Instrument Serif','serif'] }
+    }}
   }
 </script>
 
 
 <style>
-/* ===== DESIGN TOKENS ===== */
 :root{
-  --obsidian:      #070707;  /* Polished Obsidian */
-  --obsidian-soft: #0e0e0e;  /* Panel surface */
-  --chalk:         #f4f3ef;  /* Chalk White */
-  --concrete:      #8a8a86;  /* Concrete Grey */
-  --crimson:       #d11829;  /* Anodized Crimson */
-  --hairline:      rgba(244, 243, 239, 0.10);
+  --crimson: #d11829;
+  --ui-text: #f4f3ef;      /* morphs with the light/dark theme via JS */
+  --ui-dim:  #8a8a86;
   --font-sans: 'Inter', sans-serif;
   --font-serif: 'Instrument Serif', serif;
 }
 *{ margin:0; padding:0; box-sizing:border-box; }
-html{ background: var(--obsidian); }
+html{ background:#0a0a0a; }
 body{
-  background: var(--obsidian);
-  color: var(--chalk);
+  height: 500vh;            /* tall scroll track for the flythrough */
+  background:#0a0a0a;
   font-family: var(--font-sans);
-  overflow-x: hidden;
-  width: 100%;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
-body.loading{ cursor: wait; }
-::selection{ background: var(--crimson); color: #fff; }
+::selection{ background: var(--crimson); color:#fff; }
 
-/* ===== WEBGL CANVAS (fixed, meshes anchored to the right half) ===== */
-.webgl-canvas{
-  position: fixed;
-  inset: 0;
-  z-index: 5;            /* above panels, below fixed UI */
-  display: block;
-  pointer-events: none;  /* never intercept text interactions */
-}
+/* ===== FIXED CANVAS ===== */
+#webgl{ position: fixed; inset:0; z-index:0; display:block; }
 
-/* ===== FIXED UI ===== */
-.fixed-ui{ position: fixed; z-index: 50; }
-.brandmark{ font-family: var(--font-serif); font-style: italic; }
+/* ===== UI OVERLAY ROOT ===== */
+.overlay{ position: fixed; inset:0; z-index:10; pointer-events:none; }
 
+/* text colour follows the morphing theme */
+.ui-text{ color: var(--ui-text); transition: color .5s ease; }
+.ui-dim{ color: var(--ui-dim); transition: color .5s ease; }
 
-/* ===== PRELOADER ===== */
-#preloader{
-  position: fixed; inset: 0; z-index: 9999;
-  background: var(--obsidian);
-  display: flex; align-items: center; justify-content: center;
-  overflow: hidden;
-}
-.preloader-half{
-  position: absolute; top: 0; width: 50%; height: 100%;
-  background: var(--obsidian); z-index: 2;
-}
-.preloader-half.left{ left: 0; }
-.preloader-half.right{ right: 0; }
-.preloader-inner{ position: relative; z-index: 3; text-align: center; }
-#preloader-count{
-  font-family: var(--font-serif); font-style: italic;
-  font-variant-numeric: tabular-nums; color: var(--chalk);
-}
-
-/* ===== VERTICAL NAV ===== */
-.nav-item{
-  font-family: var(--font-sans); font-size: 10px; font-weight: 600;
-  letter-spacing: 0.28em; transition: color .5s ease;
-  color: var(--concrete); position: relative; text-align: left;
-  cursor: pointer; background: none; border: none; display: flex;
-  align-items: center; gap: 0.6rem;
-}
-.nav-item .dot{
-  width: 5px; height: 5px; border-radius: 50%;
-  background: var(--concrete); transition: all .5s ease; flex-shrink: 0;
-}
-.nav-item.active{ color: var(--chalk); }
-.nav-item.active .dot{ background: var(--crimson); transform: scale(1.6); }
-
-/* ===== SCROLL HINT ===== */
-.scroll-hint{
-  position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%);
-  z-index: 50; font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase;
-  color: var(--concrete); display: flex; align-items: center; gap: 0.75rem;
-}
-.scroll-hint .line{ width: 46px; height: 1px; background: var(--hairline); position: relative; overflow: hidden; }
-.scroll-hint .line::after{
-  content:''; position:absolute; inset:0; background: var(--crimson);
-  transform: translateX(-100%); animation: scrollLine 2.4s infinite ease-in-out;
-}
-@keyframes scrollLine{ 0%{transform:translateX(-100%);} 50%{transform:translateX(0);} 100%{transform:translateX(100%);} }
+/* ===== LOADER ===== */
+#loader{ position:fixed; inset:0; z-index:9999; background:#0a0a0a; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:1.2rem; transition:opacity .8s ease; }
+#loader .bar{ width:160px; height:1px; background:rgba(244,243,239,0.15); position:relative; overflow:hidden; }
+#loader .bar span{ position:absolute; inset:0; width:0; background:var(--crimson); }
+#loader .pct{ font-family:var(--font-serif); font-style:italic; font-size:2rem; color:#f4f3ef; font-variant-numeric:tabular-nums; }
 
 
-/* ===== HORIZONTAL SCROLL ===== */
-.horizontal-scroll-container{
-  position: fixed; top: 0; left: 0; height: 100vh;
-  display: flex; flex-direction: row; will-change: transform; z-index: 1;
-}
-.panel{
-  width: 100vw; height: 100vh; flex-shrink: 0;
-  position: relative; overflow: hidden;
-}
-/* The 40 / 60 split rule */
-.panel-grid{
-  display: grid; height: 100%; width: 100%;
-  grid-template-columns: 4fr 6fr;
-}
-.panel-grid.split-5050{ grid-template-columns: 1fr 1fr; }
+/* ===== TYPOGRAPHY ===== */
+.eyebrow{ font-size:11px; letter-spacing:0.42em; text-transform:uppercase; color:var(--crimson); font-weight:500; }
+.display{ font-family:var(--font-serif); line-height:0.92; letter-spacing:-0.01em; font-weight:400;
+  font-size: clamp(2.6rem, 7vw, 7rem); }
+.display .ital{ font-style:italic; color:var(--crimson); }
+.body-copy{ font-size:13px; line-height:1.85; letter-spacing:0.01em; font-weight:300; }
 
-/* Editorial (text) column — always legible */
-.editorial{
-  position: relative; z-index: 3;
-  display: flex; flex-direction: column; justify-content: center;
-  padding: 0 5vw;
-  background: linear-gradient(90deg, var(--obsidian) 0%, var(--obsidian) 72%, rgba(7,7,7,0) 100%);
-}
-/* Visual stage column — holds photography; 3D renders here via canvas */
-.stage{
-  position: relative; z-index: 2; height: 100%; width: 100%; overflow: hidden;
-}
-.stage-photo{
-  position: absolute; inset: 0; width: 100%; height: 100%;
-  object-fit: cover; filter: grayscale(0.25) contrast(1.05) brightness(0.62);
-}
-.stage-photo.framed{ inset: 8% 10%; width: auto; height: auto; }
-.stage::after{ /* obsidian vignette so 3D pops */
-  content:''; position:absolute; inset:0;
-  background: radial-gradient(120% 90% at 70% 50%, rgba(7,7,7,0) 30%, rgba(7,7,7,0.85) 100%);
-  pointer-events:none;
-}
+/* ===== LEFT VERTICAL NAV ===== */
+#vnav{ position:fixed; left:2.2rem; top:50%; transform:translateY(-50%); z-index:20; display:flex; flex-direction:column; gap:1.4rem; pointer-events:auto; }
+.vnav-item{ display:flex; align-items:center; gap:0.7rem; background:none; border:none; cursor:pointer;
+  font-size:10px; letter-spacing:0.28em; text-transform:uppercase; color:var(--ui-dim); font-weight:600; transition:color .4s ease; }
+.vnav-item .tick{ width:14px; height:1px; background:var(--ui-dim); transition:all .4s ease; }
+.vnav-item.active{ color:var(--ui-text); }
+.vnav-item.active .tick{ width:34px; background:var(--crimson); }
+.vnav-item:hover{ color:var(--ui-text); }
 
-/* ===== MASKED TYPE REVEAL ===== */
-.mask{ display:block; overflow:hidden; }
-.mask-inner{ display:block; transform: translateY(110%); will-change: transform; }
-.eyebrow{
-  font-size: 11px; letter-spacing: 0.42em; text-transform: uppercase;
-  color: var(--crimson); font-weight: 500;
-}
-.display{
-  font-family: var(--font-serif); line-height: 0.92; letter-spacing: -0.01em;
-  font-size: clamp(2.6rem, 8vw, 9rem); font-weight: 400; color: var(--chalk);
-}
-.display .ital{ font-style: italic; color: var(--crimson); }
-.body-copy{ font-size: 13px; line-height: 1.85; letter-spacing: 0.01em; color: var(--concrete); font-weight: 300; }
-.chapter-index{ font-family: var(--font-serif); font-style: italic; color: var(--concrete); }
+/* ===== SECTION BLOCKS ===== */
+.section{ position:fixed; inset:0; display:flex; align-items:center; opacity:0; pointer-events:none;
+  will-change:opacity, transform; }
+.section .wrap{ width:100%; max-width:1180px; margin:0 auto; padding:0 7vw; }
+.section-right .wrap{ display:flex; justify-content:flex-end; }
+.section-center{ justify-content:center; text-align:center; }
+.section-center .wrap{ max-width:44rem; }
+
+/* progress / brand fixed UI */
+#brand{ position:fixed; left:2.2rem; top:1.8rem; z-index:20; font-family:var(--font-serif); font-style:italic; font-size:1.2rem; pointer-events:auto; }
+#progress{ position:fixed; right:2rem; top:50%; transform:translateY(-50%); z-index:20; display:flex; flex-direction:column; align-items:center; gap:0.5rem; }
+#progress .track{ width:1px; height:140px; background:rgba(138,138,134,0.3); position:relative; }
+#progress .fill{ position:absolute; top:0; left:0; width:100%; height:0; background:var(--crimson); }
+#progress .label{ font-size:9px; letter-spacing:0.2em; writing-mode:vertical-rl; color:var(--ui-dim); }
+.scroll-cue{ position:fixed; bottom:1.6rem; left:50%; transform:translateX(-50%); z-index:20; font-size:10px; letter-spacing:0.3em; text-transform:uppercase; color:var(--ui-dim); transition:opacity .5s ease; }
 
 
-/* ===== BUTTONS / LINKS ===== */
-.btn-primary{
-  display:inline-block; background: var(--crimson); color:#fff;
-  font-size:11px; letter-spacing:0.22em; text-transform:uppercase; font-weight:600;
-  padding: 1rem 2rem; transition: all .35s ease;
+/* ===== GLASSMORPHISM SERVICE CARDS ===== */
+.cards{ display:grid; grid-template-columns:repeat(2, 1fr); gap:1rem; width:100%; max-width:520px; perspective:1200px; }
+.card{
+  pointer-events:auto; position:relative; padding:1.6rem 1.5rem; border-radius:14px;
+  background:rgba(255,255,255,0.06); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,0.16); cursor:pointer; transform-style:preserve-3d;
+  transition:border-color .4s ease, background .4s ease; will-change:transform;
 }
-.btn-primary:hover{ background: var(--chalk); color:#000; transform: translateY(-2px); }
-.link-underline{
-  font-size:11px; letter-spacing:0.22em; text-transform:uppercase; color: var(--chalk);
-  padding-bottom: 4px; border-bottom:1px solid var(--concrete); transition: border-color .35s ease, color .35s ease;
-}
-.link-underline:hover{ border-color: var(--crimson); }
+.card:nth-child(2){ margin-top:2.6rem; }
+.card:nth-child(3){ margin-top:-2.2rem; }
+.card .c-no{ font-size:10px; letter-spacing:0.2em; color:var(--crimson); }
+.card .c-title{ font-family:var(--font-serif); font-size:1.35rem; margin-top:0.4rem; color:var(--ui-text); transition:color .4s ease; }
+.card .c-desc{ font-size:11px; line-height:1.6; margin-top:0.5rem; color:var(--ui-dim); transition:color .4s ease; }
+.card:hover{ border-color:var(--crimson); background:rgba(209,24,41,0.08); }
 
-/* ===== SERVICE ACCORDION (Section 2) ===== */
-.service{ border-top:1px solid var(--hairline); padding: 1.4rem 0; cursor: pointer; transition: padding-left .4s ease; }
-.service:last-child{ border-bottom:1px solid var(--hairline); }
-.service:hover, .service:focus-visible{ padding-left: 1rem; outline:none; }
-.service-row{ display:flex; align-items:baseline; gap:1rem; }
-.service-no{ font-size:11px; color: var(--crimson); letter-spacing:0.2em; width: 2rem; flex-shrink:0; }
-.service-name{ font-family: var(--font-serif); font-size: clamp(1.4rem, 2.4vw, 2.2rem); color: var(--chalk); transition: color .35s ease; }
-.service:hover .service-name, .service:focus-visible .service-name{ color: var(--crimson); }
-.service-desc{ max-height:0; overflow:hidden; opacity:0; margin-top:0; transition: max-height .5s ease, opacity .4s ease, margin-top .4s ease; }
-.service:hover .service-desc, .service:focus-visible .service-desc, .service.open .service-desc{ max-height: 160px; opacity:1; margin-top:0.9rem; }
+/* ===== VERDICT MINI-CARDS ===== */
+.verdicts{ display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:rgba(255,255,255,0.12); max-width:560px; }
+.verdict{ padding:1.6rem; background:rgba(10,10,10,0.55); backdrop-filter:blur(8px); transition:background .4s ease; }
+.verdict:hover{ background:rgba(209,24,41,0.12); }
+.verdict .v-fig{ font-family:var(--font-serif); font-size:clamp(1.6rem,2.6vw,2.4rem); color:var(--ui-text); transition:color .4s ease; }
+.verdict .v-cap{ font-size:10px; letter-spacing:0.15em; text-transform:uppercase; color:var(--ui-dim); margin-top:0.5rem; }
 
-/* ===== VERDICT GRID (Section 4) ===== */
-.verdict{ border:1px solid var(--hairline); padding: 2rem; transition: border-color .4s ease, background .4s ease; }
-.verdict:hover{ border-color: var(--crimson); background: rgba(209,24,41,0.04); }
-.verdict-figure{ font-family: var(--font-serif); font-size: clamp(2rem,3.4vw,3.2rem); color: var(--chalk); line-height:1; }
+/* ===== BUTTONS ===== */
+.btn{ pointer-events:auto; display:inline-block; background:var(--crimson); color:#fff; font-size:11px; letter-spacing:0.22em; text-transform:uppercase; font-weight:600; padding:0.95rem 1.9rem; border-radius:6px; transition:transform .35s ease, background .35s ease; }
+.btn:hover{ transform:translateY(-2px); background:#fff; color:#000; }
 
-
-/* ===== INTAKE FORM (Section 5) ===== */
-.intake-field{ display:flex; flex-direction:column; gap:0.4rem; margin-bottom:1.4rem; }
-.intake-label{ font-size:10px; letter-spacing:0.3em; text-transform:uppercase; color: var(--concrete); }
-.intake-input{
-  background:transparent; border:none; border-bottom:1px solid var(--hairline);
-  color: var(--chalk); font-family: var(--font-sans); font-size:14px; padding:0.6rem 0;
-  outline:none; transition: border-color .35s ease; width:100%;
-}
-.intake-input::placeholder{ color:#555; }
-.intake-input:focus{ border-color: var(--crimson); }
-.intake-select{ appearance:none; cursor:pointer;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238a8a86' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
-  background-repeat:no-repeat; background-position:right center;
-}
-.intake-select option{ background: var(--obsidian-soft); color: var(--chalk); }
-
-/* ===== SECTION 3 — centered philosophy ===== */
-.philosophy-wrap{
-  position:absolute; inset:0; z-index:3; display:flex; align-items:center; justify-content:center;
-  padding: 0 6vw; text-align:center;
-}
-.philosophy-inner{ max-width: 42rem; position:relative; }
-.philosophy-inner::before{ /* legibility vignette over the deep-Z codex */
-  content:''; position:absolute; inset:-30% -18%; z-index:-1;
-  background: radial-gradient(60% 60% at 50% 50%, rgba(7,7,7,0.92) 35%, rgba(7,7,7,0) 100%);
-}
-
-/* ===== FOCUS / SKIP LINK (WCAG) ===== */
 :focus-visible{ outline:2px solid var(--crimson); outline-offset:3px; }
-.skip-link{ position:absolute; top:-100%; left:1rem; background:var(--crimson); color:#fff; padding:.5rem 1rem; font-size:13px; z-index:99999; transition: top .2s ease; }
-.skip-link:focus{ top:1rem; }
 
-
-/* ===== MOBILE: graceful vertical stack < 768px ===== */
-@media (max-width: 767px){
-  body{ overflow-x: hidden; }
-  /* WebGL is heavy + alignment-dependent — drop it, keep editorial + photography */
-  .webgl-canvas{ display:none !important; }
-  #vertical-nav{ display:none !important; }
-  .scroll-hint{ display:none !important; }
-
-  .horizontal-scroll-container{
-    position: relative !important; flex-direction: column !important;
-    height: auto !important; transform: none !important; will-change: auto !important;
-  }
-  .panel{ width: 100vw; height: auto; min-height: auto; }
-  .panel-grid, .panel-grid.split-5050{ grid-template-columns: 1fr !important; }
-
-  .editorial{ padding: 5rem 1.5rem 2rem; background: var(--obsidian) !important; }
-  .stage{ height: 56vw; }
-  .stage-photo, .stage-photo.framed{ inset:0 !important; width:100% !important; height:100% !important; }
-  .stage::after{ display:none; }
-
-  .philosophy-wrap{ position: relative; padding: 4rem 1.5rem; }
-  .philosophy-inner::before{ display:none; }
-
-  .display{ font-size: clamp(2.4rem, 13vw, 3.6rem); }
+/* ===== MOBILE ===== */
+@media (max-width:767px){
+  #vnav{ left:0; right:0; top:auto; bottom:0; transform:none; flex-direction:row; justify-content:center; gap:0.9rem; padding:0.8rem; background:rgba(10,10,10,0.6); backdrop-filter:blur(10px); flex-wrap:wrap; }
+  .vnav-item .tick{ display:none; }
+  .section .wrap, .section-right .wrap{ justify-content:center; padding:0 1.4rem; }
+  .section-right{ align-items:flex-start; padding-top:16vh; }
+  .cards{ grid-template-columns:1fr; max-width:100%; }
+  .card:nth-child(2),.card:nth-child(3){ margin-top:0; }
+  .verdicts{ grid-template-columns:1fr; }
+  #progress{ display:none; }
+  .display{ font-size:clamp(2.2rem,11vw,3.4rem); }
 }
-
-/* Reduced motion */
-@media (prefers-reduced-motion: reduce){
-  .mask-inner{ transform:none !important; }
-  .scroll-hint .line::after{ animation:none; }
-}
+@media (prefers-reduced-motion:reduce){ #loader .bar span{ transition:none; } }
 </style>
 </head>
 
-<body class="loading">
+<body>
 
-<a href="#chapter-1" class="skip-link">Skip to content</a>
-
-<!-- ════════════ PRELOADER ════════════ -->
-<div id="preloader">
-  <div class="preloader-half left"></div>
-  <div class="preloader-half right"></div>
-  <div class="preloader-inner">
-    <div class="mask"><span class="mask-inner" style="transform:translateY(0)"><span class="brandmark text-2xl text-chalk">Sovereign &amp; Partners</span></span></div>
-    <div style="margin-top:1.5rem;"><span id="preloader-count" class="text-5xl">000</span></div>
-    <div style="margin-top:1rem;"><span class="eyebrow" style="color:var(--concrete)">Litigation Architects</span></div>
-  </div>
+<!-- ===== LOADER ===== -->
+<div id="loader">
+  <div class="pct" id="loader-pct">0%</div>
+  <div class="bar"><span id="loader-bar"></span></div>
+  <div style="font-size:10px;letter-spacing:0.4em;text-transform:uppercase;color:#8a8a86">Entering the Courtroom</div>
 </div>
 
-<!-- ════════════ WEBGL CANVAS ════════════ -->
-<canvas class="webgl-canvas" id="webgl-canvas"></canvas>
+<!-- ===== 3D CANVAS ===== -->
+<canvas id="webgl"></canvas>
 
-<!-- ════════════ FIXED UI ════════════ -->
-<header class="fixed-ui left-8 top-7">
-  <span class="brandmark text-xl text-chalk">Sovereign &amp; Partners</span>
-</header>
+<!-- ===== FIXED UI ===== -->
+<div id="brand" class="ui-text">Sovereign &amp; Partners</div>
 
-<nav class="fixed-ui right-10 top-1/2 -translate-y-1/2 flex flex-col gap-5 items-end" id="vertical-nav" role="navigation" aria-label="Section navigation">
-  <button class="nav-item active" data-index="0" aria-label="Go to Overview"><span>OVERVIEW</span><span class="dot" aria-hidden="true"></span></button>
-  <button class="nav-item" data-index="1" aria-label="Go to Services"><span>SERVICES</span><span class="dot" aria-hidden="true"></span></button>
-  <button class="nav-item" data-index="2" aria-label="Go to Philosophy"><span>PHILOSOPHY</span><span class="dot" aria-hidden="true"></span></button>
-  <button class="nav-item" data-index="3" aria-label="Go to Verdicts"><span>VERDICTS</span><span class="dot" aria-hidden="true"></span></button>
-  <button class="nav-item" data-index="4" aria-label="Go to Intake"><span>INTAKE</span><span class="dot" aria-hidden="true"></span></button>
+<nav id="vnav" role="navigation" aria-label="Courtroom navigation">
+  <button class="vnav-item active" data-z="-10" data-i="0" aria-label="Go to Overview"><span class="tick"></span>Overview</button>
+  <button class="vnav-item" data-z="-35" data-i="1" aria-label="Go to Services"><span class="tick"></span>Services</button>
+  <button class="vnav-item" data-z="-60" data-i="2" aria-label="Go to Philosophy"><span class="tick"></span>Philosophy</button>
+  <button class="vnav-item" data-z="-85" data-i="3" aria-label="Go to Verdicts"><span class="tick"></span>Verdicts</button>
 </nav>
 
-<div class="scroll-hint"><span>Scroll</span><span class="line"></span><span>Five Chapters</span></div>
+<div id="progress"><span class="label">Depth</span><div class="track"><div class="fill" id="progress-fill"></div></div></div>
+<div class="scroll-cue ui-dim" id="scroll-cue">Scroll to journey ↓</div>
 
 
-<!-- ════════════ HORIZONTAL SCROLL ════════════ -->
-<main class="horizontal-scroll-container" id="horizontal-scroll" role="main">
+<!-- ===== SECTION OVERLAYS ===== -->
+<div class="overlay">
 
-  <!-- ───── CHAPTER 1 · OVERVIEW ───── -->
-  <section class="panel" id="chapter-1" data-section="0" aria-labelledby="c1-h">
-    <div class="panel-grid">
-      <div class="editorial">
-        <div class="mask mb-8"><span class="mask-inner"><span class="eyebrow">Chapter 01 — Overview</span></span></div>
-        <h1 id="c1-h" class="display">
-          <span class="mask"><span class="mask-inner">We</span></span>
-          <span class="mask"><span class="mask-inner"><span class="ital">command</span></span></span>
-          <span class="mask"><span class="mask-inner">precedent.</span></span>
-        </h1>
-        <div class="mask mt-10" style="max-width:30rem"><span class="mask-inner"><p class="body-copy">
-          Sovereign &amp; Partners is a litigation institution engineered for absolute dominance — built for high-stakes disputes, corporate warfare, and constitutional precedent. We do not negotiate from weakness. We architect the verdict.
-        </p></span></div>
-        <div class="mask mt-12"><span class="mask-inner"><span style="display:flex;gap:1.5rem;align-items:center;flex-wrap:wrap;">
-          <a href="#chapter-5" class="btn-primary nav-jump" data-target="4" aria-label="Request council">Request Council ↗</a>
-          <a href="#chapter-4" class="link-underline nav-jump" data-target="3" aria-label="View verdicts">View the Record</a>
-        </span></span></div>
+  <!-- OVERVIEW · z=-10 -->
+  <section class="section section-right" data-z="-10" id="sec-0" aria-label="Overview">
+    <div class="wrap"><div style="max-width:30rem">
+      <p class="eyebrow mb-5">Chapter 01 — Overview</p>
+      <h1 class="display ui-text mb-7">We <span class="ital">command</span> precedent.</h1>
+      <p class="body-copy ui-dim mb-9">A litigation institution engineered for absolute dominance — high-stakes disputes, corporate warfare, and constitutional precedent. We do not negotiate from weakness. We architect the verdict.</p>
+      <a href="#" class="btn nav-jump" data-i="1">Enter the Practice ↗</a>
+    </div></div>
+  </section>
+
+  <!-- SERVICES · z=-35 -->
+  <section class="section section-right" data-z="-35" id="sec-1" aria-label="Services">
+    <div class="wrap"><div style="width:100%;max-width:560px">
+      <p class="eyebrow mb-4">Chapter 02 — Practice Domains</p>
+      <h2 class="display ui-text mb-8" style="font-size:clamp(2rem,4.4vw,3.4rem)">Five <span class="ital">disciplines.</span></h2>
+      <div class="cards">
+        <div class="card" tabindex="0"><div class="c-no">01</div><div class="c-title">Civil Litigation</div><p class="c-desc">Multi-party liability, class actions and tortious interference, dismantled at deposition.</p></div>
+        <div class="card" tabindex="0"><div class="c-no">02</div><div class="c-title">Criminal Defense</div><p class="c-desc">White-collar federal prosecution to capital defense, built on constitutional rigor.</p></div>
+        <div class="card" tabindex="0"><div class="c-no">03</div><div class="c-title">Corporate Warfare</div><p class="c-desc">M&amp;A disputes, hostile takeovers and governance crises. The boardroom advantage.</p></div>
+        <div class="card" tabindex="0"><div class="c-no">04</div><div class="c-title">Intellectual Property</div><p class="c-desc">Patent litigation and trade-secret enforcement. Precedent set at the Federal Circuit.</p></div>
       </div>
-      <div class="stage">
-        <img class="stage-photo" alt="Brutalist concrete architecture"
-          src="https://images.unsplash.com/photo-1487958449943-2429e8be8625?q=80&w=1600&auto=format&fit=crop"
-          onerror="this.style.display='none'" />
-      </div>
-    </div>
+    </div></div>
   </section>
 
 
-  <!-- ───── CHAPTER 2 · SERVICES ───── -->
-  <section class="panel" data-section="1" aria-labelledby="c2-h">
-    <div class="panel-grid">
-      <div class="editorial">
-        <div class="mask mb-6"><span class="mask-inner"><span class="eyebrow">Chapter 02 — Practice Domains</span></span></div>
-        <h2 id="c2-h" class="display mb-10" style="font-size:clamp(2rem,5vw,4.5rem)">
-          <span class="mask"><span class="mask-inner">Five <span class="ital">disciplines.</span></span></span>
-        </h2>
-        <div role="list">
-          <div class="service" role="listitem" tabindex="0" aria-expanded="false" data-tilt="-0.34">
-            <div class="service-row"><span class="service-no">01</span><span class="service-name">Civil Litigation</span></div>
-            <p class="service-desc body-copy">Multi-party liability, class actions, and tortious interference — dismantled with structural precision at deposition and trial.</p>
-          </div>
-          <div class="service" role="listitem" tabindex="0" aria-expanded="false" data-tilt="-0.17">
-            <div class="service-row"><span class="service-no">02</span><span class="service-name">Criminal Defense</span></div>
-            <p class="service-desc body-copy">White-collar federal prosecution to capital defense, built on constitutional rigor — isolating the load-bearing weakness in the State's case.</p>
-          </div>
-          <div class="service" role="listitem" tabindex="0" aria-expanded="false" data-tilt="0">
-            <div class="service-row"><span class="service-no">03</span><span class="service-name">Family &amp; Estate</span></div>
-            <p class="service-desc body-copy">High-net-worth asset protection, international custody, and contested trust litigation handled with the discretion of a private vault.</p>
-          </div>
-          <div class="service" role="listitem" tabindex="0" aria-expanded="false" data-tilt="0.17">
-            <div class="service-row"><span class="service-no">04</span><span class="service-name">Corporate Warfare</span></div>
-            <p class="service-desc body-copy">M&amp;A disputes, hostile takeovers, derivative suits, and governance crises. When the boardroom becomes a battlefield, we are the advantage.</p>
-          </div>
-          <div class="service" role="listitem" tabindex="0" aria-expanded="false" data-tilt="0.34">
-            <div class="service-row"><span class="service-no">05</span><span class="service-name">Intellectual Property</span></div>
-            <p class="service-desc body-copy">Patent litigation, trade-secret enforcement, and rights of publicity — precedent set at the Federal Circuit, injunctions never lost in a decade.</p>
-          </div>
-        </div>
-      </div>
-      <div class="stage" id="stage-services"></div>
+  <!-- PHILOSOPHY · z=-60 -->
+  <section class="section section-center" data-z="-60" id="sec-2" aria-label="Philosophy">
+    <div class="wrap">
+      <p class="eyebrow mb-5">Chapter 03 — Philosophy</p>
+      <h2 class="display ui-text mb-7" style="font-size:clamp(2.2rem,5.5vw,4.6rem)">Built on <span class="ital">precedent.</span> Argued like <span class="ital">architecture.</span></h2>
+      <p class="body-copy ui-text mb-4" style="max-width:34rem;margin:0 auto">For three decades we have treated defense not as reaction, but as construction — locating the precise point at which the opposition collapses under its own weight.</p>
+      <p class="body-copy ui-dim" style="max-width:32rem;margin:0 auto">Our briefs are not documents. They are monuments. The method is structural. The result is absolute.</p>
     </div>
   </section>
 
-
-  <!-- ───── CHAPTER 3 · PHILOSOPHY ───── -->
-  <section class="panel" data-section="2" aria-labelledby="c3-h">
-    <div class="philosophy-wrap">
-      <div class="philosophy-inner">
-        <div class="mask mb-7" style="display:inline-block"><span class="mask-inner"><span class="eyebrow">Chapter 03 — Philosophy</span></span></div>
-        <h2 id="c3-h" class="display mb-8" style="font-size:clamp(2.2rem,6vw,5.5rem)">
-          <span class="mask"><span class="mask-inner">Built on <span class="ital">precedent.</span></span></span>
-          <span class="mask"><span class="mask-inner">Argued like <span class="ital">architecture.</span></span></span>
-        </h2>
-        <div class="mask"><span class="mask-inner"><p class="body-copy mb-5" style="color:var(--chalk)">
-          For three decades we have treated defense not as reaction, but as construction — locating the precise point at which the opposition collapses under its own weight.
-        </p></span></div>
-        <div class="mask"><span class="mask-inner"><p class="body-copy" style="max-width:34rem;margin:0 auto">
-          Our briefs are not documents. They are monuments — load-tested for logical integrity before they reach the record. The method is structural. The result is absolute.
-        </p></span></div>
+  <!-- VERDICTS · z=-85 -->
+  <section class="section section-right" data-z="-85" id="sec-3" aria-label="Verdicts">
+    <div class="wrap"><div style="max-width:560px">
+      <p class="eyebrow mb-4">Chapter 04 — The Record</p>
+      <h2 class="display ui-text mb-8" style="font-size:clamp(2rem,4.4vw,3.4rem)">The record <span class="ital">speaks.</span></h2>
+      <div class="verdicts">
+        <div class="verdict"><div class="v-fig">$420M</div><div class="v-cap">Antitrust · 2019</div></div>
+        <div class="verdict"><div class="v-fig">SCOTUS</div><div class="v-cap">Precedent · 2021</div></div>
+        <div class="verdict"><div class="v-fig">98.4%</div><div class="v-cap">30-Yr Win Rate</div></div>
       </div>
-    </div>
+      <a href="#" class="btn nav-jump mt-9" data-i="1">Commission the Firm ↗</a>
+    </div></div>
   </section>
 
-
-  <!-- ───── CHAPTER 4 · VERDICTS ───── -->
-  <section class="panel" id="chapter-4" data-section="3" aria-labelledby="c4-h">
-    <div class="panel-grid">
-      <div class="editorial">
-        <div class="mask mb-6"><span class="mask-inner"><span class="eyebrow">Chapter 04 — The Record</span></span></div>
-        <h2 id="c4-h" class="display mb-10" style="font-size:clamp(2rem,5vw,4.5rem)">
-          <span class="mask"><span class="mask-inner">The record <span class="ital">speaks.</span></span></span>
-        </h2>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-px" style="background:var(--hairline)">
-          <article class="verdict" role="article" aria-label="Record verdict">
-            <p class="eyebrow mb-4" style="color:var(--crimson)">Antitrust · 2019</p>
-            <p class="verdict-figure mb-3">$420M</p>
-            <p class="body-copy" style="font-size:11px">Largest single antitrust verdict in the district in a decade. Affirmed on appeal without modification.</p>
-          </article>
-          <article class="verdict" role="article" aria-label="Supreme Court precedent">
-            <p class="eyebrow mb-4" style="color:var(--crimson)">Constitutional · 2021</p>
-            <p class="verdict-figure mb-3">SCOTUS</p>
-            <p class="body-copy" style="font-size:11px">Argued and won before the Supreme Court. Opinion cited in fourteen subsequent circuit decisions.</p>
-          </article>
-          <article class="verdict" role="article" aria-label="Trial success rate">
-            <p class="eyebrow mb-4" style="color:var(--crimson)">Institutional · 30 Yrs</p>
-            <p class="verdict-figure mb-3">98.4%</p>
-            <p class="body-copy" style="font-size:11px">Across 847 tried cases over three decades — the benchmark for institutional litigation in North America.</p>
-          </article>
-        </div>
-      </div>
-      <div class="stage" id="stage-verdicts"></div>
-    </div>
-  </section>
-
-
-  <!-- ───── CHAPTER 5 · INTAKE ───── -->
-  <section class="panel" id="chapter-5" data-section="4" aria-labelledby="c5-h">
-    <div class="panel-grid split-5050">
-      <div class="editorial">
-        <div class="mask mb-6"><span class="mask-inner"><span class="eyebrow">Chapter 05 — Council Intake</span></span></div>
-        <h2 id="c5-h" class="display mb-8" style="font-size:clamp(2rem,4.6vw,4rem)">
-          <span class="mask"><span class="mask-inner">Commission the <span class="ital">firm.</span></span></span>
-        </h2>
-        <div class="mask mb-9" style="max-width:26rem"><span class="mask-inner"><p class="body-copy">
-          We accept new mandates by referral and direct inquiry. Complete the terminal to initiate first contact.
-        </p></span></div>
-        <form id="intake-form" role="form" aria-label="Council intake" style="max-width:30rem">
-          <div class="intake-field">
-            <label class="intake-label" for="f-name">Full Name</label>
-            <input class="intake-input" id="f-name" type="text" placeholder="First &amp; Last" autocomplete="name" aria-required="true" />
-          </div>
-          <div class="intake-field">
-            <label class="intake-label" for="f-email">Corporate Email</label>
-            <input class="intake-input" id="f-email" type="email" placeholder="name@organization.com" autocomplete="email" aria-required="true" />
-          </div>
-          <div class="intake-field">
-            <label class="intake-label" for="f-scope">Scope Area</label>
-            <select class="intake-input intake-select" id="f-scope" aria-required="true">
-              <option value="" disabled selected>Select a jurisdiction</option>
-              <option>Civil Litigation</option><option>Criminal Defense</option>
-              <option>Family &amp; Estate</option><option>Corporate Warfare</option>
-              <option>Intellectual Property</option><option>Constitutional</option>
-            </select>
-          </div>
-          <button type="button" class="btn-primary mt-3" id="intake-submit" aria-label="Transmit mandate">Transmit Mandate ↗</button>
-        </form>
-      </div>
-      <div class="stage" id="stage-intake">
-        <img class="stage-photo" alt="Law office interior"
-          src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=1600&auto=format&fit=crop"
-          onerror="this.style.display='none'" />
-      </div>
-    </div>
-  </section>
-
-</main>
+</div>
 
 
 <script>
 /* ═══════════════════════════════════════════════════════════
-   SOVEREIGN & PARTNERS — Editorial 3D Engine
+   SOVEREIGN & PARTNERS — Courtroom Camera Flythrough
    ═══════════════════════════════════════════════════════════ */
 gsap.registerPlugin(ScrollTrigger);
-const IS_MOBILE = window.matchMedia('(max-width: 767px)').matches;
-const RIGHT = 4.2;            // stage X for right-anchored meshes
-const GAP_FADE = 18;          // off-stage distance
+const IS_MOBILE = window.matchMedia('(max-width:767px)').matches;
 
-/* ───── RENDERER / SCENE / CAMERA ───── */
-let scene, camera, renderer, envTex, clock;
-const canvas = document.getElementById('webgl-canvas');
+const Z_START = 5, Z_END = -90;
+const MILESTONE = [-10, -35, -60, -85];   // gavel, scales, codex, rings
 
-function makeEnvTexture(){
-  const c = document.createElement('canvas'); c.width = 512; c.height = 256;
-  const x = c.getContext('2d');
-  const g = x.createLinearGradient(0,0,0,256);
-  g.addColorStop(0,'#46464a'); g.addColorStop(0.34,'#101012');
-  g.addColorStop(0.7,'#070708'); g.addColorStop(1,'#5c070f');
-  x.fillStyle = g; x.fillRect(0,0,512,256);
-  // bright key reflection streak
-  let r = x.createRadialGradient(370,46,4,370,46,130);
-  r.addColorStop(0,'rgba(255,255,255,0.95)'); r.addColorStop(1,'rgba(255,255,255,0)');
-  x.fillStyle = r; x.fillRect(0,0,512,256);
-  // crimson rim reflection
-  r = x.createRadialGradient(120,210,4,120,210,150);
-  r.addColorStop(0,'rgba(210,22,38,0.85)'); r.addColorStop(1,'rgba(210,22,38,0)');
-  x.fillStyle = r; x.fillRect(0,0,512,256);
-  const t = new THREE.CanvasTexture(c);
-  t.mapping = THREE.EquirectangularReflectionMapping;
-  t.encoding = THREE.sRGBEncoding;
-  return t;
+/* ───── ENV MAP (procedural reflections) ───── */
+function makeEnv(){
+  const c=document.createElement('canvas'); c.width=512; c.height=256; const x=c.getContext('2d');
+  const g=x.createLinearGradient(0,0,0,256);
+  g.addColorStop(0,'#3a3a40'); g.addColorStop(0.45,'#101013'); g.addColorStop(1,'#050506');
+  x.fillStyle=g; x.fillRect(0,0,512,256);
+  let r=x.createRadialGradient(360,50,4,360,50,140); r.addColorStop(0,'rgba(255,255,255,0.9)'); r.addColorStop(1,'rgba(255,255,255,0)');
+  x.fillStyle=r; x.fillRect(0,0,512,256);
+  const t=new THREE.CanvasTexture(c); t.mapping=THREE.EquirectangularReflectionMapping; t.encoding=THREE.sRGBEncoding; return t;
+}
+
+/* ───── SCENE / CAMERA / RENDERER ───── */
+const canvas=document.getElementById('webgl');
+const scene=new THREE.Scene();
+const DARK_BG=new THREE.Color(0x0a0a0a), LIGHT_BG=new THREE.Color(0xe8e6e0);
+const DARK_FOG=new THREE.Color(0x0a0a0a), LIGHT_FOG=new THREE.Color(0xdad8d2);
+scene.background=DARK_BG.clone();
+scene.fog=new THREE.FogExp2(0x0a0a0a, 0.015);
+const envTex=makeEnv(); scene.environment=envTex;
+
+const camera=new THREE.PerspectiveCamera(IS_MOBILE?62:50, innerWidth/innerHeight, 0.1, 300);
+camera.position.set(0, 1.3, Z_START);
+
+const renderer=new THREE.WebGLRenderer({canvas, antialias:true});
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.05;
+renderer.outputEncoding=THREE.sRGBEncoding;
+
+
+/* ───── LIGHTS ───── */
+const keyLight=new THREE.DirectionalLight(0xffffff, 3.2); keyLight.position.set(6,12,4); scene.add(keyLight);
+const fillLight=new THREE.DirectionalLight(0xbfc4ff, 0.8); fillLight.position.set(-6,4,-10); scene.add(fillLight);
+const ambient=new THREE.AmbientLight(0x404040, 1.0); scene.add(ambient);
+// travelling overhead lamps add rhythm to the hallway
+const lampLights=[];
+for(let z=0; z>=-100; z-=14){
+  const p=new THREE.PointLight(0xffffff, 1.3, 22, 2); p.position.set(0,7,z); scene.add(p); lampLights.push(p);
+}
+// crimson interactive spotlight (raycast-driven, hits the scales)
+const redSpot=new THREE.SpotLight(0xd11829, 0, 60, Math.PI/7, 0.4, 1.0);
+redSpot.position.set(0,9,-30); scene.add(redSpot);
+const redTarget=new THREE.Object3D(); redTarget.position.set(0,0,MILESTONE[1]); scene.add(redTarget); redSpot.target=redTarget;
+
+/* ───── MATERIALS ───── */
+function obsidian(){ return new THREE.MeshStandardMaterial({color:0x111111, roughness:0.12, metalness:0.9, envMap:envTex, envMapIntensity:1.2}); }
+function chrome(){ return new THREE.MeshStandardMaterial({color:0x202024, roughness:0.2, metalness:0.95, envMap:envTex, envMapIntensity:1.4}); }
+function stone(){ return new THREE.MeshStandardMaterial({color:0x6f6f6f, roughness:0.45, metalness:0.35, envMap:envTex, envMapIntensity:0.6}); }
+
+/* ───── MARBLE FLOOR ───── */
+const floor=new THREE.Mesh(
+  new THREE.PlaneGeometry(60, 240),
+  new THREE.MeshStandardMaterial({color:0x0c0c0d, roughness:0.08, metalness:0.85, envMap:envTex, envMapIntensity:1.1})
+);
+floor.rotation.x=-Math.PI/2; floor.position.set(0,-1.6,-90); scene.add(floor);
+const ceiling=floor.clone(); ceiling.position.y=9; ceiling.rotation.x=Math.PI/2; scene.add(ceiling);
+
+
+/* ───── PILLAR HALLWAY (z = 0 → -100) ───── */
+const pillarGeo=new THREE.CylinderGeometry(0.7, 0.8, 11, 28, 1);
+const fluteGeo=new THREE.CylinderGeometry(0.74, 0.74, 11, 8, 1, true); // subtle outer detail
+for(let z=0; z>=-100; z-=8){
+  [-6, 6].forEach(x=>{
+    const p=new THREE.Mesh(pillarGeo, stone());
+    p.position.set(x, 2.9, z); scene.add(p);
+    // base + capital blocks
+    const base=new THREE.Mesh(new THREE.BoxGeometry(2,0.5,2), chrome()); base.position.set(x,-2.65,z); scene.add(base);
+    const cap=new THREE.Mesh(new THREE.BoxGeometry(2,0.5,2), chrome()); cap.position.set(x,8.4,z); scene.add(cap);
+  });
 }
 
 
-let crimsonSpot; // interactive spotlight for the scales
-function initThree(){
-  scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(0x070707, 16, 40);   // depth haze for the deep-Z codex
-  envTex = makeEnvTexture();
-  scene.environment = envTex;
-
-  camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 100);
-  camera.position.set(0, 0, 11);
-  camera.lookAt(0, 0, 0);
-
-  renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true });
-  renderer.setClearColor(0x000000, 0);
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.1;
-  renderer.outputEncoding = THREE.sRGBEncoding;
-
-  /* High-contrast lighting */
-  const key = new THREE.DirectionalLight(0xffffff, 8);
-  key.position.set(8, 10, 8); scene.add(key);
-  const rim = new THREE.DirectionalLight(0xff0a1e, 5);
-  rim.position.set(-8, -3, -6); scene.add(rim);
-  const ambient = new THREE.AmbientLight(0x161616, 0.7); scene.add(ambient);
-  crimsonSpot = new THREE.SpotLight(0xd11829, 0, 30, Math.PI/6, 0.4, 1.2);
-  crimsonSpot.position.set(RIGHT+2, 2, 6); scene.add(crimsonSpot);
-  const spotTarget = new THREE.Object3D(); spotTarget.position.set(RIGHT,0,0);
-  scene.add(spotTarget); crimsonSpot.target = spotTarget;
-}
-
-/* ───── MATERIALS (Polished Obsidian / Dark Chrome) ───── */
-function obsidian(){ return new THREE.MeshStandardMaterial({ color:0x111111, roughness:0.1, metalness:0.9, envMap:envTex, envMapIntensity:1.25 }); }
-function chrome(){ return new THREE.MeshStandardMaterial({ color:0x1c1c1f, roughness:0.18, metalness:0.95, envMap:envTex, envMapIntensity:1.4 }); }
-
-
-/* ───── MESH 0: GAVEL ───── */
+/* ───── FOCAL OBJECTS ───── */
 function buildGavel(){
-  const g = new THREE.Group();
-  const mallet = new THREE.Group();
-  const head = new THREE.Mesh(new THREE.CylinderGeometry(0.42,0.42,1.9,48), obsidian());
-  head.rotation.z = Math.PI/2; mallet.add(head);
-  [-0.95,0.95].forEach(x=>{ const c=new THREE.Mesh(new THREE.CylinderGeometry(0.48,0.48,0.22,48),chrome()); c.rotation.z=Math.PI/2; c.position.x=x; mallet.add(c); });
-  const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.13,2.2,32), obsidian());
-  handle.position.y=-1.25; mallet.add(handle);
-  mallet.rotation.z = 0.34; g.add(mallet);
-  const base = new THREE.Mesh(new THREE.CylinderGeometry(1.5,1.65,0.4,8), chrome());
-  base.position.y=-1.9; g.add(base);
-  g.userData.mallet = mallet; return g;
+  const g=new THREE.Group(); const mallet=new THREE.Group();
+  const head=new THREE.Mesh(new THREE.CylinderGeometry(0.4,0.4,1.8,48),obsidian()); head.rotation.z=Math.PI/2; mallet.add(head);
+  [-0.9,0.9].forEach(x=>{const c=new THREE.Mesh(new THREE.CylinderGeometry(0.46,0.46,0.2,48),chrome());c.rotation.z=Math.PI/2;c.position.x=x;mallet.add(c);});
+  const h=new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.13,2.1,32),obsidian()); h.position.y=-1.2; mallet.add(h);
+  mallet.rotation.z=0.34; g.add(mallet);
+  g.userData.spin=mallet; return g;
 }
-
-/* ───── MESH 1: LADY JUSTICE (scales) ───── */
-function buildJustice(){
-  const g = new THREE.Group();
-  g.add(new THREE.Mesh(new THREE.CylinderGeometry(0.13,0.2,3.6,32), obsidian()));
-  const fin = new THREE.Mesh(new THREE.SphereGeometry(0.24,32,32), chrome()); fin.position.y=1.9; g.add(fin);
-  const bar = new THREE.Mesh(new THREE.BoxGeometry(3.4,0.12,0.12), chrome()); bar.position.y=1.62; g.add(bar);
-  const scales=[];
-  [-1.6,1.6].forEach(x=>{
-    const s=new THREE.Mesh(new THREE.CylinderGeometry(0.016,0.016,0.95,8),obsidian()); s.position.set(x,1.15,0); g.add(s);
-    const d=new THREE.Mesh(new THREE.CylinderGeometry(0.6,0.6,0.07,48),chrome()); d.position.set(x,0.64,0); g.add(d); scales.push(d);
-  });
-  g.userData.bar = bar; g.userData.scales = scales; return g;
+function buildScales(){
+  const g=new THREE.Group();
+  g.add(new THREE.Mesh(new THREE.CylinderGeometry(0.13,0.2,3.6,32),obsidian()));
+  const bar=new THREE.Mesh(new THREE.BoxGeometry(3.4,0.12,0.12),chrome()); bar.position.y=1.6; g.add(bar);
+  const fin=new THREE.Mesh(new THREE.SphereGeometry(0.22,32,32),chrome()); fin.position.y=1.95; g.add(fin);
+  [-1.6,1.6].forEach(x=>{ const s=new THREE.Mesh(new THREE.CylinderGeometry(0.015,0.015,0.95,8),obsidian()); s.position.set(x,1.15,0); g.add(s);
+    const d=new THREE.Mesh(new THREE.CylinderGeometry(0.6,0.6,0.07,48),chrome()); d.position.set(x,0.64,0); g.add(d); });
+  g.userData.bar=bar; return g;
 }
-
-/* ───── MESH 2: CODEX (legal volumes) ───── */
 function buildCodex(){
-  const g = new THREE.Group();
-  const H=[3.0,3.5,2.7,3.3]; let xo=-1.7;
-  H.forEach((h,i)=>{ const w=0.72;
-    const v=new THREE.Mesh(new THREE.BoxGeometry(w,h,1.7), i%2?chrome():obsidian());
-    v.position.set(xo,(h-3.5)/2,0); v.rotation.z=(i-1.5)*0.05; g.add(v); xo+=w+0.45; });
+  const g=new THREE.Group(); const H=[3.0,3.5,2.7,3.3]; let xo=-1.7;
+  H.forEach((h,i)=>{const w=0.72; const v=new THREE.Mesh(new THREE.BoxGeometry(w,h,1.7), i%2?chrome():obsidian()); v.position.set(xo,(h-3.5)/2,0); v.rotation.z=(i-1.5)*0.05; g.add(v); xo+=w+0.45;});
   return g;
 }
-
-/* ───── MESH 3: IRON BONDS (rings) ───── */
-function buildBonds(){
+function buildRings(){
   const g=new THREE.Group();
-  [-1.35,0,1.35].forEach((x,i)=>{ const r=new THREE.Mesh(new THREE.TorusGeometry(0.9,0.17,24,64), i===1?chrome():obsidian()); r.position.x=x; r.rotation.y=i%2?Math.PI/2:0; g.add(r); });
+  [-1.35,0,1.35].forEach((x,i)=>{const r=new THREE.Mesh(new THREE.TorusGeometry(0.9,0.17,24,64), i===1?chrome():obsidian()); r.position.x=x; r.rotation.y=i%2?Math.PI/2:0; g.add(r);});
   return g;
 }
 
-/* ───── MESH 4: SEAL (corner emblem) ───── */
-function buildSeal(){
-  const g=new THREE.Group();
-  g.add(new THREE.Mesh(new THREE.TorusKnotGeometry(0.7,0.22,128,24,2,3), chrome()));
-  return g;
+const focal=[buildGavel(), buildScales(), buildCodex(), buildRings()];
+focal.forEach((f,i)=>{ f.position.set(0, 0.4, MILESTONE[i]); scene.add(f); });
+const scales=focal[1]; // referenced by the raycast spotlight
+
+
+/* ───── HELPERS ───── */
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+function lightFactor(z){
+  // triangle peaking at the Scales (z=-35): dark→white→dark
+  if(z>=MILESTONE[0]) return 0;
+  if(z>=MILESTONE[1]) return (MILESTONE[0]-z)/(MILESTONE[0]-MILESTONE[1]);     // -10..-35 → 0..1
+  if(z>=MILESTONE[2]) return 1-(MILESTONE[1]-z)/(MILESTONE[1]-MILESTONE[2]);   // -35..-60 → 1..0
+  return 0;
 }
+const root=document.documentElement;
+const sections=[...document.querySelectorAll('.section')];
+const navItems=[...document.querySelectorAll('.vnav-item')];
 
-
-/* ───── INSTANTIATE + STAGE SYSTEM ───── */
-let meshes = [], activeIdx = 0;
-// Per-section stage transform: right-anchored, except codex (deep center) & seal (corner)
-const STAGE = [
-  { x:RIGHT, y:0.0,  z:0,   s:1.05 },  // 0 gavel
-  { x:RIGHT, y:-0.2, z:0,   s:0.92 },  // 1 justice
-  { x:0,     y:-0.4, z:-15, s:1.95 },  // 2 codex (deep Z, behind text)
-  { x:RIGHT, y:0.0,  z:0,   s:1.05 },  // 3 bonds
-  { x:4.9,   y:2.5,  z:0,   s:0.5  },  // 4 seal (corner of 50/50)
-];
-
-function buildMeshes(){
-  const factories = [buildGavel, buildJustice, buildCodex, buildBonds, buildSeal];
-  meshes = factories.map((f, i) => {
-    const m = f();
-    const c = STAGE[i];
-    m.position.set(c.x, c.y + 4, c.z); // start lifted + hidden
-    m.scale.setScalar(0.0001);
-    scene.add(m);
-    return m;
-  });
-}
-
-function showMesh(idx){
-  meshes.forEach((m, j) => {
-    const c = STAGE[j];
-    if (j === idx){
-      gsap.to(m.position, { x:c.x, y:c.y, z:c.z, duration:1.1, ease:'power3.out' });
-      gsap.to(m.scale, { x:c.s, y:c.s, z:c.s, duration:1.1, ease:'power3.out' });
-    } else {
-      gsap.to(m.scale, { x:0.0001, y:0.0001, z:0.0001, duration:0.6, ease:'power2.in' });
-      gsap.to(m.position, { y:c.y + 4, duration:0.6, ease:'power2.in' });
-    }
-  });
-}
-
-/* ───── RENDER LOOP ───── */
-function render(){
-  requestAnimationFrame(render);
-  const t = clock.getElapsedTime();
-  if (meshes[0]){ meshes[0].rotation.y = Math.sin(t*0.3)*0.4; meshes[0].position.y += 0; const ml=meshes[0].userData.mallet; if(ml) ml.rotation.z = 0.34 + Math.sin(t*1.3)*0.05; }
-  if (meshes[1]) meshes[1].rotation.y = Math.sin(t*0.25)*0.3;
-  if (meshes[2]) meshes[2].rotation.y += 0.0016;
-  if (meshes[3]) meshes[3].rotation.y += 0.006;
-  if (meshes[4]){ meshes[4].rotation.y += 0.01; meshes[4].rotation.x = Math.sin(t*0.6)*0.3; }
-  renderer.render(scene, camera);
-}
-
-
-/* ═══════════════ PRELOADER ═══════════════ */
-const countObj = { v: 0 };
-const countEl = document.getElementById('preloader-count');
-const preTL = gsap.timeline({ onComplete: startExperience });
-preTL.to(countObj, { v:100, duration:2.2, ease:'power1.inOut',
-  onUpdate:()=>{ countEl.textContent = String(Math.floor(countObj.v)).padStart(3,'0'); } });
-preTL.addLabel('exit', '+=0.15');
-preTL.to('.preloader-half.left',  { xPercent:-100, duration:0.9, ease:'power4.inOut' }, 'exit');
-preTL.to('.preloader-half.right', { xPercent:100,  duration:0.9, ease:'power4.inOut' }, 'exit');
-preTL.to('.preloader-inner', { opacity:0, duration:0.4, ease:'power2.in' }, 'exit');
-preTL.set('#preloader', { display:'none' });
-
-/* ═══════════════ MAIN EXPERIENCE ═══════════════ */
-let clockStarted = false;
-function startExperience(){
-  document.body.classList.remove('loading');
-
-  if (!IS_MOBILE){
-    initThree();
-    buildMeshes();
-    clock = new THREE.Clock();
-    render();
-    buildScrollSystem();
-  } else {
-    // Mobile: reveal every panel's masked type immediately (vertical stack)
-    document.querySelectorAll('.mask-inner').forEach(el => gsap.set(el, { yPercent:0 }));
-  }
-}
-
-
-/* ───── LENIS + HORIZONTAL SCROLL + SNAP ───── */
-let lenis, totalPanels = 5;
-function buildScrollSystem(){
-  const container = document.getElementById('horizontal-scroll');
-  const panels = gsap.utils.toArray('.panel');
-  const navItems = gsap.utils.toArray('.nav-item');
-  totalPanels = panels.length;
-
-  lenis = new Lenis({ duration:1.15, smoothWheel:true, lerp:0.085 });
-  window.__lenis = lenis;
+/* ───── SCROLL → CAMERA (scrubbed) ───── */
+let progress=0, lenis;
+function initScroll(){
+  lenis=new Lenis({duration:1.2, smoothWheel:true, lerp:0.08});
+  window.__lenis=lenis;
   lenis.on('scroll', ScrollTrigger.update);
-  gsap.ticker.add((time)=> lenis.raf(time*1000));
+  gsap.ticker.add(t=>lenis.raf(t*1000));
   gsap.ticker.lagSmoothing(0);
 
-  // Vertical spacer drives the fixed horizontal track
-  const spacer = document.createElement('div');
-  spacer.id = 'scroll-spacer';
-  spacer.style.cssText = 'height:'+(totalPanels*100)+'vh;width:1px;position:relative;z-index:-2;pointer-events:none;';
-  document.body.appendChild(spacer);
-
-  const maxX = () => (container.scrollWidth - window.innerWidth);
-
-  ScrollTrigger.create({
-    trigger: spacer, start:'top top', end:'bottom bottom', scrub: 1,
-    snap: { snapTo: 1/(totalPanels-1), duration:{min:0.25,max:0.6}, ease:'power2.inOut', delay:0.04 },
-    invalidateOnRefresh: true,
-    onRefresh: () => gsap.set(container, { x: -maxX()*(window.__p||0) }),
-    onUpdate: (self) => {
-      const p = self.progress; window.__p = p;
-      gsap.set(container, { x: -maxX()*p });
-      const idx = Math.round(p*(totalPanels-1));
-      if (idx !== activeIdx) setActiveSection(idx, navItems);
-    }
+  gsap.to(camera.position, {
+    z: Z_END, ease:'none',
+    scrollTrigger:{ trigger:document.body, start:'top top', end:'bottom bottom', scrub:1,
+      onUpdate:self=>{ progress=self.progress; } }
   });
+}
 
-  setActiveSection(0, navItems);
+/* ───── THEME + TEXT MORPH (per frame) ───── */
+const FADE=11;
+function updateScene(){
+  const z=camera.position.z;
+  // floating / walking motion
+  camera.position.y = 1.3 + Math.sin(progress*Math.PI*8)*0.22;
+  camera.position.x = Math.sin(progress*Math.PI*5)*0.18;
+  camera.lookAt(0, 0.45, z - 14);
+
+  // light/dark morph
+  const t=clamp(lightFactor(z),0,1);
+  scene.background.copy(DARK_BG).lerp(LIGHT_BG,t);
+  scene.fog.color.copy(DARK_FOG).lerp(LIGHT_FOG,t);
+  scene.fog.density = 0.015 - t*0.006;
+  // high-contrast text flip (WCAG): light text on dark, dark text on light
+  const flip = clamp((t-0.4)/0.2, 0, 1);
+  root.style.setProperty('--ui-text', flip>0.5 ? '#141414' : '#f4f3ef');
+  root.style.setProperty('--ui-dim',  flip>0.5 ? '#4a4a48' : '#8a8a86');
+
+  // section fade by proximity to milestone
+  sections.forEach((sec,i)=>{
+    const d=Math.abs(z-MILESTONE[i]);
+    let op=clamp(1-(d/FADE),0,1);
+    // Overview is the landing scene: keep it lit at the very top, then hand off to proximity
+    if(i===0) op=Math.max(op, clamp(1-progress/0.12,0,1));
+    sec.style.opacity=op;
+    sec.style.pointerEvents = op>0.55 ? 'auto':'none';
+    sec.style.transform = 'translateY('+((1-op)*22)+'px)';
+  });
+  // active nav = nearest milestone
+  let near=0,best=1e9;
+  MILESTONE.forEach((mz,i)=>{const d=Math.abs(z-mz); if(d<best){best=d;near=i;}});
+  navItems.forEach((n,i)=>n.classList.toggle('active', i===near));
+  // progress bar + scroll cue
+  document.getElementById('progress-fill').style.height=(progress*100)+'%';
+  document.getElementById('scroll-cue').style.opacity = progress>0.04 ? 0 : 0.7;
 }
 
 
-/* ───── SECTION ACTIVATION (nav + masked reveal + 3D stage) ───── */
-const revealed = new Set();
-function revealPanel(idx){
-  if (revealed.has(idx)) return;
-  revealed.add(idx);
-  const panel = document.querySelector('.panel[data-section="'+idx+'"]');
-  if (!panel) return;
-  gsap.to(panel.querySelectorAll('.mask-inner'), {
-    yPercent: 0, duration: 1.0, stagger: 0.09, ease: 'power4.out'
-  });
-}
-function setActiveSection(idx, navItems){
-  activeIdx = idx;
-  navItems = navItems || gsap.utils.toArray('.nav-item');
-  navItems.forEach((it,i)=> it.classList.toggle('active', i===idx));
-  revealPanel(idx);
-  if (!IS_MOBILE) showMesh(idx);
-}
-
-/* ───── SERVICE ACCORDION → tilt scales + crimson spotlight ───── */
-document.querySelectorAll('.service').forEach(item => {
-  const tilt = parseFloat(item.dataset.tilt || '0');
-  item.addEventListener('mouseenter', ()=>{
-    item.setAttribute('aria-expanded','true');
-    const j = meshes[1];
-    if (j && j.userData.bar){ gsap.to(j.userData.bar.rotation, { z: tilt, duration:0.5, ease:'power2.out' }); }
-    if (crimsonSpot) gsap.to(crimsonSpot, { intensity: 6, duration:0.4 });
-  });
-  item.addEventListener('mouseleave', ()=>{
-    item.setAttribute('aria-expanded','false');
-    const j = meshes[1];
-    if (j && j.userData.bar){ gsap.to(j.userData.bar.rotation, { z:0, duration:0.6, ease:'power2.out' }); }
-    if (crimsonSpot) gsap.to(crimsonSpot, { intensity: 0, duration:0.5 });
-  });
-  item.addEventListener('keydown', (e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); item.classList.toggle('open'); } });
-});
-
-/* ───── VERDICT HOVER → flex the iron bonds ───── */
-document.querySelectorAll('.verdict').forEach(card => {
-  card.addEventListener('mouseenter', ()=>{
-    const b = meshes[3];
-    if (b){ gsap.to(b.rotation, { y:'+='+(Math.PI*0.8), z:0.25, duration:0.6, ease:'power3.out' }); }
-  });
-  card.addEventListener('mouseleave', ()=>{
-    const b = meshes[3];
-    if (b) gsap.to(b.rotation, { z:0, duration:0.6, ease:'power2.out' });
-  });
-});
-
-
-/* ───── INTAKE SUBMIT ───── */
-document.getElementById('intake-submit').addEventListener('click', ()=>{
-  const name = document.getElementById('f-name').value.trim();
-  const email = document.getElementById('f-email').value.trim();
-  const scope = document.getElementById('f-scope').value;
-  const form = document.getElementById('intake-form');
-  if (!name || !email || !scope){
-    gsap.fromTo(form, { x:-6 }, { x:0, duration:0.45, ease:'elastic.out(1,0.3)' });
-    return;
+/* ───── RAYCASTER (card hover → red spotlight isolates the Scales) ───── */
+const raycaster=new THREE.Raycaster();
+function strikeScales(on){
+  if(on){
+    // cast from camera toward the scales; place the spotlight on the hit point
+    const dir=new THREE.Vector3().subVectors(scales.position, camera.position).normalize();
+    raycaster.set(camera.position, dir);
+    const hits=raycaster.intersectObject(scales, true);
+    const p = hits.length ? hits[0].point : scales.position;
+    redTarget.position.copy(p);
+    redSpot.position.set(p.x, p.y+8, p.z+5);
+    gsap.to(redSpot,{intensity:9, duration:0.45, overwrite:true});
+  } else {
+    gsap.to(redSpot,{intensity:0, duration:0.6, overwrite:true});
   }
-  if (meshes[4]) gsap.to(meshes[4].position, { z:-10, y:5, duration:1.1, ease:'power3.in' });
-  const btn = document.getElementById('intake-submit');
-  btn.textContent = 'Mandate Received ✓';
-  btn.style.pointerEvents = 'none';
-  btn.style.background = '#1c4a1c';
+}
+
+/* ───── CARD HOVER (tilt + crimson) ───── */
+document.querySelectorAll('.card').forEach(card=>{
+  card.addEventListener('mousemove', e=>{
+    const r=card.getBoundingClientRect();
+    const rx=((e.clientY-r.top)/r.height-0.5)*-12;
+    const ry=((e.clientX-r.left)/r.width-0.5)*12;
+    gsap.to(card,{rotateX:rx, rotateY:ry, transformPerspective:900, duration:0.3, ease:'power2.out'});
+  });
+  card.addEventListener('mouseenter', ()=>strikeScales(true));
+  card.addEventListener('focus', ()=>strikeScales(true));
+  card.addEventListener('mouseleave', ()=>{ gsap.to(card,{rotateX:0,rotateY:0,duration:0.5,ease:'power2.out'}); strikeScales(false); });
+  card.addEventListener('blur', ()=>{ gsap.to(card,{rotateX:0,rotateY:0,duration:0.5}); strikeScales(false); });
 });
 
-/* ───── NAV NAVIGATION ───── */
-function scrollToSection(target){
-  const spacer = document.getElementById('scroll-spacer');
-  if (!spacer || !window.__lenis){ return; }
-  const totalScroll = spacer.offsetHeight - window.innerHeight;
-  window.__lenis.scrollTo(totalScroll * (target/(totalPanels-1)), { duration:1.5 });
+/* ───── RENDER LOOP ───── */
+const clock=new THREE.Clock();
+function render(){
+  requestAnimationFrame(render);
+  const t=clock.getElapsedTime();
+  focal[0].userData.spin && (focal[0].userData.spin.rotation.z = 0.34 + Math.sin(t*1.2)*0.05);
+  focal[0].rotation.y = Math.sin(t*0.3)*0.4;
+  focal[1].rotation.y = Math.sin(t*0.25)*0.3;
+  focal[2].rotation.y += 0.0018;
+  focal[3].rotation.y += 0.006;
+  updateScene();
+  renderer.render(scene,camera);
 }
-document.querySelectorAll('.nav-item').forEach(it=>{
-  it.addEventListener('click', ()=> scrollToSection(parseInt(it.dataset.index,10)));
-});
-document.querySelectorAll('.nav-jump').forEach(a=>{
-  a.addEventListener('click', (e)=>{
-    // Desktop: smooth Lenis jump. Mobile: let the native #anchor work.
-    if (window.__lenis){ e.preventDefault(); scrollToSection(parseInt(a.dataset.target,10)); }
-  });
-});
+
+
+/* ───── NAV WARP (smooth scroll → scrub drives camera, no jumps) ───── */
+function warpTo(i){
+  const zT=MILESTONE[i];
+  const frac=clamp((zT-Z_START)/(Z_END-Z_START),0,1);
+  const maxScroll=document.body.scrollHeight - window.innerHeight;
+  if(window.__lenis) window.__lenis.scrollTo(frac*maxScroll, {duration:1.6});
+  else window.scrollTo({top:frac*maxScroll, behavior:'smooth'});
+}
+document.querySelectorAll('.vnav-item').forEach(n=> n.addEventListener('click', ()=>warpTo(parseInt(n.dataset.i,10))));
+document.querySelectorAll('.nav-jump').forEach(a=> a.addEventListener('click', e=>{ e.preventDefault(); warpTo(parseInt(a.dataset.i,10)); }));
 
 /* ───── RESIZE ───── */
 window.addEventListener('resize', ()=>{
-  if (renderer && camera){
-    camera.aspect = window.innerWidth/window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
-  }
+  camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth,innerHeight); renderer.setPixelRatio(Math.min(devicePixelRatio,2));
   ScrollTrigger.refresh();
 });
+
+/* ───── BOOT / LOADER ───── */
+function boot(){
+  initScroll();
+  render();
+  const obj={v:0};
+  gsap.to(obj,{v:100,duration:1.6,ease:'power1.inOut',
+    onUpdate:()=>{ const v=Math.floor(obj.v); document.getElementById('loader-pct').textContent=v+'%'; document.getElementById('loader-bar').style.width=v+'%'; },
+    onComplete:()=>{ const l=document.getElementById('loader'); l.style.opacity='0'; setTimeout(()=>l.style.display='none',800);
+      gsap.from('#sec-0 .wrap > div > *',{y:40,opacity:0,duration:1,stagger:0.1,ease:'power3.out'}); }
+  });
+}
+window.addEventListener('load', boot);
 </script>
 </body>
 </html>
