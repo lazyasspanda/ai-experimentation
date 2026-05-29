@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>SOVEREIGN &amp; PARTNERS — The Sovereignty 3D Engine</title>
-<meta name="description" content="Litigation architects. A high-contrast structural courtroom interface engineered for absolute dominance." />
+<title>SOVEREIGN &amp; PARTNERS — Litigation Architects</title>
+<meta name="description" content="A hyper-premium editorial legal practice. Polished obsidian, chalk white, anodized crimson." />
 
 <!-- Utility-first CSS -->
 <script src="https://cdn.tailwindcss.com"></script>
@@ -12,7 +12,7 @@
 <!-- Typography -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
 <!-- Global Motion Stack -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -25,14 +25,11 @@
     theme: {
       extend: {
         colors: {
-          'void': '#0d0d0d',
-          'slate-surface': '#121212',
-          'chalk': '#f9f9f9',
-          'cement': '#8e8e93',
-          'crimson': '#c50e1f',
-          'stone': '#f4f4f0',
-          'ink': '#1a1a1a',
-          'muted-light': '#636366',
+          'obsidian': '#070707',
+          'obsidian-soft': '#0e0e0e',
+          'chalk': '#f4f3ef',
+          'concrete': '#8a8a86',
+          'crimson': '#d11829',
         },
         fontFamily: {
           'sans': ['Inter', 'sans-serif'],
@@ -47,1250 +44,771 @@
 <style>
 /* ===== DESIGN TOKENS ===== */
 :root{
-  /* Dark Sections (1, 4, 5) */
-  --bg-dark-void:     #0d0d0d;
-  --text-dark-chalk:  #f9f9f9;
-  --text-dark-muted:  #8e8e93;
-
-  /* Light Sections (2, 3) */
-  --bg-light-stone:   #f4f4f0;
-  --text-light-ink:   #1a1a1a;
-  --text-light-muted: #636366;
-
-  /* Universal */
-  --accent-crimson:   #c50e1f;
-  --border-hairline:  rgba(142, 142, 147, 0.2);
+  --obsidian:      #070707;  /* Polished Obsidian */
+  --obsidian-soft: #0e0e0e;  /* Panel surface */
+  --chalk:         #f4f3ef;  /* Chalk White */
+  --concrete:      #8a8a86;  /* Concrete Grey */
+  --crimson:       #d11829;  /* Anodized Crimson */
+  --hairline:      rgba(244, 243, 239, 0.10);
   --font-sans: 'Inter', sans-serif;
   --font-serif: 'Instrument Serif', serif;
-
-  /* Back-compat aliases (existing rules reference these) */
-  --bg-void:        #0d0d0d;
-  --surface-slate:  #121212;
-  --text-chalk:     #f9f9f9;
-  --text-cement:    #8e8e93;
 }
 *{ margin:0; padding:0; box-sizing:border-box; }
-html{ background: var(--bg-void); }
+html{ background: var(--obsidian); }
 body{
-  background: var(--bg-void);
-  color: var(--text-chalk);
+  background: var(--obsidian);
+  color: var(--chalk);
   font-family: var(--font-sans);
   overflow-x: hidden;
   width: 100%;
+  -webkit-font-smoothing: antialiased;
 }
 body.loading{ cursor: wait; }
+::selection{ background: var(--crimson); color: #fff; }
 
-/* ===== WEBGL CANVAS ===== */
+/* ===== WEBGL CANVAS (fixed, meshes anchored to the right half) ===== */
 .webgl-canvas{
   position: fixed;
   inset: 0;
-  z-index: 0;
+  z-index: 5;            /* above panels, below fixed UI */
   display: block;
-  pointer-events: none;
+  pointer-events: none;  /* never intercept text interactions */
 }
+
+/* ===== FIXED UI ===== */
+.fixed-ui{ position: fixed; z-index: 50; }
+.brandmark{ font-family: var(--font-serif); font-style: italic; }
+
 
 /* ===== PRELOADER ===== */
 #preloader{
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  background: #161616;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  position: fixed; inset: 0; z-index: 9999;
+  background: var(--obsidian);
+  display: flex; align-items: center; justify-content: center;
   overflow: hidden;
 }
 .preloader-half{
-  position: absolute;
-  top: 0;
-  width: 50%;
-  height: 100%;
-  background: #161616;
-  z-index: 2;
+  position: absolute; top: 0; width: 50%; height: 100%;
+  background: var(--obsidian); z-index: 2;
 }
 .preloader-half.left{ left: 0; }
 .preloader-half.right{ right: 0; }
-
-.preloader-flash{
-  position: fixed;
-  inset: 0;
-  z-index: 10000;
-  background: #ffffff;
-  opacity: 0;
-  pointer-events: none;
-}
-.gavel-stroke{
-  stroke: var(--text-chalk);
-  stroke-width: 2.5;
-  fill: none;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
+.preloader-inner{ position: relative; z-index: 3; text-align: center; }
 #preloader-count{
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-variant-numeric: tabular-nums;
+  font-family: var(--font-serif); font-style: italic;
+  font-variant-numeric: tabular-nums; color: var(--chalk);
 }
 
-/* ===== VERTICAL NAV TRACK ===== */
+/* ===== VERTICAL NAV ===== */
 .nav-item{
-  font-family: var(--font-sans);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.3em;
-  transition: all 0.5s ease;
-  color: var(--text-cement);
-  position: relative;
-  text-align: left;
-  cursor: pointer;
-  background: none;
-  border: none;
+  font-family: var(--font-sans); font-size: 10px; font-weight: 600;
+  letter-spacing: 0.28em; transition: color .5s ease;
+  color: var(--concrete); position: relative; text-align: left;
+  cursor: pointer; background: none; border: none; display: flex;
+  align-items: center; gap: 0.6rem;
 }
-.nav-item.active{ color: var(--text-chalk); }
-/* Light-section nav coloring (toggled via JS on sections 2 & 3) */
-.nav-item.light-mode{ color: var(--text-light-muted); }
-.nav-item.light-mode.active{ color: var(--text-light-ink); }
-.nav-indicator{
-  width: 0;
-  height: 2px;
-  background: var(--accent-crimson);
-  margin-top: 6px;
-  transition: width 0.5s ease;
+.nav-item .dot{
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--concrete); transition: all .5s ease; flex-shrink: 0;
 }
-.nav-item.active .nav-indicator{ width: 32px; }
-
-/* ===== HORIZONTAL SCROLL ===== */
-.horizontal-scroll-container{
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100vh;
-  display: flex;
-  flex-direction: row;
-  will-change: transform;
-  z-index: 10;
-}
-
-.section-panel{
-  width: 100vw;
-  height: 100vh;
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  padding: 0 3rem;
-  position: relative;
-}
-
-/* ===== TYPOGRAPHY HELPERS ===== */
-.serif-italic{
-  font-family: var(--font-serif);
-  font-style: italic;
-  color: var(--accent-crimson);
-  text-transform: none;
-  font-weight: 400;
-}
-.btn-primary{
-  background: var(--accent-crimson);
-  color: #fff;
-  transition: all 0.3s ease;
-}
-.btn-primary:hover{
-  background: #fff;
-  color: #000;
-  transform: scale(1.03);
-}
-.btn-secondary{
-  border-bottom: 1px solid var(--text-cement);
-  transition: color 0.3s ease, border-color 0.3s ease;
-}
-.btn-secondary:hover{
-  border-color: var(--accent-crimson);
-  color: #fff;
-}
-
-/* ===== SECTION 2 — EDITORIAL SERVICE LIST ===== */
-.section-2-layout{
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  width: 100%;
-  max-width: 1200px;
-  padding: 0 4rem;
-}
-.services-list-column{
-  width: 480px;
-  flex-shrink: 0;
-}
-.service-item{
-  border-top: 1px solid var(--border-hairline);
-  padding: 1.25rem 0;
-  cursor: pointer;
-  transition: padding-left 0.3s ease;
-}
-.service-item:hover, .service-item:focus{
-  padding-left: 0.75rem;
-  outline: none;
-}
-.service-label{
-  font-family: var(--font-sans);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--text-light-muted);
-  transition: color 0.3s ease;
-  display: block;
-}
-.service-item:hover .service-label,
-.service-item:focus .service-label{ color: var(--accent-crimson); }
-.service-desc{
-  font-family: var(--font-sans);
-  font-size: 13px;
-  line-height: 1.7;
-  color: var(--text-light-muted);
-  max-height: 0;
-  overflow: hidden;
-  margin-top: 0;
-  transition: max-height 0.45s ease, margin-top 0.3s ease, opacity 0.3s ease;
-  opacity: 0;
-}
-.service-item:hover .service-desc,
-.service-item:focus .service-desc,
-.service-item.active .service-desc{
-  max-height: 120px;
-  margin-top: 0.75rem;
-  opacity: 1;
-}
-
-/* ===== SECTION 3 — TWO-COLUMN PHILOSOPHY ===== */
-.section-3-layout{
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 6rem;
-  max-width: 1200px;
-  width: 100%;
-  padding: 0 4rem;
-  align-items: start;
-}
-.philosophy-header{ padding-top: 1rem; }
-.philosophy-body{ display: flex; flex-direction: column; gap: 1.75rem; padding-top: 0.5rem; }
-.philosophy-para{
-  font-family: var(--font-sans);
-  font-size: 14px;
-  line-height: 1.85;
-  font-weight: 300;
-}
-.philosophy-cta{
-  font-family: var(--font-sans);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--accent-crimson);
-  text-decoration: none;
-  border-bottom: 1px solid var(--accent-crimson);
-  padding-bottom: 3px;
-  width: fit-content;
-  transition: opacity 0.3s ease;
-}
-.philosophy-cta:hover{ opacity: 0.7; }
-
-/* ===== SECTION 5 — COUNCIL INTAKE TERMINAL ===== */
-.intake-layout{
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 5rem;
-  max-width: 1100px;
-  width: 100%;
-  padding: 0 4rem;
-  align-items: center;
-}
-.intake-form-frame{
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  border: 1px solid var(--border-hairline);
-  padding: 2.5rem;
-  backdrop-filter: blur(12px);
-  background: rgba(255,255,255,0.03);
-}
-.intake-field-group{
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-.intake-label{
-  font-family: var(--font-sans);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: var(--text-dark-muted);
-}
-.intake-input{
-  background: transparent;
-  border: none;
-  border-bottom: 1px solid var(--border-hairline);
-  color: var(--text-dark-chalk);
-  font-family: var(--font-sans);
-  font-size: 14px;
-  padding: 0.65rem 0;
-  outline: none;
-  transition: border-color 0.3s ease;
-  width: 100%;
-}
-.intake-input::placeholder{ color: var(--text-dark-muted); }
-.intake-input:focus{
-  border-color: var(--accent-crimson);
-  outline: 2px solid transparent;
-  box-shadow: 0 1px 0 0 var(--accent-crimson);
-}
-.intake-select{
-  appearance: none;
-  cursor: pointer;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238e8e93' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 0 center;
-}
-.intake-select option{ background: #1a1a1a; color: var(--text-dark-chalk); }
-.intake-submit{
-  background: var(--accent-crimson);
-  color: #fff;
-  font-family: var(--font-sans);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
-  padding: 1rem 2rem;
-  border: none;
-  cursor: pointer;
-  transition: background 0.3s ease, transform 0.2s ease;
-  align-self: flex-start;
-  margin-top: 0.5rem;
-}
-.intake-submit:hover{ background: #fff; color: #000; transform: scale(1.03); }
-.intake-submit:focus-visible{
-  outline: 2px solid var(--accent-crimson);
-  outline-offset: 3px;
-}
-
-
-/* ===== VERDICT CARDS (Section 4) ===== */
-.verdict-card{
-  border: 1px solid var(--border-hairline);
-  background: rgba(18,18,18,0.4);
-  backdrop-filter: blur(8px);
-  transition: border-color 0.4s ease, transform 0.4s ease;
-  cursor: pointer;
-}
-.verdict-card:hover{
-  border-color: var(--accent-crimson);
-  transform: translateY(-6px);
-}
-
-/* ===== LETTER REVEAL (Section 3) ===== */
-.char{
-  display: inline-block;
-  opacity: 0;
-  will-change: opacity, transform;
-}
+.nav-item.active{ color: var(--chalk); }
+.nav-item.active .dot{ background: var(--crimson); transform: scale(1.6); }
 
 /* ===== SCROLL HINT ===== */
 .scroll-hint{
-  position: fixed;
-  bottom: 2rem;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 50;
-  font-size: 10px;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: var(--text-cement);
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
+  position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%);
+  z-index: 50; font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase;
+  color: var(--concrete); display: flex; align-items: center; gap: 0.75rem;
 }
-.scroll-hint .line{
-  width: 40px;
-  height: 1px;
-  background: var(--text-cement);
-  position: relative;
-  overflow: hidden;
-}
+.scroll-hint .line{ width: 46px; height: 1px; background: var(--hairline); position: relative; overflow: hidden; }
 .scroll-hint .line::after{
-  content:'';
-  position:absolute;
-  inset:0;
-  background: var(--accent-crimson);
-  transform: translateX(-100%);
-  animation: scrollLine 2s infinite ease-in-out;
+  content:''; position:absolute; inset:0; background: var(--crimson);
+  transform: translateX(-100%); animation: scrollLine 2.4s infinite ease-in-out;
 }
-@keyframes scrollLine{
-  0%{ transform: translateX(-100%); }
-  50%{ transform: translateX(0); }
-  100%{ transform: translateX(100%); }
-}
-.fixed-ui{ position: fixed; z-index: 50; }
+@keyframes scrollLine{ 0%{transform:translateX(-100%);} 50%{transform:translateX(0);} 100%{transform:translateX(100%);} }
 
-/* ===== FOCUS STATES (WCAG AA) ===== */
-:focus-visible{
-  outline: 2px solid var(--accent-crimson);
-  outline-offset: 3px;
-  border-radius: 1px;
+
+/* ===== HORIZONTAL SCROLL ===== */
+.horizontal-scroll-container{
+  position: fixed; top: 0; left: 0; height: 100vh;
+  display: flex; flex-direction: row; will-change: transform; z-index: 1;
 }
-a:focus-visible, button:focus-visible{
-  outline: 2px solid var(--accent-crimson);
-  outline-offset: 4px;
+.panel{
+  width: 100vw; height: 100vh; flex-shrink: 0;
+  position: relative; overflow: hidden;
+}
+/* The 40 / 60 split rule */
+.panel-grid{
+  display: grid; height: 100%; width: 100%;
+  grid-template-columns: 4fr 6fr;
+}
+.panel-grid.split-5050{ grid-template-columns: 1fr 1fr; }
+
+/* Editorial (text) column — always legible */
+.editorial{
+  position: relative; z-index: 3;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 0 5vw;
+  background: linear-gradient(90deg, var(--obsidian) 0%, var(--obsidian) 72%, rgba(7,7,7,0) 100%);
+}
+/* Visual stage column — holds photography; 3D renders here via canvas */
+.stage{
+  position: relative; z-index: 2; height: 100%; width: 100%; overflow: hidden;
+}
+.stage-photo{
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; filter: grayscale(0.25) contrast(1.05) brightness(0.62);
+}
+.stage-photo.framed{ inset: 8% 10%; width: auto; height: auto; }
+.stage::after{ /* obsidian vignette so 3D pops */
+  content:''; position:absolute; inset:0;
+  background: radial-gradient(120% 90% at 70% 50%, rgba(7,7,7,0) 30%, rgba(7,7,7,0.85) 100%);
+  pointer-events:none;
 }
 
-/* Skip-to-content link */
-.skip-link{
-  position: absolute;
-  top: -100%;
-  left: 1rem;
-  background: var(--accent-crimson);
-  color: #fff;
-  padding: 0.5rem 1rem;
-  font-size: 13px;
-  font-weight: 600;
-  z-index: 99999;
-  transition: top 0.2s ease;
+/* ===== MASKED TYPE REVEAL ===== */
+.mask{ display:block; overflow:hidden; }
+.mask-inner{ display:block; transform: translateY(110%); will-change: transform; }
+.eyebrow{
+  font-size: 11px; letter-spacing: 0.42em; text-transform: uppercase;
+  color: var(--crimson); font-weight: 500;
 }
-.skip-link:focus{ top: 1rem; }
+.display{
+  font-family: var(--font-serif); line-height: 0.92; letter-spacing: -0.01em;
+  font-size: clamp(2.6rem, 8vw, 9rem); font-weight: 400; color: var(--chalk);
+}
+.display .ital{ font-style: italic; color: var(--crimson); }
+.body-copy{ font-size: 13px; line-height: 1.85; letter-spacing: 0.01em; color: var(--concrete); font-weight: 300; }
+.chapter-index{ font-family: var(--font-serif); font-style: italic; color: var(--concrete); }
 
-/* ===== MOBILE BREAKPOINT < 768px ===== */
+
+/* ===== BUTTONS / LINKS ===== */
+.btn-primary{
+  display:inline-block; background: var(--crimson); color:#fff;
+  font-size:11px; letter-spacing:0.22em; text-transform:uppercase; font-weight:600;
+  padding: 1rem 2rem; transition: all .35s ease;
+}
+.btn-primary:hover{ background: var(--chalk); color:#000; transform: translateY(-2px); }
+.link-underline{
+  font-size:11px; letter-spacing:0.22em; text-transform:uppercase; color: var(--chalk);
+  padding-bottom: 4px; border-bottom:1px solid var(--concrete); transition: border-color .35s ease, color .35s ease;
+}
+.link-underline:hover{ border-color: var(--crimson); }
+
+/* ===== SERVICE ACCORDION (Section 2) ===== */
+.service{ border-top:1px solid var(--hairline); padding: 1.4rem 0; cursor: pointer; transition: padding-left .4s ease; }
+.service:last-child{ border-bottom:1px solid var(--hairline); }
+.service:hover, .service:focus-visible{ padding-left: 1rem; outline:none; }
+.service-row{ display:flex; align-items:baseline; gap:1rem; }
+.service-no{ font-size:11px; color: var(--crimson); letter-spacing:0.2em; width: 2rem; flex-shrink:0; }
+.service-name{ font-family: var(--font-serif); font-size: clamp(1.4rem, 2.4vw, 2.2rem); color: var(--chalk); transition: color .35s ease; }
+.service:hover .service-name, .service:focus-visible .service-name{ color: var(--crimson); }
+.service-desc{ max-height:0; overflow:hidden; opacity:0; margin-top:0; transition: max-height .5s ease, opacity .4s ease, margin-top .4s ease; }
+.service:hover .service-desc, .service:focus-visible .service-desc, .service.open .service-desc{ max-height: 160px; opacity:1; margin-top:0.9rem; }
+
+/* ===== VERDICT GRID (Section 4) ===== */
+.verdict{ border:1px solid var(--hairline); padding: 2rem; transition: border-color .4s ease, background .4s ease; }
+.verdict:hover{ border-color: var(--crimson); background: rgba(209,24,41,0.04); }
+.verdict-figure{ font-family: var(--font-serif); font-size: clamp(2rem,3.4vw,3.2rem); color: var(--chalk); line-height:1; }
+
+
+/* ===== INTAKE FORM (Section 5) ===== */
+.intake-field{ display:flex; flex-direction:column; gap:0.4rem; margin-bottom:1.4rem; }
+.intake-label{ font-size:10px; letter-spacing:0.3em; text-transform:uppercase; color: var(--concrete); }
+.intake-input{
+  background:transparent; border:none; border-bottom:1px solid var(--hairline);
+  color: var(--chalk); font-family: var(--font-sans); font-size:14px; padding:0.6rem 0;
+  outline:none; transition: border-color .35s ease; width:100%;
+}
+.intake-input::placeholder{ color:#555; }
+.intake-input:focus{ border-color: var(--crimson); }
+.intake-select{ appearance:none; cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238a8a86' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right center;
+}
+.intake-select option{ background: var(--obsidian-soft); color: var(--chalk); }
+
+/* ===== SECTION 3 — centered philosophy ===== */
+.philosophy-wrap{
+  position:absolute; inset:0; z-index:3; display:flex; align-items:center; justify-content:center;
+  padding: 0 6vw; text-align:center;
+}
+.philosophy-inner{ max-width: 42rem; position:relative; }
+.philosophy-inner::before{ /* legibility vignette over the deep-Z codex */
+  content:''; position:absolute; inset:-30% -18%; z-index:-1;
+  background: radial-gradient(60% 60% at 50% 50%, rgba(7,7,7,0.92) 35%, rgba(7,7,7,0) 100%);
+}
+
+/* ===== FOCUS / SKIP LINK (WCAG) ===== */
+:focus-visible{ outline:2px solid var(--crimson); outline-offset:3px; }
+.skip-link{ position:absolute; top:-100%; left:1rem; background:var(--crimson); color:#fff; padding:.5rem 1rem; font-size:13px; z-index:99999; transition: top .2s ease; }
+.skip-link:focus{ top:1rem; }
+
+
+/* ===== MOBILE: graceful vertical stack < 768px ===== */
 @media (max-width: 767px){
-  /* Kill fixed horizontal track — go vertical */
+  body{ overflow-x: hidden; }
+  /* WebGL is heavy + alignment-dependent — drop it, keep editorial + photography */
+  .webgl-canvas{ display:none !important; }
+  #vertical-nav{ display:none !important; }
+  .scroll-hint{ display:none !important; }
+
   .horizontal-scroll-container{
-    position: relative !important;
-    flex-direction: column !important;
-    height: auto !important;
-    transform: none !important;
-    will-change: unset !important;
+    position: relative !important; flex-direction: column !important;
+    height: auto !important; transform: none !important; will-change: auto !important;
   }
-  .section-panel{
-    width: 100vw !important;
-    height: auto !important;
-    min-height: 100svh;
-    padding: 6rem 1.5rem 4rem;
-    text-align: left;
-  }
-  /* WebGL canvas — shrink to top portion */
-  .webgl-canvas{
-    position: fixed !important;
-    top: 0 !important;
-    height: 45vh !important;
-  }
-  /* Section layouts go single-column */
-  .section-2-layout,
-  .section-3-layout,
-  .intake-layout{
-    grid-template-columns: 1fr !important;
-    gap: 2rem !important;
-    padding: 0 1.5rem !important;
-  }
-  .services-list-column{ width: 100% !important; }
-  /* Typography scale-down */
-  h1{ font-size: 3rem !important; }
-  h2{ font-size: 2.5rem !important; }
-  /* Verdict grid */
-  .grid-cols-3{ grid-template-columns: 1fr !important; }
-  /* Nav — hide on mobile, use scroll-hint only */
-  #vertical-nav{ display: none !important; }
-  /* Light sections need a solid light bg on mobile (theme-swap JS is desktop-only) */
-  .section-panel[data-section="1"],
-  .section-panel[data-section="2"]{ background: var(--bg-light-stone); }
-  /* Dark sections stay transparent so the canvas backdrop shows through */
-  .section-panel[data-section="0"],
-  .section-panel[data-section="3"],
-  .section-panel[data-section="4"]{ background: transparent; }
+  .panel{ width: 100vw; height: auto; min-height: auto; }
+  .panel-grid, .panel-grid.split-5050{ grid-template-columns: 1fr !important; }
+
+  .editorial{ padding: 5rem 1.5rem 2rem; background: var(--obsidian) !important; }
+  .stage{ height: 56vw; }
+  .stage-photo, .stage-photo.framed{ inset:0 !important; width:100% !important; height:100% !important; }
+  .stage::after{ display:none; }
+
+  .philosophy-wrap{ position: relative; padding: 4rem 1.5rem; }
+  .philosophy-inner::before{ display:none; }
+
+  .display{ font-size: clamp(2.4rem, 13vw, 3.6rem); }
 }
 
-
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .mask-inner{ transform:none !important; }
+  .scroll-hint .line::after{ animation:none; }
+}
 </style>
 </head>
+
 <body class="loading">
 
-<!-- ════════════ SKIP TO CONTENT ════════════ -->
-<a href="#horizontal-scroll" class="skip-link">Skip to main content</a>
+<a href="#chapter-1" class="skip-link">Skip to content</a>
 
-<!-- ════════════ KINETIC LOADING MATRIX ════════════ -->
-<div class="preloader-flash" id="preloader-flash"></div>
+<!-- ════════════ PRELOADER ════════════ -->
 <div id="preloader">
   <div class="preloader-half left"></div>
   <div class="preloader-half right"></div>
-  <div style="position:relative; z-index:3; display:flex; flex-direction:column; align-items:center; gap:2.5rem;">
-    <!-- 2D Gavel line-art -->
-    <svg id="gavel-svg" width="150" height="170" viewBox="0 0 150 170">
-      <g id="gavel-pivot" style="transform-origin:75px 70px;">
-        <rect class="gavel-stroke" x="40" y="55" width="70" height="22" rx="3"/>
-        <line class="gavel-stroke" x1="75" y1="77" x2="75" y2="140"/>
-      </g>
-      <line id="gavel-baseline" class="gavel-stroke" x1="35" y1="150" x2="115" y2="150" stroke-dasharray="3 5" style="stroke:#444;"/>
-    </svg>
-    <span id="preloader-count" class="text-6xl text-chalk opacity-90">000</span>
-    <span class="text-[10px] tracking-[0.4em] uppercase text-cement">// Initializing Sovereignty Engine</span>
+  <div class="preloader-inner">
+    <div class="mask"><span class="mask-inner" style="transform:translateY(0)"><span class="brandmark text-2xl text-chalk">Sovereign &amp; Partners</span></span></div>
+    <div style="margin-top:1.5rem;"><span id="preloader-count" class="text-5xl">000</span></div>
+    <div style="margin-top:1rem;"><span class="eyebrow" style="color:var(--concrete)">Litigation Architects</span></div>
   </div>
 </div>
 
-<!-- ════════════ WEBGL BACKGROUND CANVAS ════════════ -->
+<!-- ════════════ WEBGL CANVAS ════════════ -->
 <canvas class="webgl-canvas" id="webgl-canvas"></canvas>
 
+<!-- ════════════ FIXED UI ════════════ -->
+<header class="fixed-ui left-8 top-7">
+  <span class="brandmark text-xl text-chalk">Sovereign &amp; Partners</span>
+</header>
 
-<!-- ════════════ VERTICAL NAVIGATION TRACK ════════════ -->
-<nav class="fixed-ui left-8 top-1/2 -translate-y-1/2 flex flex-col gap-6" id="vertical-nav" role="navigation" aria-label="Section navigation">
-  <button class="nav-item active" data-index="0" aria-label="Navigate to Sovereign Overview section">
-    <span>01 // OVERVIEW</span>
-    <div class="nav-indicator" aria-hidden="true"></div>
-  </button>
-  <button class="nav-item" data-index="1" aria-label="Navigate to Jurisdictions Matrix section">
-    <span>02 // JURISDICTIONS</span>
-    <div class="nav-indicator" aria-hidden="true"></div>
-  </button>
-  <button class="nav-item" data-index="2" aria-label="Navigate to Foundational Legacy section">
-    <span>03 // FOUNDATION</span>
-    <div class="nav-indicator" aria-hidden="true"></div>
-  </button>
-  <button class="nav-item" data-index="3" aria-label="Navigate to Verdict Matrix section">
-    <span>04 // VERDICTS</span>
-    <div class="nav-indicator" aria-hidden="true"></div>
-  </button>
-  <button class="nav-item" data-index="4" aria-label="Navigate to Council Intake section">
-    <span>05 // INTAKE</span>
-    <div class="nav-indicator" aria-hidden="true"></div>
-  </button>
+<nav class="fixed-ui right-10 top-1/2 -translate-y-1/2 flex flex-col gap-5 items-end" id="vertical-nav" role="navigation" aria-label="Section navigation">
+  <button class="nav-item active" data-index="0" aria-label="Go to Overview"><span>OVERVIEW</span><span class="dot" aria-hidden="true"></span></button>
+  <button class="nav-item" data-index="1" aria-label="Go to Services"><span>SERVICES</span><span class="dot" aria-hidden="true"></span></button>
+  <button class="nav-item" data-index="2" aria-label="Go to Philosophy"><span>PHILOSOPHY</span><span class="dot" aria-hidden="true"></span></button>
+  <button class="nav-item" data-index="3" aria-label="Go to Verdicts"><span>VERDICTS</span><span class="dot" aria-hidden="true"></span></button>
+  <button class="nav-item" data-index="4" aria-label="Go to Intake"><span>INTAKE</span><span class="dot" aria-hidden="true"></span></button>
 </nav>
 
-<!-- ════════════ TOP-RIGHT LOGO ════════════ -->
-<div class="fixed-ui right-8 top-8 text-right">
-  <span class="font-serif italic text-xl text-chalk">Sovereign &amp; Partners</span>
-</div>
-
-<!-- ════════════ SCROLL HINT ════════════ -->
-<div class="scroll-hint">
-  <span>Scroll</span>
-  <span class="line"></span>
-  <span>Navigate</span>
-</div>
+<div class="scroll-hint"><span>Scroll</span><span class="line"></span><span>Five Chapters</span></div>
 
 
-<!-- ════════════ HORIZONTAL SCROLL CONTAINER ════════════ -->
-<div class="horizontal-scroll-container" id="horizontal-scroll" role="main">
+<!-- ════════════ HORIZONTAL SCROLL ════════════ -->
+<main class="horizontal-scroll-container" id="horizontal-scroll" role="main">
 
-  <!-- ───── SECTION 1: THE SOVEREIGN OVERVIEW ───── -->
-  <section class="section-panel" data-section="0">
-    <p class="text-xs font-sans tracking-[0.4em] uppercase text-crimson mb-6">// Litigation Architects</p>
-    <h1 class="text-6xl md:text-8xl font-sans font-black tracking-tighter uppercase leading-[0.85] mb-8 text-chalk max-w-5xl">
-      We do not <span class="serif-italic">defend.</span><br/>
-      We <span class="serif-italic">command</span> precedent.
-    </h1>
-    <p class="text-sm max-w-xl text-cement font-light leading-relaxed mb-12 mx-auto">
-      A sovereign legal institution engineered for absolute dominance in high-stakes litigation, corporate warfare, and constitutional precedent. We do not negotiate from weakness — we architect the verdict.
-    </p>
-    <div class="flex justify-center gap-6 flex-wrap">
-      <a href="#" class="btn-primary px-8 py-4 text-xs tracking-widest font-bold uppercase" aria-label="Request legal counsel from Sovereign & Partners">Request Council ↗</a>
-      <a href="#" class="btn-secondary text-xs uppercase tracking-widest text-cement pb-1" aria-label="View our case portfolio">View Case Portfolio</a>
+  <!-- ───── CHAPTER 1 · OVERVIEW ───── -->
+  <section class="panel" id="chapter-1" data-section="0" aria-labelledby="c1-h">
+    <div class="panel-grid">
+      <div class="editorial">
+        <div class="mask mb-8"><span class="mask-inner"><span class="eyebrow">Chapter 01 — Overview</span></span></div>
+        <h1 id="c1-h" class="display">
+          <span class="mask"><span class="mask-inner">We</span></span>
+          <span class="mask"><span class="mask-inner"><span class="ital">command</span></span></span>
+          <span class="mask"><span class="mask-inner">precedent.</span></span>
+        </h1>
+        <div class="mask mt-10" style="max-width:30rem"><span class="mask-inner"><p class="body-copy">
+          Sovereign &amp; Partners is a litigation institution engineered for absolute dominance — built for high-stakes disputes, corporate warfare, and constitutional precedent. We do not negotiate from weakness. We architect the verdict.
+        </p></span></div>
+        <div class="mask mt-12"><span class="mask-inner"><span style="display:flex;gap:1.5rem;align-items:center;flex-wrap:wrap;">
+          <a href="#chapter-5" class="btn-primary nav-jump" data-target="4" aria-label="Request council">Request Council ↗</a>
+          <a href="#chapter-4" class="link-underline nav-jump" data-target="3" aria-label="View verdicts">View the Record</a>
+        </span></span></div>
+      </div>
+      <div class="stage">
+        <img class="stage-photo" alt="Brutalist concrete architecture"
+          src="https://images.unsplash.com/photo-1487958449943-2429e8be8625?q=80&w=1600&auto=format&fit=crop"
+          onerror="this.style.display='none'" />
+      </div>
     </div>
   </section>
 
 
-  <!-- ───── SECTION 2: THE JURISDICTIONS MATRIX ───── -->
-  <section class="section-panel" data-section="1" aria-labelledby="sec2-heading">
-    <!-- Left: interactive service list -->
-    <div class="section-2-layout">
-      <div class="services-list-column" role="list" aria-label="Practice areas">
-        <p class="text-xs font-sans tracking-[0.4em] uppercase mb-8" style="color: var(--accent-crimson);">// Jurisdictions Matrix</p>
-        <h2 id="sec2-heading" class="text-5xl font-sans font-black tracking-tighter uppercase leading-[0.9] mb-10" style="color: var(--text-light-ink);">
-          Practice <span class="serif-italic">domains</span>
+  <!-- ───── CHAPTER 2 · SERVICES ───── -->
+  <section class="panel" data-section="1" aria-labelledby="c2-h">
+    <div class="panel-grid">
+      <div class="editorial">
+        <div class="mask mb-6"><span class="mask-inner"><span class="eyebrow">Chapter 02 — Practice Domains</span></span></div>
+        <h2 id="c2-h" class="display mb-10" style="font-size:clamp(2rem,5vw,4.5rem)">
+          <span class="mask"><span class="mask-inner">Five <span class="ital">disciplines.</span></span></span>
         </h2>
-
-        <div class="service-item" data-service="civil" role="listitem" tabindex="0" aria-expanded="false">
-          <span class="service-label">01 — Civil Litigation</span>
-          <p class="service-desc">We handle complex civil disputes involving multi-party liability, class actions, and tortious interference with precision architecture that dismantles opposing counsel at deposition.</p>
-        </div>
-
-        <div class="service-item" data-service="criminal" role="listitem" tabindex="0" aria-expanded="false">
-          <span class="service-label">02 — Criminal Defense</span>
-          <p class="service-desc">From white-collar federal prosecution to capital defense, our criminal practice is built on constitutional rigor. We treat every case as a structural engineering problem — isolating the load-bearing weaknesses in the State's case.</p>
-        </div>
-
-        <div class="service-item" data-service="family" role="listitem" tabindex="0" aria-expanded="false">
-          <span class="service-label">03 — Family & Estate</span>
-          <p class="service-desc">High-net-worth asset protection, international custody matters, and contested trust litigation. We approach family law with the discretion of a private vault and the precision of a forensic accountant.</p>
-        </div>
-
-        <div class="service-item" data-service="corporate" role="listitem" tabindex="0" aria-expanded="false">
-          <span class="service-label">04 — Corporate Warfare</span>
-          <p class="service-desc">M&A disputes, hostile takeovers, derivative suits, and board governance crises. When the boardroom becomes a battlefield, our institutional litigation practice becomes the decisive strategic advantage.</p>
-        </div>
-
-        <div class="service-item" data-service="ip" role="listitem" tabindex="0" aria-expanded="false">
-          <span class="service-label">05 — Intellectual Property</span>
-          <p class="service-desc">Patent litigation, trade secret enforcement, and rights of publicity — spanning both trial and appellate courts. We've set precedent at the Federal Circuit and have never lost a preliminary injunction in the last decade.</p>
+        <div role="list">
+          <div class="service" role="listitem" tabindex="0" aria-expanded="false" data-tilt="-0.34">
+            <div class="service-row"><span class="service-no">01</span><span class="service-name">Civil Litigation</span></div>
+            <p class="service-desc body-copy">Multi-party liability, class actions, and tortious interference — dismantled with structural precision at deposition and trial.</p>
+          </div>
+          <div class="service" role="listitem" tabindex="0" aria-expanded="false" data-tilt="-0.17">
+            <div class="service-row"><span class="service-no">02</span><span class="service-name">Criminal Defense</span></div>
+            <p class="service-desc body-copy">White-collar federal prosecution to capital defense, built on constitutional rigor — isolating the load-bearing weakness in the State's case.</p>
+          </div>
+          <div class="service" role="listitem" tabindex="0" aria-expanded="false" data-tilt="0">
+            <div class="service-row"><span class="service-no">03</span><span class="service-name">Family &amp; Estate</span></div>
+            <p class="service-desc body-copy">High-net-worth asset protection, international custody, and contested trust litigation handled with the discretion of a private vault.</p>
+          </div>
+          <div class="service" role="listitem" tabindex="0" aria-expanded="false" data-tilt="0.17">
+            <div class="service-row"><span class="service-no">04</span><span class="service-name">Corporate Warfare</span></div>
+            <p class="service-desc body-copy">M&amp;A disputes, hostile takeovers, derivative suits, and governance crises. When the boardroom becomes a battlefield, we are the advantage.</p>
+          </div>
+          <div class="service" role="listitem" tabindex="0" aria-expanded="false" data-tilt="0.34">
+            <div class="service-row"><span class="service-no">05</span><span class="service-name">Intellectual Property</span></div>
+            <p class="service-desc body-copy">Patent litigation, trade-secret enforcement, and rights of publicity — precedent set at the Federal Circuit, injunctions never lost in a decade.</p>
+          </div>
         </div>
       </div>
+      <div class="stage" id="stage-services"></div>
     </div>
   </section>
 
 
-  <!-- ───── SECTION 3: THE FOUNDATIONAL LEGACY ───── -->
-  <section class="section-panel" data-section="2" aria-labelledby="sec3-heading">
-    <div class="section-3-layout">
-      <!-- Left column: heading + label -->
-      <div class="philosophy-header">
-        <p class="text-xs font-sans tracking-[0.4em] uppercase mb-6" style="color: var(--accent-crimson);">// Foundational Philosophy</p>
-        <h2 id="sec3-heading" class="text-6xl font-sans font-black tracking-tighter uppercase leading-[0.88]" style="color: var(--text-light-ink);">
-          Built on<br/><span class="serif-italic">precedent.</span><br/>Argued<br/>with<br/><span class="serif-italic">architecture.</span>
+  <!-- ───── CHAPTER 3 · PHILOSOPHY ───── -->
+  <section class="panel" data-section="2" aria-labelledby="c3-h">
+    <div class="philosophy-wrap">
+      <div class="philosophy-inner">
+        <div class="mask mb-7" style="display:inline-block"><span class="mask-inner"><span class="eyebrow">Chapter 03 — Philosophy</span></span></div>
+        <h2 id="c3-h" class="display mb-8" style="font-size:clamp(2.2rem,6vw,5.5rem)">
+          <span class="mask"><span class="mask-inner">Built on <span class="ital">precedent.</span></span></span>
+          <span class="mask"><span class="mask-inner">Argued like <span class="ital">architecture.</span></span></span>
         </h2>
-        <div style="width: 48px; height: 2px; background: var(--accent-crimson); margin-top: 2.5rem;"></div>
-      </div>
-
-      <!-- Right column: narrative paragraphs -->
-      <div class="philosophy-body">
-        <p class="reveal-text philosophy-para" style="color: var(--text-light-ink);">
-          For three decades, Sovereign & Partners has treated legal defense not as an act of reaction, but as an act of construction. We approach every case the way a structural engineer approaches a load-bearing problem — identifying the precise point at which the opposition's argument will collapse under its own weight.
-        </p>
-        <p class="reveal-text philosophy-para" style="color: var(--text-light-muted);">
-          Our briefs are not documents. They are monuments. Each paragraph is load-tested for logical integrity before it reaches the court record. We do not use ornamental language — we use language that builds, that holds, that does not yield under cross-examination or appellate scrutiny.
-        </p>
-        <p class="reveal-text philosophy-para" style="color: var(--text-light-muted);">
-          This structural philosophy has produced a 30-year record of precedent-setting outcomes: two decisions affirmed by the Supreme Court, four landmark circuit opinions cited in academic law journals, and an institutional win rate that has never dipped below 94%. The method is architectural. The result is absolute.
-        </p>
-        <a href="#" class="philosophy-cta" aria-label="Learn more about our legal philosophy">Read Our Philosophy Manifesto →</a>
+        <div class="mask"><span class="mask-inner"><p class="body-copy mb-5" style="color:var(--chalk)">
+          For three decades we have treated defense not as reaction, but as construction — locating the precise point at which the opposition collapses under its own weight.
+        </p></span></div>
+        <div class="mask"><span class="mask-inner"><p class="body-copy" style="max-width:34rem;margin:0 auto">
+          Our briefs are not documents. They are monuments — load-tested for logical integrity before they reach the record. The method is structural. The result is absolute.
+        </p></span></div>
       </div>
     </div>
   </section>
 
 
-  <!-- ───── SECTION 4: THE VERDICT MATRIX ───── -->
-  <section class="section-panel" data-section="3">
-    <p class="text-xs font-sans tracking-[0.4em] uppercase text-crimson mb-6">// Verdict Matrix</p>
-    <h2 class="text-5xl md:text-7xl font-sans font-black tracking-tighter uppercase leading-[0.9] mb-12 text-chalk">
-      The <span class="serif-italic">record</span> speaks
-    </h2>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-5xl w-full">
-      <div class="verdict-card p-8 text-left" role="article" aria-label="Record verdict in antitrust case">
-        <p class="text-[10px] uppercase tracking-[0.3em] mb-4" style="color: var(--accent-crimson);">Antitrust // 2019</p>
-        <p class="text-5xl font-sans font-black tracking-tighter mb-3" style="color: var(--text-dark-chalk);">$420M</p>
-        <p class="text-[11px] uppercase tracking-[0.25em] mb-4" style="color: var(--text-dark-muted);">Record Verdict</p>
-        <p class="text-xs leading-relaxed" style="color: var(--text-dark-muted);">Largest single antitrust verdict in the Eastern District in a decade. Affirmed on appeal without modification.</p>
-      </div>
-      <div class="verdict-card p-8 text-left" role="article" aria-label="Supreme Court precedent">
-        <p class="text-[10px] uppercase tracking-[0.3em] mb-4" style="color: var(--accent-crimson);">Constitutional // 2021</p>
-        <p class="text-5xl font-sans font-black tracking-tighter mb-3" style="color: var(--text-dark-chalk);">SCOTUS</p>
-        <p class="text-[11px] uppercase tracking-[0.25em] mb-4" style="color: var(--text-dark-muted);">Precedent Set</p>
-        <p class="text-xs leading-relaxed" style="color: var(--text-dark-muted);">Argued and won before the United States Supreme Court. Opinion cited in 14 subsequent circuit decisions.</p>
-      </div>
-      <div class="verdict-card p-8 text-left" role="article" aria-label="Trial success rate over 30 years">
-        <p class="text-[10px] uppercase tracking-[0.3em] mb-4" style="color: var(--accent-crimson);">Institutional // 30 Years</p>
-        <p class="text-5xl font-sans font-black tracking-tighter mb-3" style="color: var(--text-dark-chalk);">98.4%</p>
-        <p class="text-[11px] uppercase tracking-[0.25em] mb-4" style="color: var(--text-dark-muted);">Trial Success Rate</p>
-        <p class="text-xs leading-relaxed" style="color: var(--text-dark-muted);">Across 847 tried cases spanning three decades, our verdict record remains the benchmark for institutional litigation in North America.</p>
-      </div>
-    </div>
-    <div class="mt-12">
-      <a href="#" class="btn-primary px-8 py-4 text-xs tracking-widest font-bold uppercase">Commission the Firm ↗</a>
-    </div>
-  </section>
-
-  <!-- ───── SECTION 5: THE COUNCIL INTAKE TERMINAL ───── -->
-  <section class="section-panel" data-section="4" aria-labelledby="sec5-heading">
-    <div class="intake-layout">
-      <div class="intake-header">
-        <p class="text-xs font-sans tracking-[0.4em] uppercase mb-6" style="color: var(--accent-crimson);">// Council Intake Terminal</p>
-        <h2 id="sec5-heading" class="text-5xl font-sans font-black tracking-tighter uppercase leading-[0.9] mb-4" style="color: var(--text-dark-chalk);">
-          Commission the <span class="serif-italic">Firm</span>
+  <!-- ───── CHAPTER 4 · VERDICTS ───── -->
+  <section class="panel" id="chapter-4" data-section="3" aria-labelledby="c4-h">
+    <div class="panel-grid">
+      <div class="editorial">
+        <div class="mask mb-6"><span class="mask-inner"><span class="eyebrow">Chapter 04 — The Record</span></span></div>
+        <h2 id="c4-h" class="display mb-10" style="font-size:clamp(2rem,5vw,4.5rem)">
+          <span class="mask"><span class="mask-inner">The record <span class="ital">speaks.</span></span></span>
         </h2>
-        <p class="text-sm font-light leading-relaxed" style="color: var(--text-dark-muted); max-width: 380px;">
-          Sovereign & Partners accepts new mandates by referral and direct inquiry. Complete the intake terminal below to initiate first contact.
-        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-px" style="background:var(--hairline)">
+          <article class="verdict" role="article" aria-label="Record verdict">
+            <p class="eyebrow mb-4" style="color:var(--crimson)">Antitrust · 2019</p>
+            <p class="verdict-figure mb-3">$420M</p>
+            <p class="body-copy" style="font-size:11px">Largest single antitrust verdict in the district in a decade. Affirmed on appeal without modification.</p>
+          </article>
+          <article class="verdict" role="article" aria-label="Supreme Court precedent">
+            <p class="eyebrow mb-4" style="color:var(--crimson)">Constitutional · 2021</p>
+            <p class="verdict-figure mb-3">SCOTUS</p>
+            <p class="body-copy" style="font-size:11px">Argued and won before the Supreme Court. Opinion cited in fourteen subsequent circuit decisions.</p>
+          </article>
+          <article class="verdict" role="article" aria-label="Trial success rate">
+            <p class="eyebrow mb-4" style="color:var(--crimson)">Institutional · 30 Yrs</p>
+            <p class="verdict-figure mb-3">98.4%</p>
+            <p class="body-copy" style="font-size:11px">Across 847 tried cases over three decades — the benchmark for institutional litigation in North America.</p>
+          </article>
+        </div>
       </div>
+      <div class="stage" id="stage-verdicts"></div>
+    </div>
+  </section>
 
-      <div class="intake-form-frame" role="form" aria-label="Council intake form">
-        <div class="intake-field-group">
-          <label class="intake-label" for="intake-name">Full Name</label>
-          <input type="text" id="intake-name" class="intake-input" placeholder="First & Last Name" autocomplete="name" aria-required="true" />
-        </div>
 
-        <div class="intake-field-group">
-          <label class="intake-label" for="intake-email">Corporate Email</label>
-          <input type="email" id="intake-email" class="intake-input" placeholder="name@organization.com" autocomplete="email" aria-required="true" />
-        </div>
-
-        <div class="intake-field-group">
-          <label class="intake-label" for="intake-scope">Case Scope Area</label>
-          <select id="intake-scope" class="intake-input intake-select" aria-required="true">
-            <option value="" disabled selected>Select a jurisdiction</option>
-            <option value="civil">Civil Litigation</option>
-            <option value="criminal">Criminal Defense</option>
-            <option value="family">Family & Estate</option>
-            <option value="corporate">Corporate Warfare</option>
-            <option value="ip">Intellectual Property</option>
-            <option value="constitutional">Constitutional Precedent</option>
-          </select>
-        </div>
-
-        <div class="intake-field-group">
-          <label class="intake-label" for="intake-brief">Brief Overview</label>
-          <textarea id="intake-brief" class="intake-input" rows="3" placeholder="Describe the nature of your matter in 2–3 sentences." aria-required="false" style="resize: none;"></textarea>
-        </div>
-
-        <button type="button" class="intake-submit" aria-label="Submit intake form to Sovereign & Partners" onclick="handleIntakeSubmit()">
-          Transmit Mandate ↗
-        </button>
+  <!-- ───── CHAPTER 5 · INTAKE ───── -->
+  <section class="panel" id="chapter-5" data-section="4" aria-labelledby="c5-h">
+    <div class="panel-grid split-5050">
+      <div class="editorial">
+        <div class="mask mb-6"><span class="mask-inner"><span class="eyebrow">Chapter 05 — Council Intake</span></span></div>
+        <h2 id="c5-h" class="display mb-8" style="font-size:clamp(2rem,4.6vw,4rem)">
+          <span class="mask"><span class="mask-inner">Commission the <span class="ital">firm.</span></span></span>
+        </h2>
+        <div class="mask mb-9" style="max-width:26rem"><span class="mask-inner"><p class="body-copy">
+          We accept new mandates by referral and direct inquiry. Complete the terminal to initiate first contact.
+        </p></span></div>
+        <form id="intake-form" role="form" aria-label="Council intake" style="max-width:30rem">
+          <div class="intake-field">
+            <label class="intake-label" for="f-name">Full Name</label>
+            <input class="intake-input" id="f-name" type="text" placeholder="First &amp; Last" autocomplete="name" aria-required="true" />
+          </div>
+          <div class="intake-field">
+            <label class="intake-label" for="f-email">Corporate Email</label>
+            <input class="intake-input" id="f-email" type="email" placeholder="name@organization.com" autocomplete="email" aria-required="true" />
+          </div>
+          <div class="intake-field">
+            <label class="intake-label" for="f-scope">Scope Area</label>
+            <select class="intake-input intake-select" id="f-scope" aria-required="true">
+              <option value="" disabled selected>Select a jurisdiction</option>
+              <option>Civil Litigation</option><option>Criminal Defense</option>
+              <option>Family &amp; Estate</option><option>Corporate Warfare</option>
+              <option>Intellectual Property</option><option>Constitutional</option>
+            </select>
+          </div>
+          <button type="button" class="btn-primary mt-3" id="intake-submit" aria-label="Transmit mandate">Transmit Mandate ↗</button>
+        </form>
+      </div>
+      <div class="stage" id="stage-intake">
+        <img class="stage-photo" alt="Law office interior"
+          src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=1600&auto=format&fit=crop"
+          onerror="this.style.display='none'" />
       </div>
     </div>
   </section>
 
-</div>
+</main>
 
 
 <script>
 /* ═══════════════════════════════════════════════════════════
-   THE SOVEREIGNTY 3D ENGINE
+   SOVEREIGN & PARTNERS — Editorial 3D Engine
    ═══════════════════════════════════════════════════════════ */
 gsap.registerPlugin(ScrollTrigger);
+const IS_MOBILE = window.matchMedia('(max-width: 767px)').matches;
+const RIGHT = 4.2;            // stage X for right-anchored meshes
+const GAP_FADE = 18;          // off-stage distance
 
-const TOKENS = {
-  void: 0x0d0d0d,
-  crimson: 0xc50e1f,
-  metal: 0x2c2c2e,
-};
-const SECTION_GAP = 3.5; // X distance between meshes
-
-/* ───────── SCENE / RENDERER / CAMERA ───────── */
+/* ───── RENDERER / SCENE / CAMERA ───── */
+let scene, camera, renderer, envTex, clock;
 const canvas = document.getElementById('webgl-canvas');
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(TOKENS.void);
 
-const sizes = { w: window.innerWidth, h: window.innerHeight };
-
-const camera = new THREE.PerspectiveCamera(45, sizes.w / sizes.h, 0.1, 100);
-camera.position.set(0, 0, 9);
-camera.lookAt(0, 0, 0);
-
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
-renderer.setClearColor(TOKENS.void, 1);
-renderer.setSize(sizes.w, sizes.h);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.15;
-
-/* Shared scene group (parallax target) */
-const webglSceneGroup = new THREE.Group();
-scene.add(webglSceneGroup);
-
-
-/* ───────── DYNAMIC LIGHTING MATRIX ───────── */
-// Overhead master spotlight
-const masterSpot = new THREE.SpotLight(0xfefefe, 8.0, 60, Math.PI / 7, 0.25, 1.2);
-masterSpot.position.set(0, 15, 5);
-masterSpot.target.position.set(0, 0, 0);
-scene.add(masterSpot);
-scene.add(masterSpot.target);
-
-// Helper directional light — guarantees mesh visibility in light & dark
-const helperDir = new THREE.DirectionalLight(0xfefefe, 3.5);
-helperDir.position.set(5, 5, 4);
-scene.add(helperDir);
-
-// Crimson interactive under-glow
-const crimsonGlow = new THREE.PointLight(0xc50e1f, 4.0, 25, 1.5);
-crimsonGlow.position.set(0, -6, 2);
-scene.add(crimsonGlow);
-
-// Interactive mouse spotlight (raycast-driven)
-const interactiveSpotlight = new THREE.PointLight(0xffffff, 0, 18, 2);
-interactiveSpotlight.position.set(0, 0, 3);
-scene.add(interactiveSpotlight);
-
-// Ambient fill so silhouettes never go fully black
-const ambient = new THREE.AmbientLight(0x303030, 1.2);
-scene.add(ambient);
-
-/* ───────── SHARED MATERIAL (Matte Titanium / Gunmetal) ───────── */
-const metalMat = new THREE.MeshStandardMaterial({
-  color: 0x2c2c2e,
-  roughness: 0.35,
-  metalness: 0.6,
-});
-const accentMat = new THREE.MeshStandardMaterial({
-  color: 0x3a3a3c,
-  roughness: 0.4,
-  metalness: 0.55,
-});
+function makeEnvTexture(){
+  const c = document.createElement('canvas'); c.width = 512; c.height = 256;
+  const x = c.getContext('2d');
+  const g = x.createLinearGradient(0,0,0,256);
+  g.addColorStop(0,'#46464a'); g.addColorStop(0.34,'#101012');
+  g.addColorStop(0.7,'#070708'); g.addColorStop(1,'#5c070f');
+  x.fillStyle = g; x.fillRect(0,0,512,256);
+  // bright key reflection streak
+  let r = x.createRadialGradient(370,46,4,370,46,130);
+  r.addColorStop(0,'rgba(255,255,255,0.95)'); r.addColorStop(1,'rgba(255,255,255,0)');
+  x.fillStyle = r; x.fillRect(0,0,512,256);
+  // crimson rim reflection
+  r = x.createRadialGradient(120,210,4,120,210,150);
+  r.addColorStop(0,'rgba(210,22,38,0.85)'); r.addColorStop(1,'rgba(210,22,38,0)');
+  x.fillStyle = r; x.fillRect(0,0,512,256);
+  const t = new THREE.CanvasTexture(c);
+  t.mapping = THREE.EquirectangularReflectionMapping;
+  t.encoding = THREE.sRGBEncoding;
+  return t;
+}
 
 
-/* ───────── MESH 1: THE GAVEL & SOUNDING BLOCK ───────── */
+let crimsonSpot; // interactive spotlight for the scales
+function initThree(){
+  scene = new THREE.Scene();
+  scene.fog = new THREE.Fog(0x070707, 16, 40);   // depth haze for the deep-Z codex
+  envTex = makeEnvTexture();
+  scene.environment = envTex;
+
+  camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 100);
+  camera.position.set(0, 0, 11);
+  camera.lookAt(0, 0, 0);
+
+  renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true });
+  renderer.setClearColor(0x000000, 0);
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.1;
+  renderer.outputEncoding = THREE.sRGBEncoding;
+
+  /* High-contrast lighting */
+  const key = new THREE.DirectionalLight(0xffffff, 8);
+  key.position.set(8, 10, 8); scene.add(key);
+  const rim = new THREE.DirectionalLight(0xff0a1e, 5);
+  rim.position.set(-8, -3, -6); scene.add(rim);
+  const ambient = new THREE.AmbientLight(0x161616, 0.7); scene.add(ambient);
+  crimsonSpot = new THREE.SpotLight(0xd11829, 0, 30, Math.PI/6, 0.4, 1.2);
+  crimsonSpot.position.set(RIGHT+2, 2, 6); scene.add(crimsonSpot);
+  const spotTarget = new THREE.Object3D(); spotTarget.position.set(RIGHT,0,0);
+  scene.add(spotTarget); crimsonSpot.target = spotTarget;
+}
+
+/* ───── MATERIALS (Polished Obsidian / Dark Chrome) ───── */
+function obsidian(){ return new THREE.MeshStandardMaterial({ color:0x111111, roughness:0.1, metalness:0.9, envMap:envTex, envMapIntensity:1.25 }); }
+function chrome(){ return new THREE.MeshStandardMaterial({ color:0x1c1c1f, roughness:0.18, metalness:0.95, envMap:envTex, envMapIntensity:1.4 }); }
+
+
+/* ───── MESH 0: GAVEL ───── */
 function buildGavel(){
-  const group = new THREE.Group();
-  // Pivot for the mallet assembly
+  const g = new THREE.Group();
   const mallet = new THREE.Group();
-  const head = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.35, 1.6, 32), metalMat);
-  head.rotation.z = Math.PI / 2;
-  mallet.add(head);
-  // End caps
-  [-0.8, 0.8].forEach(x => {
-    const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 0.18, 32), accentMat);
-    cap.rotation.z = Math.PI / 2;
-    cap.position.x = x;
-    mallet.add(cap);
-  });
-  // Handle
-  const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.11, 1.8, 24), metalMat);
-  handle.position.y = -1.0;
-  mallet.add(handle);
-  mallet.position.set(0, 1.5, 0);
-  mallet.rotation.z = 0.3;
-  group.add(mallet);
-  // Hexagonal base plate (sounding block)
-  const base = new THREE.Mesh(new THREE.CylinderGeometry(1.4, 1.5, 0.4, 6), accentMat);
-  base.position.y = -1.4;
-  group.add(base);
-  group.userData.mallet = mallet;
-  return group;
+  const head = new THREE.Mesh(new THREE.CylinderGeometry(0.42,0.42,1.9,48), obsidian());
+  head.rotation.z = Math.PI/2; mallet.add(head);
+  [-0.95,0.95].forEach(x=>{ const c=new THREE.Mesh(new THREE.CylinderGeometry(0.48,0.48,0.22,48),chrome()); c.rotation.z=Math.PI/2; c.position.x=x; mallet.add(c); });
+  const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.13,2.2,32), obsidian());
+  handle.position.y=-1.25; mallet.add(handle);
+  mallet.rotation.z = 0.34; g.add(mallet);
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(1.5,1.65,0.4,8), chrome());
+  base.position.y=-1.9; g.add(base);
+  g.userData.mallet = mallet; return g;
 }
 
-
-/* ───────── MESH 2: LADY JUSTICE (Scales) ───────── */
+/* ───── MESH 1: LADY JUSTICE (scales) ───── */
 function buildJustice(){
-  const group = new THREE.Group();
-  // Central column
-  const column = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.18, 3.4, 24), metalMat);
-  group.add(column);
-  // Top finial
-  const finial = new THREE.Mesh(new THREE.SphereGeometry(0.22, 24, 24), accentMat);
-  finial.position.y = 1.8;
-  group.add(finial);
-  // Horizontal balance bar
-  const bar = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.1, 0.1), metalMat);
-  bar.position.y = 1.55;
-  group.add(bar);
-  // Suspended disc elements + strings
-  const scales = [];
-  [-1.5, 1.5].forEach((x, i) => {
-    const str = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.9, 8), accentMat);
-    str.position.set(x, 1.1, 0);
-    group.add(str);
-    const disc = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.55, 0.08, 32), metalMat);
-    disc.position.set(x, 0.62, 0);
-    group.add(disc);
-    scales.push(disc);
+  const g = new THREE.Group();
+  g.add(new THREE.Mesh(new THREE.CylinderGeometry(0.13,0.2,3.6,32), obsidian()));
+  const fin = new THREE.Mesh(new THREE.SphereGeometry(0.24,32,32), chrome()); fin.position.y=1.9; g.add(fin);
+  const bar = new THREE.Mesh(new THREE.BoxGeometry(3.4,0.12,0.12), chrome()); bar.position.y=1.62; g.add(bar);
+  const scales=[];
+  [-1.6,1.6].forEach(x=>{
+    const s=new THREE.Mesh(new THREE.CylinderGeometry(0.016,0.016,0.95,8),obsidian()); s.position.set(x,1.15,0); g.add(s);
+    const d=new THREE.Mesh(new THREE.CylinderGeometry(0.6,0.6,0.07,48),chrome()); d.position.set(x,0.64,0); g.add(d); scales.push(d);
   });
-  group.userData.scales = scales;
-  return group;
+  g.userData.bar = bar; g.userData.scales = scales; return g;
 }
 
-
-/* ───────── MESH 3: THE LEGACY MONOLITHS / CODEX ───────── */
+/* ───── MESH 2: CODEX (legal volumes) ───── */
 function buildCodex(){
-  const group = new THREE.Group();
-  const heights = [3.0, 3.4, 2.6, 3.2];
-  let xOff = -1.65;
-  heights.forEach((h, i) => {
-    const w = 0.7;
-    const volume = new THREE.Mesh(new THREE.BoxGeometry(w, h, 1.6), i % 2 ? accentMat : metalMat);
-    volume.position.set(xOff, (h - 3.4) / 2, 0);
-    volume.rotation.z = (i - 1.5) * 0.04;
-    group.add(volume);
-    // Scored vertical spine lines
-    for (let s = 0; s < 3; s++){
-      const score = new THREE.Mesh(new THREE.BoxGeometry(0.02, h * 0.85, 0.04), accentMat);
-      score.position.set(xOff - w/2 + 0.001, (h - 3.4) / 2, 0.81 + (s * 0.0));
-      score.position.x = xOff;
-      score.position.z = 0.81;
-      score.position.y = (h - 3.4) / 2 + (s - 1) * (h * 0.28);
-      group.add(score);
-    }
-    xOff += w + 0.42;
-  });
-  return group;
+  const g = new THREE.Group();
+  const H=[3.0,3.5,2.7,3.3]; let xo=-1.7;
+  H.forEach((h,i)=>{ const w=0.72;
+    const v=new THREE.Mesh(new THREE.BoxGeometry(w,h,1.7), i%2?chrome():obsidian());
+    v.position.set(xo,(h-3.5)/2,0); v.rotation.z=(i-1.5)*0.05; g.add(v); xo+=w+0.45; });
+  return g;
 }
 
-/* ───────── MESH 4: THE IRON BONDS (Interlocking Rings) ───────── */
+/* ───── MESH 3: IRON BONDS (rings) ───── */
 function buildBonds(){
-  const group = new THREE.Group();
-  const positions = [-1.3, 0, 1.3];
-  positions.forEach((x, i) => {
-    const ring = new THREE.Mesh(new THREE.TorusGeometry(0.85, 0.16, 20, 48), i === 1 ? accentMat : metalMat);
-    ring.position.x = x;
-    ring.rotation.y = i % 2 ? Math.PI / 2 : 0;
-    group.add(ring);
+  const g=new THREE.Group();
+  [-1.35,0,1.35].forEach((x,i)=>{ const r=new THREE.Mesh(new THREE.TorusGeometry(0.9,0.17,24,64), i===1?chrome():obsidian()); r.position.x=x; r.rotation.y=i%2?Math.PI/2:0; g.add(r); });
+  return g;
+}
+
+/* ───── MESH 4: SEAL (corner emblem) ───── */
+function buildSeal(){
+  const g=new THREE.Group();
+  g.add(new THREE.Mesh(new THREE.TorusKnotGeometry(0.7,0.22,128,24,2,3), chrome()));
+  return g;
+}
+
+
+/* ───── INSTANTIATE + STAGE SYSTEM ───── */
+let meshes = [], activeIdx = 0;
+// Per-section stage transform: right-anchored, except codex (deep center) & seal (corner)
+const STAGE = [
+  { x:RIGHT, y:0.0,  z:0,   s:1.05 },  // 0 gavel
+  { x:RIGHT, y:-0.2, z:0,   s:0.92 },  // 1 justice
+  { x:0,     y:-0.4, z:-15, s:1.95 },  // 2 codex (deep Z, behind text)
+  { x:RIGHT, y:0.0,  z:0,   s:1.05 },  // 3 bonds
+  { x:4.9,   y:2.5,  z:0,   s:0.5  },  // 4 seal (corner of 50/50)
+];
+
+function buildMeshes(){
+  const factories = [buildGavel, buildJustice, buildCodex, buildBonds, buildSeal];
+  meshes = factories.map((f, i) => {
+    const m = f();
+    const c = STAGE[i];
+    m.position.set(c.x, c.y + 4, c.z); // start lifted + hidden
+    m.scale.setScalar(0.0001);
+    scene.add(m);
+    return m;
   });
-  return group;
 }
 
-
-/* ───────── INSTANTIATE & LINE UP MESHES ───────── */
-const meshFactories = [buildGavel, buildJustice, buildCodex, buildBonds];
-const meshes = meshFactories.map((factory, i) => {
-  const m = factory();
-  m.position.x = i * SECTION_GAP; // 0, 3.5, 7, 10.5
-  m.scale.setScalar(0.95);
-  webglSceneGroup.add(m);
-  return m;
-});
-
-// All intersectable objects for raycasting
-let raycastTargets = [];
-webglSceneGroup.traverse(o => { if (o.isMesh) raycastTargets.push(o); });
-
-// Mobile: scale down meshes & pull camera back for smaller viewports
-if (window.innerWidth < 768){
-  meshes.forEach(m => m.scale.setScalar(0.6));
-  camera.position.z = 11;
+function showMesh(idx){
+  meshes.forEach((m, j) => {
+    const c = STAGE[j];
+    if (j === idx){
+      gsap.to(m.position, { x:c.x, y:c.y, z:c.z, duration:1.1, ease:'power3.out' });
+      gsap.to(m.scale, { x:c.s, y:c.s, z:c.s, duration:1.1, ease:'power3.out' });
+    } else {
+      gsap.to(m.scale, { x:0.0001, y:0.0001, z:0.0001, duration:0.6, ease:'power2.in' });
+      gsap.to(m.position, { y:c.y + 4, duration:0.6, ease:'power2.in' });
+    }
+  });
 }
 
-/* ───────── RAYCASTER + MOUSE SPOTLIGHT ───────── */
-const raycaster = new THREE.Raycaster();
-const mouse = new THREE.Vector2(0, 0);
-const lightTarget = new THREE.Vector3(0, 0, 3);
-
-window.addEventListener('mousemove', (e) => {
-  mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-  mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
-
-  // Map to a vector plane at z = 3 for the moving spotlight
-  raycaster.setFromCamera(mouse, camera);
-  const planeZ = 3;
-  const dir = raycaster.ray.direction;
-  const origin = raycaster.ray.origin;
-  const t = (planeZ - origin.z) / dir.z;
-  lightTarget.set(origin.x + dir.x * t, origin.y + dir.y * t, planeZ);
-
-  // Intersection test for intensity ramp
-  const hits = raycaster.intersectObjects(raycastTargets, true);
-  if (hits.length > 0){
-    gsap.to(interactiveSpotlight, { intensity: 5.0, duration: 0.4, overwrite: true });
-    document.body.style.cursor = 'pointer';
-  } else {
-    gsap.to(interactiveSpotlight, { intensity: 0.0, duration: 0.6, overwrite: true });
-    document.body.style.cursor = 'default';
-  }
-});
-
-
-/* ───────── RENDER LOOP ───────── */
-const clock = new THREE.Clock();
-let activeMeshIndex = 0;
-
+/* ───── RENDER LOOP ───── */
 function render(){
   requestAnimationFrame(render);
   const t = clock.getElapsedTime();
-
-  // Smoothly lerp the interactive spotlight toward the mapped plane point
-  interactiveSpotlight.position.x += (lightTarget.x - interactiveSpotlight.position.x) * 0.1;
-  interactiveSpotlight.position.y += (lightTarget.y - interactiveSpotlight.position.y) * 0.1;
-  interactiveSpotlight.position.z += (lightTarget.z - interactiveSpotlight.position.z) * 0.1;
-
-  // Continuous revolution on every mesh group
-  meshes.forEach((m, i) => {
-    m.rotation.y += 0.003;
-    // Subtle idle float, phase-shifted per mesh
-    m.position.y = Math.sin(t * 0.8 + i * 1.3) * 0.12;
-  });
-
-  // Gavel idle mallet sway
-  const gavelMallet = meshes[0].userData.mallet;
-  if (gavelMallet) gavelMallet.rotation.z = 0.3 + Math.sin(t * 1.4) * 0.05;
-
+  if (meshes[0]){ meshes[0].rotation.y = Math.sin(t*0.3)*0.4; meshes[0].position.y += 0; const ml=meshes[0].userData.mallet; if(ml) ml.rotation.z = 0.34 + Math.sin(t*1.3)*0.05; }
+  if (meshes[1]) meshes[1].rotation.y = Math.sin(t*0.25)*0.3;
+  if (meshes[2]) meshes[2].rotation.y += 0.0016;
+  if (meshes[3]) meshes[3].rotation.y += 0.006;
+  if (meshes[4]){ meshes[4].rotation.y += 0.01; meshes[4].rotation.x = Math.sin(t*0.6)*0.3; }
   renderer.render(scene, camera);
 }
-render();
-
-/* ───────── RESIZE ───────── */
-window.addEventListener('resize', () => {
-  sizes.w = window.innerWidth;
-  sizes.h = window.innerHeight;
-  camera.aspect = sizes.w / sizes.h;
-  camera.updateProjectionMatrix();
-  renderer.setSize(sizes.w, sizes.h);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  ScrollTrigger.refresh();
-});
 
 
-/* ═══════════════════════════════════════════════════════════
-   KINETIC LOADING MATRIX
-   ═══════════════════════════════════════════════════════════ */
-const preloaderCount = { val: 0 };
+/* ═══════════════ PRELOADER ═══════════════ */
+const countObj = { v: 0 };
 const countEl = document.getElementById('preloader-count');
-const gavelPivot = document.getElementById('gavel-pivot');
-const flashEl = document.getElementById('preloader-flash');
-
 const preTL = gsap.timeline({ onComplete: startExperience });
+preTL.to(countObj, { v:100, duration:2.2, ease:'power1.inOut',
+  onUpdate:()=>{ countEl.textContent = String(Math.floor(countObj.v)).padStart(3,'0'); } });
+preTL.addLabel('exit', '+=0.15');
+preTL.to('.preloader-half.left',  { xPercent:-100, duration:0.9, ease:'power4.inOut' }, 'exit');
+preTL.to('.preloader-half.right', { xPercent:100,  duration:0.9, ease:'power4.inOut' }, 'exit');
+preTL.to('.preloader-inner', { opacity:0, duration:0.4, ease:'power2.in' }, 'exit');
+preTL.set('#preloader', { display:'none' });
 
-// Repeating gavel drop with white-flash on impact
-const dropTL = gsap.timeline({ repeat: 2 });
-dropTL.to(gavelPivot, { rotation: 38, transformOrigin: '75px 70px', duration: 0.34, ease: 'power2.in' })
-      .to(gavelPivot, { rotation: 0, duration: 0.12, ease: 'power4.in', onComplete: () => {
-        // Flash the screen white for ~50ms
-        gsap.fromTo(flashEl, { opacity: 0.25 }, { opacity: 0, duration: 0.4, ease: 'power2.out' });
-      }})
-      .to(gavelPivot, { rotation: 0, duration: 0.45, ease: 'elastic.out(1,0.5)' });
-
-preTL.add(dropTL, 0);
-
-// Counter 000 -> 100
-preTL.to(preloaderCount, {
-  val: 100,
-  duration: 2.6,
-  ease: 'power1.inOut',
-  onUpdate: () => { countEl.textContent = String(Math.floor(preloaderCount.val)).padStart(3, '0'); }
-}, 0);
-
-
-// Split exit — two halves skew + slide out
-preTL.addLabel('exit', '+=0.2');
-preTL.to('.preloader-half.left', {
-  xPercent: -120, skewX: 10, duration: 0.9, ease: 'power4.inOut'
-}, 'exit');
-preTL.to('.preloader-half.right', {
-  xPercent: 120, skewX: 10, duration: 0.9, ease: 'power4.inOut'
-}, 'exit');
-preTL.to('#preloader > div:last-child', {
-  opacity: 0, duration: 0.4, ease: 'power2.in'
-}, 'exit');
-preTL.set('#preloader', { display: 'none' });
-
-
-/* ═══════════════════════════════════════════════════════════
-   MAIN EXPERIENCE
-   ═══════════════════════════════════════════════════════════ */
+/* ═══════════════ MAIN EXPERIENCE ═══════════════ */
+let clockStarted = false;
 function startExperience(){
   document.body.classList.remove('loading');
 
-  /* ───── SPLIT REVEAL-TEXT INTO CHARS (Section 3) ───── */
-  document.querySelectorAll('.reveal-text').forEach(el => {
-    const text = el.textContent;
-    el.textContent = '';
-    text.split('').forEach(ch => {
-      const span = document.createElement('span');
-      span.className = 'char';
-      span.textContent = ch === ' ' ? '\u00A0' : ch;
-      el.appendChild(span);
-    });
-  });
-
-  /* ───── LENIS SMOOTH SCROLL (drives vertical proxy) ───── */
-  const lenis = new Lenis({ duration: 1.1, smoothWheel: true, lerp: 0.08 });
-  window.__lenis = lenis;
-  lenis.on('scroll', ScrollTrigger.update);
-  gsap.ticker.add((time) => { lenis.raf(time * 1000); });
-  gsap.ticker.lagSmoothing(0);
-
-  buildScrollSystem();
+  if (!IS_MOBILE){
+    initThree();
+    buildMeshes();
+    clock = new THREE.Clock();
+    render();
+    buildScrollSystem();
+  } else {
+    // Mobile: reveal every panel's masked type immediately (vertical stack)
+    document.querySelectorAll('.mask-inner').forEach(el => gsap.set(el, { yPercent:0 }));
+  }
 }
 
 
-/* ───── HORIZONTAL SCROLL + PARALLAX SYSTEM ───── */
+/* ───── LENIS + HORIZONTAL SCROLL + SNAP ───── */
+let lenis, totalPanels = 5;
 function buildScrollSystem(){
   const container = document.getElementById('horizontal-scroll');
-  const panels = gsap.utils.toArray('.section-panel');
+  const panels = gsap.utils.toArray('.panel');
   const navItems = gsap.utils.toArray('.nav-item');
-  const totalPanels = panels.length;
-  const groupTravel = SECTION_GAP * (meshes.length - 1); // 10.5
+  totalPanels = panels.length;
 
-  // Scroll spacer generates the vertical scroll distance that the
-  // fixed horizontal container consumes (one viewport per panel).
+  lenis = new Lenis({ duration:1.15, smoothWheel:true, lerp:0.085 });
+  window.__lenis = lenis;
+  lenis.on('scroll', ScrollTrigger.update);
+  gsap.ticker.add((time)=> lenis.raf(time*1000));
+  gsap.ticker.lagSmoothing(0);
+
+  // Vertical spacer drives the fixed horizontal track
   const spacer = document.createElement('div');
   spacer.id = 'scroll-spacer';
-  spacer.style.cssText = 'height:' + (totalPanels * 100) + 'vh;width:1px;position:relative;z-index:-2;pointer-events:none;';
+  spacer.style.cssText = 'height:'+(totalPanels*100)+'vh;width:1px;position:relative;z-index:-2;pointer-events:none;';
+  document.body.appendChild(spacer);
 
   const maxX = () => (container.scrollWidth - window.innerWidth);
 
-  // Hero entrance (all viewports)
-  gsap.from('[data-section="0"] > *', {
-    y: 50, opacity: 0, duration: 1, stagger: 0.12, ease: 'power3.out', delay: 0.1
+  ScrollTrigger.create({
+    trigger: spacer, start:'top top', end:'bottom bottom', scrub: 1,
+    snap: { snapTo: 1/(totalPanels-1), duration:{min:0.25,max:0.6}, ease:'power2.inOut', delay:0.04 },
+    invalidateOnRefresh: true,
+    onRefresh: () => gsap.set(container, { x: -maxX()*(window.__p||0) }),
+    onUpdate: (self) => {
+      const p = self.progress; window.__p = p;
+      gsap.set(container, { x: -maxX()*p });
+      const idx = Math.round(p*(totalPanels-1));
+      if (idx !== activeIdx) setActiveSection(idx, navItems);
+    }
   });
 
-  if (window.innerWidth >= 768){
-    // ── DESKTOP: fixed horizontal track driven by a vertical scroll spacer ──
-    document.body.appendChild(spacer);
-
-    // Master scroll-driven timeline
-    ScrollTrigger.create({
-      trigger: spacer,
-      start: 'top top',
-      end: 'bottom bottom',
-      scrub: 1,
-      snap: {
-        snapTo: 1 / (totalPanels - 1),   // snaps to exact panel fractions
-        duration: { min: 0.3, max: 0.6 },
-        ease: 'power2.inOut',
-        delay: 0.05
-      },
-      invalidateOnRefresh: true,
-      onRefresh: () => { gsap.set(container, { x: -maxX() * (window.__sovP || 0) }); },
-      onUpdate: (self) => {
-        const p = self.progress;
-        window.__sovP = p;
-        // Foreground containers shift LEFT
-        gsap.set(container, { x: -maxX() * p });
-        // 3D subject glides into the center frame (group shifts left)
-        webglSceneGroup.position.x = -groupTravel * p;
-        // Asymmetric opposite parallax: camera drifts the other way (+X)
-        camera.position.x = 1.5 * p;
-        camera.lookAt(0, 0, 0);
-        // Active section index
-        const idx = Math.round(p * (totalPanels - 1));
-        if (idx !== activeMeshIndex){
-          setActiveSection(idx, navItems);
-        }
-      }
-    });
-  } else {
-    // ── MOBILE: native vertical scroll; horizontal track is stacked via CSS ──
-    document.body.style.overflow = 'auto';
-  }
-
-  // Seed initial state
   setActiveSection(0, navItems);
 }
 
 
-/* ───── ACTIVE SECTION HANDLER (nav + rotation strike + reveal) ───── */
-let section3Revealed = false;
-function setActiveSection(idx, navItems){
-  const prev = activeMeshIndex;
-  activeMeshIndex = idx;
-
-  // ── DYNAMIC THEME SWAP (light sections 2 & 3 / dark sections 1, 4, 5) ──
-  const body = document.body;
-  const isLight = (idx === 1 || idx === 2);
-  if (isLight){
-    gsap.to(body, { backgroundColor: '#f4f4f0', color: '#1a1a1a', duration: 0.6, overwrite: true });
-    gsap.to(scene.background, { r: 0.957, g: 0.957, b: 0.941, duration: 0.6 });
-    gsap.to(crimsonGlow, { intensity: 1.5, duration: 0.5 });
-    gsap.to(crimsonGlow.color, { r: 0.667, g: 0.667, b: 0.667, duration: 0.5 });
-  } else {
-    gsap.to(body, { backgroundColor: '#0d0d0d', color: '#f9f9f9', duration: 0.6, overwrite: true });
-    gsap.to(scene.background, { r: 0.051, g: 0.051, b: 0.051, duration: 0.6 });
-    gsap.to(crimsonGlow, { intensity: 4.0, duration: 0.5 });
-    gsap.to(crimsonGlow.color, { r: 0.773, g: 0.055, b: 0.122, duration: 0.5 });
-  }
-
-  // Nav active state (+ light-mode coloring on light sections)
-  navItems.forEach((item, i) => {
-    item.classList.toggle('active', i === idx);
-    item.classList.toggle('light-mode', isLight);
+/* ───── SECTION ACTIVATION (nav + masked reveal + 3D stage) ───── */
+const revealed = new Set();
+function revealPanel(idx){
+  if (revealed.has(idx)) return;
+  revealed.add(idx);
+  const panel = document.querySelector('.panel[data-section="'+idx+'"]');
+  if (!panel) return;
+  gsap.to(panel.querySelectorAll('.mask-inner'), {
+    yPercent: 0, duration: 1.0, stagger: 0.09, ease: 'power4.out'
   });
-
-  // Transition rotation strike — fast burst to the right on the entering mesh
-  if (idx !== prev && meshes[idx]){
-    gsap.to(meshes[idx].rotation, {
-      y: '+=' + (Math.PI * 0.5),
-      duration: 0.7,
-      ease: 'power3.out',
-      overwrite: false
-    });
-    // Pulse the crimson under-glow on each transition
-    gsap.fromTo(crimsonGlow, { intensity: 3.0 }, { intensity: 5.5, duration: 0.25, yoyo: true, repeat: 1 });
-  }
-
-  // Section 3 — letter-by-letter character reveal (once)
-  if (idx === 2 && !section3Revealed){
-    section3Revealed = true;
-    gsap.to('[data-section="2"] .char', {
-      opacity: 1, y: 0, duration: 0.02, stagger: 0.012, ease: 'none'
-    });
-  }
+}
+function setActiveSection(idx, navItems){
+  activeIdx = idx;
+  navItems = navItems || gsap.utils.toArray('.nav-item');
+  navItems.forEach((it,i)=> it.classList.toggle('active', i===idx));
+  revealPanel(idx);
+  if (!IS_MOBILE) showMesh(idx);
 }
 
+/* ───── SERVICE ACCORDION → tilt scales + crimson spotlight ───── */
+document.querySelectorAll('.service').forEach(item => {
+  const tilt = parseFloat(item.dataset.tilt || '0');
+  item.addEventListener('mouseenter', ()=>{
+    item.setAttribute('aria-expanded','true');
+    const j = meshes[1];
+    if (j && j.userData.bar){ gsap.to(j.userData.bar.rotation, { z: tilt, duration:0.5, ease:'power2.out' }); }
+    if (crimsonSpot) gsap.to(crimsonSpot, { intensity: 6, duration:0.4 });
+  });
+  item.addEventListener('mouseleave', ()=>{
+    item.setAttribute('aria-expanded','false');
+    const j = meshes[1];
+    if (j && j.userData.bar){ gsap.to(j.userData.bar.rotation, { z:0, duration:0.6, ease:'power2.out' }); }
+    if (crimsonSpot) gsap.to(crimsonSpot, { intensity: 0, duration:0.5 });
+  });
+  item.addEventListener('keydown', (e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); item.classList.toggle('open'); } });
+});
 
-/* ───── SECTION 2 SERVICE ITEMS → tilt Lady Justice balance bar ───── */
-document.querySelectorAll('.service-item').forEach((item, idx) => {
-  item.addEventListener('mouseenter', () => {
-    item.setAttribute('aria-expanded', 'true');
-    const justice = meshes[1];
-    if (justice){
-      const tilt = (idx - 2) * 0.18; // tilt scales based on which item
-      gsap.to(justice.children[2].rotation, { z: tilt, duration: 0.5, ease: 'power2.out' }); // balance bar
-      gsap.to(interactiveSpotlight, { intensity: 5.5, duration: 0.3 });
-    }
+/* ───── VERDICT HOVER → flex the iron bonds ───── */
+document.querySelectorAll('.verdict').forEach(card => {
+  card.addEventListener('mouseenter', ()=>{
+    const b = meshes[3];
+    if (b){ gsap.to(b.rotation, { y:'+='+(Math.PI*0.8), z:0.25, duration:0.6, ease:'power3.out' }); }
   });
-  item.addEventListener('mouseleave', () => {
-    item.setAttribute('aria-expanded', 'false');
-    const justice = meshes[1];
-    if (justice){
-      gsap.to(justice.children[2].rotation, { z: 0, duration: 0.6, ease: 'power2.out' });
-      gsap.to(interactiveSpotlight, { intensity: 0, duration: 0.5 });
-    }
-  });
-  // Keyboard accessibility
-  item.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' '){
-      e.preventDefault();
-      item.classList.toggle('active');
-    }
+  card.addEventListener('mouseleave', ()=>{
+    const b = meshes[3];
+    if (b) gsap.to(b.rotation, { z:0, duration:0.6, ease:'power2.out' });
   });
 });
 
 
-/* ───── VERDICT CARD HOVER → flex the Iron Bonds ───── */
-document.querySelectorAll('.verdict-card').forEach(card => {
-  card.addEventListener('mouseenter', () => {
-    const bonds = meshes[3];
-    if (bonds){
-      gsap.to(bonds.rotation, { y: '+=' + (Math.PI * 0.8), z: 0.25, duration: 0.6, ease: 'power3.out' });
-      gsap.to(bonds.scale, { x: 1.08, y: 1.08, z: 1.08, duration: 0.4, yoyo: true, repeat: 1 });
-    }
-  });
-  card.addEventListener('mouseleave', () => {
-    const bonds = meshes[3];
-    if (bonds) gsap.to(bonds.rotation, { z: 0, duration: 0.6, ease: 'power2.out' });
-  });
-});
-
-/* ───── SECTION 5 — INTAKE SUBMIT HANDLER ───── */
-function handleIntakeSubmit(){
-  const name = document.getElementById('intake-name').value.trim();
-  const email = document.getElementById('intake-email').value.trim();
-  const scope = document.getElementById('intake-scope').value;
-
+/* ───── INTAKE SUBMIT ───── */
+document.getElementById('intake-submit').addEventListener('click', ()=>{
+  const name = document.getElementById('f-name').value.trim();
+  const email = document.getElementById('f-email').value.trim();
+  const scope = document.getElementById('f-scope').value;
+  const form = document.getElementById('intake-form');
   if (!name || !email || !scope){
-    // Shake the form frame
-    gsap.to('.intake-form-frame', { x: -6, duration: 0.08, repeat: 5, yoyo: true, ease: 'none', onComplete: () => gsap.set('.intake-form-frame', { x: 0 }) });
+    gsap.fromTo(form, { x:-6 }, { x:0, duration:0.45, ease:'elastic.out(1,0.3)' });
     return;
   }
-
-  // Float all meshes away
-  meshes.forEach((m, i) => {
-    gsap.to(m.position, { z: -8, duration: 1.2, delay: i * 0.1, ease: 'power3.in' });
-  });
-
-  // Show success message
-  const btn = document.querySelector('.intake-submit');
-  btn.textContent = 'Mandate Received. ✓';
+  if (meshes[4]) gsap.to(meshes[4].position, { z:-10, y:5, duration:1.1, ease:'power3.in' });
+  const btn = document.getElementById('intake-submit');
+  btn.textContent = 'Mandate Received ✓';
   btn.style.pointerEvents = 'none';
   btn.style.background = '#1c4a1c';
-}
+});
 
-/* ───── VERTICAL NAV CLICK → jump to section ───── */
-document.querySelectorAll('.nav-item').forEach(item => {
-  item.addEventListener('click', () => {
-    const target = parseInt(item.dataset.index, 10);
-    const spacer = document.getElementById('scroll-spacer');
-    if (!spacer) return;
-    const totalPanels = document.querySelectorAll('.section-panel').length;
-    const rect = spacer.getBoundingClientRect();
-    const totalScroll = spacer.offsetHeight - window.innerHeight;
-    const y = window.scrollY + rect.top + (totalScroll * (target / (totalPanels - 1)));
-    if (window.__lenis){
-      window.__lenis.scrollTo(y, { duration: 1.4 });
-    } else {
-      window.scrollTo({ top: y, behavior: 'smooth' });
-    }
+/* ───── NAV NAVIGATION ───── */
+function scrollToSection(target){
+  const spacer = document.getElementById('scroll-spacer');
+  if (!spacer || !window.__lenis){ return; }
+  const totalScroll = spacer.offsetHeight - window.innerHeight;
+  window.__lenis.scrollTo(totalScroll * (target/(totalPanels-1)), { duration:1.5 });
+}
+document.querySelectorAll('.nav-item').forEach(it=>{
+  it.addEventListener('click', ()=> scrollToSection(parseInt(it.dataset.index,10)));
+});
+document.querySelectorAll('.nav-jump').forEach(a=>{
+  a.addEventListener('click', (e)=>{
+    // Desktop: smooth Lenis jump. Mobile: let the native #anchor work.
+    if (window.__lenis){ e.preventDefault(); scrollToSection(parseInt(a.dataset.target,10)); }
   });
 });
 
-
-/* ───── INITIAL CHAR STATE for reveal-text (set after split) ───── */
-ScrollTrigger.addEventListener('refreshInit', () => {
-  gsap.set('.char', { y: 8 });
+/* ───── RESIZE ───── */
+window.addEventListener('resize', ()=>{
+  if (renderer && camera){
+    camera.aspect = window.innerWidth/window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  }
+  ScrollTrigger.refresh();
 });
 </script>
 </body>
